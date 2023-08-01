@@ -43,7 +43,8 @@
     "react-window": "^1.8.9",
     "sass": "^1.63.6",
     "simple-update-notifier": "^2.0.0",
-    "sort-by": "^1.2.0"
+    "sort-by": "^1.2.0",
+    "vite-plugin-monaco-editor": "^1.1.0"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^7.0.27",
