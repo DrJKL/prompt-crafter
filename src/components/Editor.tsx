@@ -13,6 +13,7 @@ export function Editor(_props: EditorProps = {}) {
   return (
     <>
       <MonacoEditor
+        theme="vs-dark"
         onChange={handleEditorChange}
         language="yaml"></MonacoEditor>
     </>
