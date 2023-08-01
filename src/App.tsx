@@ -1,4 +1,5 @@
 import { AppBar, CssBaseline, Toolbar, Typography } from '@mui/material';
+import { Editor } from './components/Editor';
 function App() {
   return (
     <>
@@ -15,7 +16,9 @@ function App() {
           </Toolbar>
         </AppBar>
         <Toolbar />
-        <main className="p-4">Main stuff</main>
+        <main className="p-4">
+          <Editor />
+        </main>
       </div>
     </>
   );
