@@ -2,7 +2,7 @@
 
 ## Local Storage
 
-- [ ] Save current prompt to local storage
+- [x] Save current prompt to local storage
 - [ ] Save history to local storage
 - [ ] Allow deleting history items
 
