@@ -1,21 +1,18 @@
-import MonacoEditor from '@monaco-editor/react';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import MonacoEditor, { EditorProps } from '@monaco-editor/react';
+import _ from 'lodash';
 
-export interface EditorProps {}
+const DEFAULT_OPTIONS: EditorProps = {
+  theme: 'vs-dark',
+  options: { minimap: { enabled: false }, wordWrap: 'wordWrapColumn' },
+  language: 'sdprompt',
+};
 
-export function Editor(_props: EditorProps = {}) {
-  function handleEditorChange(
-    value: string | undefined,
-    _event: monaco.editor.IModelContentChangedEvent,
-  ) {
-    console.log(value);
-  }
+export function Editor(props: EditorProps = {}) {
+  const withDefaults = _.merge({}, DEFAULT_OPTIONS, props);
+
   return (
     <>
-      <MonacoEditor
-        theme="vs-dark"
-        onChange={handleEditorChange}
-        language="yaml"></MonacoEditor>
+      <MonacoEditor {...withDefaults}></MonacoEditor>
     </>
   );
 }
