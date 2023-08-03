@@ -1,4 +1,4 @@
-import MonacoEditor, { EditorProps, useMonaco } from '@monaco-editor/react';
+import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import _ from 'lodash';
 
 const DEFAULT_OPTIONS: EditorProps = {
