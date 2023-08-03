@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <script>self["MonacoEnvironment"] = (function (paths) {
+          return {
+            globalAPI: false,
+            getWorkerUrl : function (moduleId, label) {
+              var result =  paths[label];
+              if (/^((http:)|(https:)|(file:)|(\/\/))/.test(result)) {
+                var currentUrl = String(window.location);
+                var currentOrigin = currentUrl.substr(0, currentUrl.length - window.location.hash.length - window.location.search.length - window.location.pathname.length);
+                if (result.substring(0, currentOrigin.length) !== currentOrigin) {
+                  var js = '/*' + label + '*/importScripts("' + result + '");';
+                  var blob = new Blob([js], { type: 'application/javascript' });
+                  return URL.createObjectURL(blob);
+                }
+              }
+              return result;
+            }
+          };
+        })({
+  "editorWorkerService": "/prompt-crafter/monacoeditorwork/editor.worker.bundle.js",
+  "css": "/prompt-crafter/monacoeditorwork/css.worker.bundle.js",
+  "html": "/prompt-crafter/monacoeditorwork/html.worker.bundle.js",
+  "json": "/prompt-crafter/monacoeditorwork/json.worker.bundle.js",
+  "typescript": "/prompt-crafter/monacoeditorwork/ts.worker.bundle.js",
+  "javascript": "/prompt-crafter/monacoeditorwork/ts.worker.bundle.js",
+  "less": "/prompt-crafter/monacoeditorwork/css.worker.bundle.js",
+  "scss": "/prompt-crafter/monacoeditorwork/css.worker.bundle.js",
+  "handlebars": "/prompt-crafter/monacoeditorwork/html.worker.bundle.js",
+  "razor": "/prompt-crafter/monacoeditorwork/html.worker.bundle.js"
+});</script>
+
+      <meta charset="UTF-8" />
+      <meta name="viewport"
+            content="width=device-width, initial-scale=1.0" />
+      <title>Prompt Crafter</title>
+  <script type="module" crossorigin src="/prompt-crafter/assets/index-4131e540.js"></script>
+  <link rel="stylesheet" href="/prompt-crafter/assets/index-7e948789.css">
+</head>
+
+<body>
+      <div id="root"
+           class="contents"></div>
+      
+</body>
+
+</html>
