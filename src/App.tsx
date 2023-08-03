@@ -35,10 +35,8 @@ function App() {
     }
   }
   function splitOnCommas(prompt: string) {
-    return prompt.split(/\s*,\s*/);
+    return prompt.split(/\s*,\s*/).map((s) => s.trim());
   }
-
-  editorRef.current?.layout();
 
   return (
     <>
