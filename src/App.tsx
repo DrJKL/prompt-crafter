@@ -1,8 +1,9 @@
 import { AppBar, CssBaseline, Paper, Toolbar, Typography } from '@mui/material';
 import { Editor } from './components/Editor';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMonaco } from '@monaco-editor/react';
 import { conf, language } from './common/sdprompt_monaco';
+import monaco from 'monaco-editor';
 function App() {
   const [promptText, setPromptText] = useState(
     localStorage.getItem('pc.active_prompt') ?? '',
@@ -22,6 +23,12 @@ function App() {
     localStorage.setItem('pc.active_prompt', promptText);
   }, [promptText]);
 
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+
+  function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
+    editorRef.current = editor;
+  }
+
   function handleEditorTextChange(value: string | undefined) {
     if (value) {
       setPromptText(value);
@@ -31,11 +38,13 @@ function App() {
     return prompt.split(/\s*,\s*/);
   }
 
+  editorRef.current?.layout();
+
   return (
     <>
       <CssBaseline />
-      <div className="grid grid-cols-1 grid-rows-[auto_1fr]">
-        <AppBar classes="grid">
+      <div className="h-full grid grid-cols-1 grid-rows-[auto_minmax(0,_1fr)]">
+        <AppBar>
           <Toolbar className="flex flex-auto justify-between">
             <Typography
               className="flex-auto select-none"
@@ -55,15 +64,15 @@ function App() {
         <main className="grid grid-cols-2 grid-rows-1 p-4 gap-4">
           <Paper elevation={16}>
             <Editor
-              options={{ padding: { top: 1 }, automaticLayout: true }}
+              onMount={handleEditorDidMount}
               defaultValue={promptText}
               onChange={handleEditorTextChange}
             />
           </Paper>
           <Paper elevation={16}>
-            <div className="whitespace-pre-wrap p-4">
-              {splitOnCommas(promptText).map((segment) => (
-                <div>{segment}</div>
+            <div className="overflow-y-auto h-full whitespace-pre-wrap p-4">
+              {splitOnCommas(promptText).map((segment, idx) => (
+                <div key={`segment-${idx}`}>{segment}</div>
               ))}
             </div>
           </Paper>
