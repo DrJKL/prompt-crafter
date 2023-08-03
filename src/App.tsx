@@ -1,4 +1,4 @@
-import { AppBar, CssBaseline, Toolbar, Typography } from '@mui/material';
+import { AppBar, CssBaseline, Paper, Toolbar, Typography } from '@mui/material';
 import { Editor } from './components/Editor';
 import { useEffect, useState } from 'react';
 import { useMonaco } from '@monaco-editor/react';
@@ -28,7 +28,7 @@ function App() {
     }
   }
   function splitOnCommas(prompt: string) {
-    return prompt.split(/\s*,\s*/).join('\n');
+    return prompt.split(/\s*,\s*/);
   }
 
   return (
@@ -37,11 +37,14 @@ function App() {
       <div className="grid grid-cols-1 grid-rows-[auto_1fr]">
         <AppBar classes="grid">
           <Toolbar className="flex flex-auto justify-between">
-            <Typography className="flex-auto" variant="h5" color="initial">
+            <Typography
+              className="flex-auto select-none"
+              variant="h5"
+              color="initial">
               Prompt Crafter
             </Typography>
             <Typography
-              className="flex-auto text-right"
+              className="flex-auto text-right select-none"
               variant="body1"
               color="initial">
               v0.0.1
@@ -49,9 +52,21 @@ function App() {
           </Toolbar>
         </AppBar>
         <Toolbar />
-        <main className="grid grid-cols-2 grid-rows-1 p-4">
-          <Editor defaultValue={promptText} onChange={handleEditorTextChange} />
-          <div className="whitespace-pre-wrap">{splitOnCommas(promptText)}</div>
+        <main className="grid grid-cols-2 grid-rows-1 p-4 gap-4">
+          <Paper elevation={16}>
+            <Editor
+              options={{ padding: { top: 1 }, automaticLayout: true }}
+              defaultValue={promptText}
+              onChange={handleEditorTextChange}
+            />
+          </Paper>
+          <Paper elevation={16}>
+            <div className="whitespace-pre-wrap p-4">
+              {splitOnCommas(promptText).map((segment) => (
+                <div>{segment}</div>
+              ))}
+            </div>
+          </Paper>
         </main>
       </div>
     </>
