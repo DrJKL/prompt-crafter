@@ -85,7 +85,7 @@ function App() {
               <Typography variant="h6" className="pl-6">
                 Parsed
               </Typography>
-              <div className="overflow-y-auto h-full whitespace-pre-wrap p-4">
+              <div className="overflow-y-auto h-full whitespace-pre-wrap p-4 pl-6">
                 {splitOnCommas(promptText).map((segment, idx) => (
                   <div key={`segment-${idx}`}>{segment}</div>
                 ))}
