@@ -7,8 +7,8 @@ const DEFAULT_OPTIONS: EditorProps = {
     padding: { top: 16 },
     minimap: { enabled: false },
     automaticLayout: true,
-    scrollBeyondLastLine: false,
-    wordWrap: 'wordWrapColumn',
+    // scrollBeyondLastLine: false,
+    wordWrap: 'on',
   },
   language: 'sdprompt',
 };
