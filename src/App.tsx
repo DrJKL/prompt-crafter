@@ -1,4 +1,4 @@
-import { AppBar, CssBaseline, Paper, Toolbar, Typography } from '@mui/material';
+import { AppBar, CssBaseline, Toolbar, Typography } from '@mui/material';
 import { Editor } from './components/Editor';
 import { useEffect, useRef, useState } from 'react';
 import { useMonaco } from '@monaco-editor/react';
@@ -13,11 +13,13 @@ import {
   Top,
   ViewPort,
 } from 'react-spaces';
+import { basicPromptLexer } from './common/sdprompt_lexer';
 
 function App() {
   const [promptText, setPromptText] = useState(
     localStorage.getItem('pc.active_prompt') ?? '',
   );
+  const [typeOrValue, setTypeOrValue] = useState(false);
   const monaco = useMonaco();
 
   useEffect(() => {
@@ -47,6 +49,12 @@ function App() {
   function splitOnCommas(prompt: string) {
     return prompt.split(/\s*,\s*/).map((s) => s.trim());
   }
+  function tokensView(prompt: string) {
+    basicPromptLexer.reset(prompt);
+    return Array.from(basicPromptLexer).map((token) => (
+      <span>{typeOrValue ? `${token.type} ` : token.value}</span>
+    ));
+  }
 
   return (
     <>
@@ -61,6 +69,15 @@ function App() {
                 component="h1">
                 Prompt Crafter
               </Typography>
+              <span>
+                <input
+                  type="checkbox"
+                  name=""
+                  id=""
+                  checked={typeOrValue}
+                  onChange={(event) => setTypeOrValue(event.target.checked)}
+                />
+              </span>
               <Typography
                 className="flex-auto text-right select-none"
                 variant="subtitle1">
@@ -71,9 +88,6 @@ function App() {
         </Top>
         <Fill className="p-4 pb-10">
           <LeftResizable size="50%">
-            <Typography variant="h6" className="pl-6">
-              Editor
-            </Typography>
             <Editor
               onMount={handleEditorDidMount}
               defaultValue={promptText}
@@ -82,17 +96,17 @@ function App() {
           </LeftResizable>
           <Fill>
             <Fill>
-              <Typography variant="h6" className="pl-6">
-                Parsed
-              </Typography>
               <div className="overflow-y-auto h-full whitespace-pre-wrap p-4 pl-6">
-                {splitOnCommas(promptText).map((segment, idx) => (
-                  <div key={`segment-${idx}`}>{segment}</div>
-                ))}
+                {/*
+                  splitOnCommas(promptText).map((segment, idx) => (
+                    <div key={`segment-${idx}`}>{segment}</div>
+                  ))
+                  //*/}
+                {tokensView(promptText)}
               </div>
             </Fill>
             <BottomResizable
-              size="20%"
+              size="0%"
               className="bg-blue-600 p-2 text-xl font-mono">
               <Typography variant="h6" component="h2" className="pl-6">
                 Saved
@@ -100,9 +114,9 @@ function App() {
             </BottomResizable>
           </Fill>
         </Fill>
-        <Bottom size={'2rem'} centerContent={CenterType.HorizontalVertical}>
+        {/* <Bottom size={'2rem'} centerContent={CenterType.HorizontalVertical}>
           Footer
-        </Bottom>
+        </Bottom> */}
       </ViewPort>
     </>
   );
