@@ -19,4 +19,15 @@ describe('basicPromptLexer', () => {
         .join(' '),
     );
   });
+  it('should handle bounds', () => {
+    const prompt = `
+      {2-4$$lone twisted tree | winding river| mountain peak| crumbling ruins| abandoned cabin|wooden fence | dramatic cliffs | stormy sea | rolling thunder | howling wind | foggy moor | charred forest | broken-down cart| towering dunes | parched canyon | bone-strewn pit | petrified woods| wrecked galleon | beast's den| majestic waterfall | calm lake | moonlit trail  | moss-covered stones | misty vale |ravaged battlefield | derelict mill}   
+   `;
+    basicPromptLexer.reset(prompt);
+    console.log(
+      Array.from(basicPromptLexer)
+        .map((t) => t.type)
+        .join(' '),
+    );
+  });
 });
