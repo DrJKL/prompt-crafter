@@ -1,8 +1,10 @@
 @preprocessor typescript
 @{%
+    // eslint-disable
+    // @ts-nocheck
     import {basicPromptLexer} from './sdprompt_lexer';
-    const tag = (key) => (data) => [key, ...data.flat()]; 
-    const unwrap = (data) => data[0][0];
+    const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
+    const unwrap = (data: any[]) => data[0][0];
     const DEFAULT_BOUND = {
         min: "1",
         max: "1",
@@ -10,8 +12,6 @@
 %}
 
 @lexer basicPromptLexer
-main                     -> (prompt | variant_prompt) {% unwrap %}
-
 variant_prompt           -> variant_chunk:* {% id %}
 
 variant_chunk            -> (variants | wildcard | variant_literal_sequence) {% unwrap %}

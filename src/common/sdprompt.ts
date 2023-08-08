@@ -14,9 +14,11 @@ declare var wildcard_enclosure: any;
 declare var path: any;
 declare var variant_literal: any;
 
+    // eslint-disable
+    // @ts-nocheck
     import {basicPromptLexer} from './sdprompt_lexer';
-    const tag = (key) => (data) => [key, ...data.flat()]; 
-    const unwrap = (data) => data[0][0];
+    const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
+    const unwrap = (data: any[]) => data[0][0];
     const DEFAULT_BOUND = {
         min: "1",
         max: "1",
@@ -52,9 +54,6 @@ interface Grammar {
 const grammar: Grammar = {
   Lexer: basicPromptLexer,
   ParserRules: [
-    {"name": "main$subexpression$1", "symbols": ["prompt"]},
-    {"name": "main$subexpression$1", "symbols": ["variant_prompt"]},
-    {"name": "main", "symbols": ["main$subexpression$1"], "postprocess": unwrap},
     {"name": "variant_prompt$ebnf$1", "symbols": []},
     {"name": "variant_prompt$ebnf$1", "symbols": ["variant_prompt$ebnf$1", "variant_chunk"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "variant_prompt", "symbols": ["variant_prompt$ebnf$1"], "postprocess": id},
@@ -106,7 +105,7 @@ const grammar: Grammar = {
     {"name": "variant_literal_sequence$ebnf$1", "symbols": ["variant_literal_sequence$ebnf$1", "variant_literal_sequence$ebnf$1$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "variant_literal_sequence", "symbols": ["variant_literal_sequence$ebnf$1"], "postprocess": unwrap}
   ],
-  ParserStart: "main",
+  ParserStart: "variant_prompt",
 };
 
 export default grammar;
