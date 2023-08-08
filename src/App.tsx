@@ -130,7 +130,7 @@ function App() {
               <Typography
                 className="flex-auto text-right select-none"
                 variant="subtitle1">
-                v0.0.1
+                v0.0.2
               </Typography>
             </Toolbar>
           </AppBar>

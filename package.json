@@ -9,6 +9,7 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest",
     "preview": "vite preview",
+    "deploy": "gh-pages -d dist",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "build-nearly-sdprompt": "nearleyc .\\src\\common\\sdprompt.ne -o .\\src\\common\\sdprompt.ts",
