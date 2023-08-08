@@ -6,7 +6,7 @@ import {
   IconButton,
   Select,
   MenuItem,
-  SelectProps,
+  SelectChangeEvent,
 } from '@mui/material';
 import { Editor } from './components/Editor';
 import { useEffect, useRef, useState } from 'react';
@@ -59,6 +59,21 @@ function App() {
       setPromptText(value);
     }
   }
+
+  function isRenderType(typeMaybe: unknown): typeMaybe is RenderType {
+    return (
+      typeof typeMaybe === 'string' &&
+      RENDER_TYPES.some((type) => type === typeMaybe)
+    );
+  }
+
+  function handleDisplayTypeChange(event: SelectChangeEvent<RenderType>) {
+    const value: unknown = event.target.value;
+    if (isRenderType(value)) {
+      setTypeOrValue(value);
+    }
+  }
+
   function rotateSelect() {
     const currentRender = RENDER_TYPES.indexOf(typeOrValue);
     setTypeOrValue(RENDER_TYPES[(currentRender + 1) % RENDER_TYPES.length]);
@@ -103,7 +118,7 @@ function App() {
                 <Select
                   name="display-type"
                   value={typeOrValue}
-                  onChange={(event) => setTypeOrValue(event.target.value)}>
+                  onChange={handleDisplayTypeChange}>
                   <MenuItem value="raw">Raw</MenuItem>
                   <MenuItem value="tokens">Tokens</MenuItem>
                   <MenuItem value="parsed">Parsed</MenuItem>
