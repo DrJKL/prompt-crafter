@@ -38,5 +38,4 @@ in the style of
 Frazetta| John Constable |J.C. Dahl }   
 and
 {1-2$$James Gurney | Craig Mullins| Android Jones |Justin Maller | John Berkey| Roger Dean| Rodney Matthews | Chris Foss| Nicolas Roeg | Geoffrey Hayes | John Harris| Dinotopia| Jon Foster| Brom| Brian Froud | Alan Lee},
-
 `;
