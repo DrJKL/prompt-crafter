@@ -10,7 +10,12 @@
     "test": "vitest",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "build-nearly-sdprompt": "nearleyc .\\src\\common\\sdprompt.ne -o .\\src\\common\\sdprompt.ts",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "build-nearly-sdprompt": "src/common/sdprompt.ne"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -78,6 +83,7 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "eslint-plugin-storybook": "^0.6.12",
     "gh-pages": "^5.0.0",
+    "npm-watch": "^0.11.0",
     "postcss": "^8.4.21",
     "prop-types": "^15.8.1",
     "storybook": "^7.0.27",
