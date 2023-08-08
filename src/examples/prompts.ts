@@ -1,5 +1,8 @@
 import dedent from 'dedent';
 
+/**
+ * https://lemmy.dbzer0.com/post/1352473
+ */
 export const LANDSCAPE_VERY_DYNAMIC = dedent`
 {cinematic shot | establishing shot | intimate scene | sweeping grandeur},(21:9 aspect ratio)
 
