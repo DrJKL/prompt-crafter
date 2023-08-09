@@ -7,6 +7,8 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { Editor } from './components/Editor';
 import { useEffect, useRef, useState } from 'react';
@@ -145,15 +147,21 @@ function App() {
                 component="h1">
                 Prompt Crafter
               </Typography>
-              <span>
-                <Select
-                  name="display-type"
-                  value={typeOrValue}
-                  onChange={handleDisplayTypeChange}>
-                  <MenuItem value="raw">Raw</MenuItem>
-                  <MenuItem value="tokens">Tokens</MenuItem>
-                  <MenuItem value="parsed">Parsed</MenuItem>
-                </Select>
+              <span className="flex flex-1">
+                <FormControl size="small" className="flex-1">
+                  <InputLabel>Render Type</InputLabel>
+                  <Select
+                    label="Render Type"
+                    name="display-type"
+                    value={typeOrValue}
+                    autoWidth={true}
+                    onChange={handleDisplayTypeChange}>
+                    <MenuItem value="raw">Raw</MenuItem>
+                    <MenuItem value="tokens">Tokens</MenuItem>
+                    <MenuItem value="parsed">Parsed</MenuItem>
+                  </Select>
+                </FormControl>
+
                 <IconButton aria-label="" onClick={rotateSelect}>
                   <NavigateNext />
                 </IconButton>
