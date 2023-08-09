@@ -1,15 +1,4 @@
-import {
-  AppBar,
-  CssBaseline,
-  Toolbar,
-  Typography,
-  IconButton,
-  Select,
-  MenuItem,
-  SelectChangeEvent,
-  FormControl,
-  InputLabel,
-} from '@mui/material';
+import { CssBaseline, Typography, SelectChangeEvent } from '@mui/material';
 import { Editor } from './components/Editor';
 import { useEffect, useRef, useState } from 'react';
 import { useMonaco } from '@monaco-editor/react';
@@ -24,17 +13,20 @@ import {
   Top,
   ViewPort,
 } from 'react-spaces';
-import { HistoryEdu, NavigateNext } from '@mui/icons-material';
+import { HistoryEdu } from '@mui/icons-material';
 import { basicPromptLexer } from './common/sdprompt_lexer';
 import grammar from './common/sdprompt';
 import { Grammar, Parser } from 'nearley';
+import { PromptCrafterAppBar } from './components/PromptCrafterAppBar';
+import {
+  RenderType,
+  isRenderType,
+  nextType,
+} from './common/rendering/RenderType';
 
 /** LocalStorage keys */
 const keyActivePrompt = 'pc.active_prompt';
 const keyRenderType = 'pc.prompt_render_type';
-
-const RENDER_TYPES = ['raw', 'tokens', 'parsed'] as const;
-type RenderType = (typeof RENDER_TYPES)[number];
 
 function getRenderTypeFromLocalStorage(): RenderType {
   const currentValue = localStorage.getItem(keyRenderType);
@@ -43,14 +35,6 @@ function getRenderTypeFromLocalStorage(): RenderType {
   }
   return 'raw';
 }
-
-function isRenderType(typeMaybe: unknown): typeMaybe is RenderType {
-  return (
-    typeof typeMaybe === 'string' &&
-    RENDER_TYPES.some((type) => type === typeMaybe)
-  );
-}
-
 function App() {
   const [promptText, setPromptText] = useState(
     localStorage.getItem(keyActivePrompt) ?? '',
@@ -60,13 +44,13 @@ function App() {
     localStorage.setItem(keyActivePrompt, promptText);
   }, [promptText]);
 
-  const [typeOrValue, setTypeOrValue] = useState<RenderType>(
+  const [renderType, setRenderType] = useState<RenderType>(
     getRenderTypeFromLocalStorage(),
   );
 
   useEffect(() => {
-    localStorage.setItem(keyRenderType, typeOrValue);
-  }, [typeOrValue]);
+    localStorage.setItem(keyRenderType, renderType);
+  }, [renderType]);
 
   const monaco = useMonaco();
 
@@ -94,18 +78,17 @@ function App() {
   function handleDisplayTypeChange(event: SelectChangeEvent<RenderType>) {
     const value: unknown = event.target.value;
     if (isRenderType(value)) {
-      setTypeOrValue(value);
+      setRenderType(value);
     }
   }
 
   function rotateSelect() {
-    const currentRender = RENDER_TYPES.indexOf(typeOrValue);
-    setTypeOrValue(RENDER_TYPES[(currentRender + 1) % RENDER_TYPES.length]);
+    setRenderType(nextType(renderType));
   }
 
   function tokensView(prompt: string) {
     basicPromptLexer.reset(prompt);
-    switch (typeOrValue) {
+    switch (renderType) {
       case 'raw':
         return Array.from(basicPromptLexer).map((token) => (
           <span>{token.value}</span>
@@ -139,40 +122,11 @@ function App() {
       <CssBaseline />
       <ViewPort>
         <Top size={64}>
-          <AppBar position="static">
-            <Toolbar className="flex flex-auto justify-between">
-              <Typography
-                className="flex-auto select-none"
-                variant="h5"
-                component="h1">
-                Prompt Crafter
-              </Typography>
-              <span className="flex flex-1">
-                <FormControl size="small" className="flex-1">
-                  <InputLabel>Render Type</InputLabel>
-                  <Select
-                    label="Render Type"
-                    name="display-type"
-                    value={typeOrValue}
-                    autoWidth={true}
-                    onChange={handleDisplayTypeChange}>
-                    <MenuItem value="raw">Raw</MenuItem>
-                    <MenuItem value="tokens">Tokens</MenuItem>
-                    <MenuItem value="parsed">Parsed</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <IconButton aria-label="" onClick={rotateSelect}>
-                  <NavigateNext />
-                </IconButton>
-              </span>
-              <Typography
-                className="flex-auto text-right select-none"
-                variant="subtitle1">
-                v0.0.2
-              </Typography>
-            </Toolbar>
-          </AppBar>
+          <PromptCrafterAppBar
+            renderType={renderType}
+            handleDisplayTypeChange={handleDisplayTypeChange}
+            rotateSelect={rotateSelect}
+          />
         </Top>
         <Fill className="p-4 pb-10">
           <LeftResizable size="50%">
