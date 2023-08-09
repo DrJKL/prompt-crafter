@@ -3,7 +3,12 @@
     // eslint-disable
     // @ts-nocheck
     import {basicPromptLexer} from './sdprompt_lexer';
-    const DEFAULT_BOUND = {
+    import {Token} from 'moo';
+    interface Bound {
+        min: string;
+        max: string;
+    }
+    const DEFAULT_BOUND: Bound = {
         min: "1",
         max: "1",
     };
@@ -11,43 +16,43 @@
     const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
     const unwrap = (data: any[]) => data[0][0];
     
-    function wrapVariants(data: any[]) {
+    function wrapVariants([,bound, variants]: [unknown, Bound|undefined, string[]]) {
         return {
             type: 'variants',
-            bound: data[1] ?? DEFAULT_BOUND,
-            variants: data[2],
+            bound: bound ?? DEFAULT_BOUND,
+            variants,
         };
     }
-    function flattenVariantsList(data: any[]) {
-        return [data[0][0], ...data[1]];
+
+    function flattenVariantsList([firstVariant, restOfVariants]: any[]) {
+        return [firstVariant[0], ...restOfVariants];
     }
-    function lexerValue(data: any[]) {
-        return data[0].value;
-    }
-    function constructLiteral(data: any[]) {
+
+    function constructLiteral([literalToken]: [Token]) {
         return {
             type: 'literal',
-            value: data[0].value,
+            value: literalToken.value,
         }
     }
-    function constructBound(data: any[]) {
+
+    function constructBound([minToken, maxToken]: [Token, Token]) {
         return ({
             type: 'bound',
-            min: data[0].value,
-            max: data[1].value ?? data[0].value,
+            min: minToken.value,
+            max: maxToken?.value ?? minToken.value,
         });
     }
-    function constructWildcard(data: any[]) {
+    function constructWildcard([,wildcardPath]: [unknown, Token]) {
         return {
             type: 'wildcard',
-            path: data[1],
+            path: wildcardPath,
         };
     }
 
 %}
 
 @lexer basicPromptLexer
-variant_prompt           -> (variant_chunk {% id %}):* {% id %}
+variant_prompt           -> (variant_chunk {% id %}):*                                        {% id %}
 
 variant_chunk            -> (variants | wildcard | variant_literal_sequence)                  {% unwrap %}
 variants                 -> %lmoustache bound:? variants_list:?  %rmoustache                  {% wrapVariants %}
@@ -58,4 +63,4 @@ weight                   -> %number | %integer                                  
 bound                    -> %integer (%dash %integer {% data => data[1] %}):? %dollar %dollar {% constructBound %}
 
 wildcard                 -> %wildcard_enclosure %path %wildcard_enclosure                     {% constructWildcard %}
-variant_literal_sequence -> (%variant_literal {% constructLiteral %}):+                             {% unwrap %}
+variant_literal_sequence -> (%variant_literal {% constructLiteral %}):+                       {% unwrap %}
