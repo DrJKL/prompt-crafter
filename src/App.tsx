@@ -119,8 +119,17 @@ function App() {
 
   function parseView(prompt: string) {
     const parser = new Parser(Grammar.fromCompiled(grammar));
-    parser.feed(prompt);
-    return JSON.stringify(parser.results, null, 2);
+    try {
+      parser.feed(prompt);
+      return JSON.stringify(parser.results, null, 2);
+    } catch (error: unknown) {
+      return (
+        <div>
+          <h1>Failed to parse</h1>
+          <div>{`${error}`}</div>
+        </div>
+      );
+    }
   }
 
   return (
