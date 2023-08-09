@@ -17,7 +17,6 @@ declare var variant_literal: any;
     // eslint-disable
     // @ts-nocheck
     import {basicPromptLexer} from './sdprompt_lexer';
-    import {Token} from 'moo';
     interface Bound {
         min: string;
         max: string;
@@ -30,7 +29,7 @@ declare var variant_literal: any;
     const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
     const unwrap = (data: any[]) => data[0][0];
     
-    function wrapVariants([,bound, variants]: [unknown, Bound|undefined, string[]]) {
+    function wrapVariants([,bound, variants]: any[]) {
         return {
             type: 'variants',
             bound: bound ?? DEFAULT_BOUND,
@@ -42,21 +41,21 @@ declare var variant_literal: any;
         return [firstVariant[0], ...restOfVariants];
     }
 
-    function constructLiteral([literalToken]: [Token]) {
+    function constructLiteral([literalToken]: any[]) {
         return {
             type: 'literal',
             value: literalToken.value,
         }
     }
 
-    function constructBound([minToken, maxToken]: [Token, Token]) {
+    function constructBound([minToken, maxToken]: any[]) {
         return ({
             type: 'bound',
             min: minToken.value,
             max: maxToken?.value ?? minToken.value,
         });
     }
-    function constructWildcard([,wildcardPath]: [unknown, Token]) {
+    function constructWildcard([,wildcardPath]: any[]) {
         return {
             type: 'wildcard',
             path: wildcardPath,
