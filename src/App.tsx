@@ -14,15 +14,13 @@ import {
   ViewPort,
 } from 'react-spaces';
 import { HistoryEdu } from '@mui/icons-material';
-import { basicPromptLexer } from './common/sdprompt_lexer';
-import grammar from './common/sdprompt';
-import { Grammar, Parser } from 'nearley';
 import { PromptCrafterAppBar } from './components/PromptCrafterAppBar';
 import {
   RenderType,
   isRenderType,
   nextType,
 } from './common/rendering/RenderType';
+import { tokensView } from './common/rendering/PromptRender';
 
 /** LocalStorage keys */
 const keyActivePrompt = 'pc.active_prompt';
@@ -30,29 +28,26 @@ const keyRenderType = 'pc.prompt_render_type';
 
 function getRenderTypeFromLocalStorage(): RenderType {
   const currentValue = localStorage.getItem(keyRenderType);
-  if (isRenderType(currentValue)) {
-    return currentValue;
-  }
-  return 'raw';
+  return isRenderType(currentValue) ? currentValue : 'raw';
 }
+
 function App() {
   const [promptText, setPromptText] = useState(
     localStorage.getItem(keyActivePrompt) ?? '',
   );
+  const [renderType, setRenderType] = useState<RenderType>(
+    getRenderTypeFromLocalStorage(),
+  );
+  const monaco = useMonaco();
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   useEffect(() => {
     localStorage.setItem(keyActivePrompt, promptText);
   }, [promptText]);
 
-  const [renderType, setRenderType] = useState<RenderType>(
-    getRenderTypeFromLocalStorage(),
-  );
-
   useEffect(() => {
     localStorage.setItem(keyRenderType, renderType);
   }, [renderType]);
-
-  const monaco = useMonaco();
 
   useEffect(() => {
     if (!monaco) {
@@ -62,8 +57,6 @@ function App() {
     monaco.languages.setLanguageConfiguration('sdprompt', conf);
     monaco.languages.setMonarchTokensProvider('sdprompt', language);
   }, [monaco]);
-
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
     editorRef.current = editor;
@@ -84,37 +77,6 @@ function App() {
 
   function rotateSelect() {
     setRenderType(nextType(renderType));
-  }
-
-  function tokensView(prompt: string) {
-    basicPromptLexer.reset(prompt);
-    switch (renderType) {
-      case 'raw':
-        return Array.from(basicPromptLexer).map((token) => (
-          <span>{token.value}</span>
-        ));
-      case 'tokens':
-        return Array.from(basicPromptLexer).map((token) => (
-          <span>{token.type} </span>
-        ));
-      case 'parsed':
-        return parseView(prompt);
-    }
-  }
-
-  function parseView(prompt: string) {
-    const parser = new Parser(Grammar.fromCompiled(grammar));
-    try {
-      parser.feed(prompt);
-      return JSON.stringify(parser.results, null, 2);
-    } catch (error: unknown) {
-      return (
-        <div>
-          <h1>Failed to parse</h1>
-          <div>{`${error}`}</div>
-        </div>
-      );
-    }
   }
 
   return (
@@ -139,7 +101,7 @@ function App() {
           <Fill>
             <Fill>
               <div className="overflow-y-auto h-full whitespace-pre-wrap p-4 pl-6">
-                {tokensView(promptText)}
+                {tokensView(promptText, renderType)}
               </div>
             </Fill>
             <BottomResizable
