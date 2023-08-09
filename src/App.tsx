@@ -14,25 +14,58 @@ import { useMonaco } from '@monaco-editor/react';
 import { conf, language } from './common/sdprompt_monaco';
 import monaco from 'monaco-editor';
 import {
+  Bottom,
   BottomResizable,
+  CenterType,
   Fill,
   LeftResizable,
   Top,
   ViewPort,
 } from 'react-spaces';
-import { NavigateNext } from '@mui/icons-material';
+import { HistoryEdu, NavigateNext } from '@mui/icons-material';
 import { basicPromptLexer } from './common/sdprompt_lexer';
 import grammar from './common/sdprompt';
 import { Grammar, Parser } from 'nearley';
 
+/** LocalStorage keys */
+const keyActivePrompt = 'pc.active_prompt';
+const keyRenderType = 'pc.prompt_render_type';
+
 const RENDER_TYPES = ['raw', 'tokens', 'parsed'] as const;
 type RenderType = (typeof RENDER_TYPES)[number];
 
+function getRenderTypeFromLocalStorage(): RenderType {
+  const currentValue = localStorage.getItem(keyRenderType);
+  if (isRenderType(currentValue)) {
+    return currentValue;
+  }
+  return 'raw';
+}
+
+function isRenderType(typeMaybe: unknown): typeMaybe is RenderType {
+  return (
+    typeof typeMaybe === 'string' &&
+    RENDER_TYPES.some((type) => type === typeMaybe)
+  );
+}
+
 function App() {
   const [promptText, setPromptText] = useState(
-    localStorage.getItem('pc.active_prompt') ?? '',
+    localStorage.getItem(keyActivePrompt) ?? '',
   );
-  const [typeOrValue, setTypeOrValue] = useState<RenderType>('raw');
+
+  useEffect(() => {
+    localStorage.setItem(keyActivePrompt, promptText);
+  }, [promptText]);
+
+  const [typeOrValue, setTypeOrValue] = useState<RenderType>(
+    getRenderTypeFromLocalStorage(),
+  );
+
+  useEffect(() => {
+    localStorage.setItem(keyRenderType, typeOrValue);
+  }, [typeOrValue]);
+
   const monaco = useMonaco();
 
   useEffect(() => {
@@ -44,10 +77,6 @@ function App() {
     monaco.languages.setMonarchTokensProvider('sdprompt', language);
   }, [monaco]);
 
-  useEffect(() => {
-    localStorage.setItem('pc.active_prompt', promptText);
-  }, [promptText]);
-
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
@@ -58,13 +87,6 @@ function App() {
     if (value) {
       setPromptText(value);
     }
-  }
-
-  function isRenderType(typeMaybe: unknown): typeMaybe is RenderType {
-    return (
-      typeof typeMaybe === 'string' &&
-      RENDER_TYPES.some((type) => type === typeMaybe)
-    );
   }
 
   function handleDisplayTypeChange(event: SelectChangeEvent<RenderType>) {
@@ -150,7 +172,8 @@ function App() {
               </div>
             </Fill>
             <BottomResizable
-              size="0%"
+              size="10px"
+              minimumSize={10}
               className="bg-blue-600 p-2 text-xl font-mono">
               <Typography variant="h6" component="h2" className="pl-6">
                 Saved
@@ -158,9 +181,9 @@ function App() {
             </BottomResizable>
           </Fill>
         </Fill>
-        {/* <Bottom size={'2rem'} centerContent={CenterType.HorizontalVertical}>
-          Footer
-        </Bottom> */}
+        <Bottom size={'2rem'} centerContent={CenterType.HorizontalVertical}>
+          <HistoryEdu color="secondary" />
+        </Bottom>
       </ViewPort>
     </>
   );
