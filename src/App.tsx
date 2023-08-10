@@ -107,7 +107,7 @@ function App() {
             <BottomResizable
               size="10px"
               minimumSize={10}
-              className="bg-blue-600 p-2 text-xl font-mono">
+              className="bg-gradient-to-tr from-stone-500 to-blue-800 p-2 text-xl font-mono opacity-70">
               <Typography variant="h6" component="h2" className="pl-6">
                 Saved
               </Typography>
