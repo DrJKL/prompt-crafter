@@ -40,12 +40,17 @@
         return numberMaybe;
     }
 
-    function constructBound([minToken, maxToken]: any[]): Bound {
-        return ({
-            type: 'bound',
-            min: safeNumberParse(minToken.value),
-            max: safeNumberParse(maxToken?.value ?? minToken.value),
-        });
+    const BOUND_FORMAT = new RegExp('(?<min>\\d+)(?:-(?<max>\\d+))?\\$\\$');
+    function constructBound([boundString]: any[]): Bound {
+        const matches = BOUND_FORMAT.exec(boundString.value);
+        if (matches && matches.groups) {
+            return ({
+                type: 'bound',
+                min: safeNumberParse(matches.groups['min']),
+                max: safeNumberParse(matches.groups['max'] ?? matches.groups['min']),
+            });
+        }
+        return DEFAULT_BOUND;
     }
     function constructWildcard([wildcardPath]: any[]): Wildcard {
         return {
@@ -65,7 +70,7 @@ variants_list            -> variant (%bar variant {% (data) => data[1][0] %}):* 
 variant                  -> weight:? variant_prompt                                           {% data => data[1] %}
 
 weight                   -> %number | %integer                                                {% tag('weight')  %}
-bound                    -> %integer (%dash %integer {% data => data[1] %}):? %dollar %dollar {% constructBound %}
+bound                    -> %bound                                                            {% constructBound %}
 
 wildcard                 -> %wildcard                                                         {% constructWildcard %}
 variant_literal_sequence -> (%variant_literal {% constructLiteral %}):+                       {% unwrap %}

@@ -2,11 +2,12 @@ import moo from 'moo';
 const wildcard_enclosure = '__' as const;
 
 export const basicPromptLexer = moo.compile({
-  integer: /\d+/,
-  number: [/[0-9]+\.[0-9]+/, /[0-9]+\.\b/, /\.[0-9]+/, /[0-9]+/],
   lmoustache: '{',
   rmoustache: '}',
   bar: '|',
+  bound: {
+    match: /\d+(?:-\d+)?\$\$/,
+  },
   dash: '-',
   dollar: '$',
   wildcard: {
@@ -17,6 +18,8 @@ export const basicPromptLexer = moo.compile({
       x.slice(wildcard_enclosure.length, -wildcard_enclosure.length),
   },
   variant_literal: { match: /[^#$|{}]+/, lineBreaks: true }, // Has to come before literal
+  integer: /\d+/,
+  number: [/[0-9]+\.[0-9]+/, /[0-9]+\.\b/, /\.[0-9]+/, /[0-9]+/],
   literal: { match: /[^#{|]+/, lineBreaks: true },
   NL: { match: /\n/, lineBreaks: true },
 });

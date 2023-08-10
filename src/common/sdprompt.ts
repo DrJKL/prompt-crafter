@@ -8,8 +8,7 @@ declare var rmoustache: any;
 declare var bar: any;
 declare var number: any;
 declare var integer: any;
-declare var dash: any;
-declare var dollar: any;
+declare var bound: any;
 declare var wildcard: any;
 declare var variant_literal: any;
 
@@ -53,12 +52,17 @@ declare var variant_literal: any;
         return numberMaybe;
     }
 
-    function constructBound([minToken, maxToken]: any[]): Bound {
-        return ({
-            type: 'bound',
-            min: safeNumberParse(minToken.value),
-            max: safeNumberParse(maxToken?.value ?? minToken.value),
-        });
+    const BOUND_FORMAT = new RegExp('(?<min>\\d+)(?:-(?<max>\\d+))?\\$\\$');
+    function constructBound([boundString]: any[]): Bound {
+        const matches = BOUND_FORMAT.exec(boundString.value);
+        if (matches && matches.groups) {
+            return ({
+                type: 'bound',
+                min: safeNumberParse(matches.groups['min']),
+                max: safeNumberParse(matches.groups['max'] ?? matches.groups['min']),
+            });
+        }
+        return DEFAULT_BOUND;
     }
     function constructWildcard([wildcardPath]: any[]): Wildcard {
         return {
@@ -120,10 +124,7 @@ const grammar: Grammar = {
     {"name": "variant", "symbols": ["variant$ebnf$1", "variant_prompt"], "postprocess": data => data[1]},
     {"name": "weight", "symbols": [(basicPromptLexer.has("number") ? {type: "number"} : number)]},
     {"name": "weight", "symbols": [(basicPromptLexer.has("integer") ? {type: "integer"} : integer)], "postprocess": tag('weight')},
-    {"name": "bound$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("dash") ? {type: "dash"} : dash), (basicPromptLexer.has("integer") ? {type: "integer"} : integer)], "postprocess": data => data[1]},
-    {"name": "bound$ebnf$1", "symbols": ["bound$ebnf$1$subexpression$1"], "postprocess": id},
-    {"name": "bound$ebnf$1", "symbols": [], "postprocess": () => null},
-    {"name": "bound", "symbols": [(basicPromptLexer.has("integer") ? {type: "integer"} : integer), "bound$ebnf$1", (basicPromptLexer.has("dollar") ? {type: "dollar"} : dollar), (basicPromptLexer.has("dollar") ? {type: "dollar"} : dollar)], "postprocess": constructBound},
+    {"name": "bound", "symbols": [(basicPromptLexer.has("bound") ? {type: "bound"} : bound)], "postprocess": constructBound},
     {"name": "wildcard", "symbols": [(basicPromptLexer.has("wildcard") ? {type: "wildcard"} : wildcard)], "postprocess": constructWildcard},
     {"name": "variant_literal_sequence$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("variant_literal") ? {type: "variant_literal"} : variant_literal)], "postprocess": constructLiteral},
     {"name": "variant_literal_sequence$ebnf$1", "symbols": ["variant_literal_sequence$ebnf$1$subexpression$1"]},
