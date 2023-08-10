@@ -43,9 +43,16 @@ function formattedParseView(prompt: string) {
   try {
     parser.feed(prompt);
     const [results]: Array<Array<Chunk>> = parser.results; // Strip outer Array
-    return results.map((chunk, idx) => (
-      <ChunkView chunk={chunk} key={`${idx}-chunk-${JSON.stringify(chunk)}`} />
-    ));
+    return (
+      <div className="whitespace-pre-line">
+        {results.map((chunk, idx) => (
+          <ChunkView
+            chunk={chunk}
+            key={`${idx}-chunk-${JSON.stringify(chunk)}`}
+          />
+        ))}
+      </div>
+    );
   } catch (error: unknown) {
     return (
       <div>
