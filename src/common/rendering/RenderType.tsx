@@ -1,4 +1,9 @@
-const RENDER_TYPES = ['raw', 'tokens', 'parsed'] as const;
+export const RENDER_TYPES = [
+  'raw',
+  'tokens',
+  'parsed',
+  'parsed-formatted',
+] as const;
 export type RenderType = (typeof RENDER_TYPES)[number];
 
 export function isRenderType(typeMaybe: unknown): typeMaybe is RenderType {

@@ -16,6 +16,8 @@ export function tokensView(prompt: string, renderType: RenderType) {
       ));
     case 'parsed':
       return parseView(prompt);
+    case 'parsed-formatted':
+      return formattedParseView(prompt);
   }
 }
 
@@ -29,6 +31,24 @@ function parseView(prompt: string) {
       <div>
         <h1>Failed to parse</h1>
         <div>{`${error}`}</div>
+      </div>
+    );
+  }
+}
+
+function formattedParseView(prompt: string) {
+  const parser = new Parser(Grammar.fromCompiled(grammar));
+  try {
+    parser.feed(prompt);
+    const [results]: Array<Array<object>> = parser.results; // Strip outer Array
+    return results.map((item) => (
+      <div className="whitespace-pre-wrap">{JSON.stringify(item, null, 2)}</div>
+    ));
+  } catch (error: unknown) {
+    return (
+      <div>
+        <h1>Failed to parse</h1>
+        <div className="errorMessage">{`${error}`}</div>
       </div>
     );
   }

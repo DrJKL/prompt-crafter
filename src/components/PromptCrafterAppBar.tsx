@@ -10,7 +10,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import { NavigateNext } from '@mui/icons-material';
-import { RenderType } from '../common/rendering/RenderType';
+import { RENDER_TYPES, RenderType } from '../common/rendering/RenderType';
 
 export interface PromptCrafterAppBarProps {
   renderType: RenderType;
@@ -40,9 +40,14 @@ export function PromptCrafterAppBar({
               value={renderType}
               autoWidth={true}
               onChange={handleDisplayTypeChange}>
-              <MenuItem value="raw">Raw</MenuItem>
-              <MenuItem value="tokens">Tokens</MenuItem>
-              <MenuItem value="parsed">Parsed</MenuItem>
+              {RENDER_TYPES.map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type
+                    .split('-')
+                    .map((e) => e.replace(e[0], e[0].toUpperCase()))
+                    .join(' ')}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
 
