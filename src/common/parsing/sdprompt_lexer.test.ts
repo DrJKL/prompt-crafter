@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest';
 import { basicPromptLexer } from './sdprompt_lexer';
-import { LANDSCAPE_VERY_DYNAMIC } from '../examples/prompts';
+import { LANDSCAPE_VERY_DYNAMIC } from '../../examples/prompts';
 
 describe('basicPromptLexer', () => {
   it('should lex a prompt with no weights', () => {

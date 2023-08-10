@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { LANDSCAPE_VERY_DYNAMIC } from '../examples/prompts';
+import { LANDSCAPE_VERY_DYNAMIC } from '../../examples/prompts';
 import grammar from './sdprompt';
 import nearley from 'nearley';
 import { countType } from './parse_utils';

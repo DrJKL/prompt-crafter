@@ -3,7 +3,7 @@
     // eslint-disable
     // @ts-nocheck
     import {basicPromptLexer} from './sdprompt_lexer';
-    import {Bound, Literal, Wildcard, Variants, DEFAULT_BOUND} from './rendering/parsed_types';
+    import {Bound, Literal, Wildcard, Variants, DEFAULT_BOUND} from '../rendering/parsed_types';
     
     const BOUND_FORMAT = new RegExp('(?<min>\\d+)(?:-(?<max>\\d+))?\\$\\$');
 
