@@ -17,8 +17,7 @@ declare var literal: any;
     import {basicPromptLexer} from './sdprompt_lexer';
     import {Bound, Literal, Wildcard, Variants, DEFAULT_BOUND} from '../rendering/parsed_types';
     
-    const BOUND_FORMAT = new RegExp('(?<min>\\d+)(?:-(?<max>\\d+))?\\$\\$');
-
+    const BOUND_FORMAT = new RegExp('(?<min>\\d+)?(?:(?<dash>-)(?<max>\\d+)?)?\\$\\$');
     
     /* Utility */
     const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
@@ -47,10 +46,15 @@ declare var literal: any;
     function constructBound([boundString]: any[]): Bound {
         const matches = BOUND_FORMAT.exec(boundString.value);
         if (matches && matches.groups) {
+            const hasDash = !!matches.groups['dash'];
+            const minMaybe = safeNumberParse(matches.groups['min']);
+            const maxMaybe = safeNumberParse(matches.groups['max']);
+            const min = minMaybe ?? 1;
+            const max = maxMaybe ?? (hasDash ? -1 : minMaybe);
             return ({
                 type: 'bound',
-                min: safeNumberParse(matches.groups['min']),
-                max: safeNumberParse(matches.groups['max'] ?? matches.groups['min']),
+                min,
+                max,
             });
         }
         return DEFAULT_BOUND;
@@ -64,10 +68,10 @@ declare var literal: any;
     }
 
     /* Types */
-    function safeNumberParse(value: string): number {
+    function safeNumberParse(value: string): number|undefined {
         const numberMaybe = Number(value);
         if (isNaN(numberMaybe)) {
-            return 1;
+            return undefined;
         }
         return numberMaybe;
     }

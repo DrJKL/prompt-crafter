@@ -5,9 +5,13 @@ export const basicPromptLexer = moo.compile({
   lmoustache: '{',
   rmoustache: '}',
   bar: /\s*\|\s*/,
-  bound: {
-    match: /\d+(?:-\d+)?\$\$/,
-  },
+  bound: [
+    /\d+\$\$/, // min
+    /-\d+\$\$/, // min-omitted
+    /\d+-\$\$/, // max_omitted
+    /\d+-\d+\$\$/, // min-max
+    /\$\$/, // no-bound
+  ],
   wildcard: {
     match: new RegExp(
       `${wildcard_enclosure}[^{}#\\n\\s]+${wildcard_enclosure}`,

@@ -3,6 +3,7 @@ import { LANDSCAPE_VERY_DYNAMIC } from '../../examples/prompts';
 import grammar from './sdprompt';
 import nearley from 'nearley';
 import { countType } from './parse_utils';
+import { Bound, Variants } from '../rendering/parsed_types';
 
 describe('parser', () => {
   it('should lex a prompt with no weights', () => {
@@ -48,7 +49,68 @@ describe('parser', () => {
     expect(nestedVariants?.type).toBe('variants');
 
     expect(countType(nestedVariants.variants, 'literal')).toBe(2);
+  });
 
-    console.log(JSON.stringify(parser.results[0], null, 1));
+  describe('bounds', () => {
+    it('should handle no bound', () => {
+      const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+      const prompt = `{A|B|C|D|E}`;
+      parser.feed(prompt);
+      const [result] = parser.results;
+      const [variants] = result;
+      const { bound }: { bound: Bound } = variants;
+      expect(bound.min).toBe(1);
+      expect(bound.max).toBe(1);
+    });
+
+    it('should handle just min', () => {
+      const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+      const prompt = `{3$$A|B|C|D|E}`;
+      parser.feed(prompt);
+
+      const [result] = parser.results;
+      const [variants]: [Variants] = result;
+      const { bound }: { bound: Bound } = variants;
+
+      expect(bound.min).toBe(3);
+      expect(bound.max).toBe(3);
+    });
+    it('should handle min dash', () => {
+      const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+      const prompt = `{3-$$A|B|C|D|E}`;
+      parser.feed(prompt);
+
+      const [result] = parser.results;
+      const [variants] = result;
+      const { bound }: { bound: Bound } = variants;
+
+      expect(bound.min).toBe(3);
+      expect(bound.max).toBe(-1);
+    });
+
+    it('should handle just max', () => {
+      const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+      const prompt = `{-3$$A|B|C|D|E}`;
+      parser.feed(prompt);
+
+      const [result] = parser.results;
+      const [variants] = result;
+      const { bound }: { bound: Bound } = variants;
+
+      expect(bound.min).toBe(1);
+      expect(bound.max).toBe(3);
+    });
+    it('should handle just min-max', () => {
+      const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+      const prompt = `{2-3$$A|B|C|D|E}`;
+      parser.feed(prompt);
+
+      const [result] = parser.results;
+      const [variants] = result;
+      const { bound }: { bound: Bound } = variants;
+
+      expect(bound.min).toBe(2);
+      expect(bound.max).toBe(3);
+    });
   });
 });

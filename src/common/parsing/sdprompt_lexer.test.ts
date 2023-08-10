@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { basicPromptLexer } from './sdprompt_lexer';
 import { LANDSCAPE_VERY_DYNAMIC } from '../../examples/prompts';
 
@@ -35,5 +35,17 @@ describe('basicPromptLexer', () => {
     Array.from(basicPromptLexer)
       .map((t) => t.type)
       .join(' ');
+  });
+
+  it('should lex with separator', () => {
+    const prompt = `{$$ and $$ foo | bar | baz}`;
+
+    basicPromptLexer.reset(prompt);
+
+    const result = Array.from(basicPromptLexer)
+      .map((t) => t.type)
+      .join(' ');
+    console.log(result);
+    expect(result).toBeTruthy();
   });
 });
