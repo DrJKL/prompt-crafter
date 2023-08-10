@@ -21,3 +21,9 @@ export interface Variants {
   readonly bound: Bound;
   variants: ReadonlyArray<Literal | Variants | Wildcard>;
 }
+
+export const DEFAULT_BOUND: Bound = {
+  type: 'bound',
+  min: 1,
+  max: 1,
+};
