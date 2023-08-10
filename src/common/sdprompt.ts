@@ -10,7 +10,7 @@ declare var number: any;
 declare var integer: any;
 declare var bound: any;
 declare var wildcard: any;
-declare var variant_literal: any;
+declare var literal: any;
 
     // eslint-disable
     // @ts-nocheck
@@ -128,9 +128,9 @@ const grammar: Grammar = {
     {"name": "weight", "symbols": [(basicPromptLexer.has("integer") ? {type: "integer"} : integer)], "postprocess": tag('weight')},
     {"name": "bound", "symbols": [(basicPromptLexer.has("bound") ? {type: "bound"} : bound)], "postprocess": constructBound},
     {"name": "wildcard", "symbols": [(basicPromptLexer.has("wildcard") ? {type: "wildcard"} : wildcard)], "postprocess": constructWildcard},
-    {"name": "literal_sequence$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("variant_literal") ? {type: "variant_literal"} : variant_literal)], "postprocess": constructLiteral},
+    {"name": "literal_sequence$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)], "postprocess": constructLiteral},
     {"name": "literal_sequence$ebnf$1", "symbols": ["literal_sequence$ebnf$1$subexpression$1"]},
-    {"name": "literal_sequence$ebnf$1$subexpression$2", "symbols": [(basicPromptLexer.has("variant_literal") ? {type: "variant_literal"} : variant_literal)], "postprocess": constructLiteral},
+    {"name": "literal_sequence$ebnf$1$subexpression$2", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)], "postprocess": constructLiteral},
     {"name": "literal_sequence$ebnf$1", "symbols": ["literal_sequence$ebnf$1", "literal_sequence$ebnf$1$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "literal_sequence", "symbols": ["literal_sequence$ebnf$1"], "postprocess": unwrap},
     {"name": "unknown$ebnf$1", "symbols": []},

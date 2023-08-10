@@ -75,5 +75,5 @@ weight                   -> %number | %integer                                  
 bound                    -> %bound                                              {% constructBound %}
 
 wildcard                 -> %wildcard                                           {% constructWildcard %}
-literal_sequence         -> (%variant_literal {% constructLiteral %}):+         {% unwrap %}
+literal_sequence         -> (%literal {% constructLiteral %}):+         {% unwrap %}
 unknown                  -> %lmoustache [\s\n]:*

@@ -15,7 +15,7 @@ export const basicPromptLexer = moo.compile({
     value: (x) =>
       x.slice(wildcard_enclosure.length, -wildcard_enclosure.length),
   },
-  variant_literal: { match: /[^#$|{}]+/, lineBreaks: true },
+  literal: { match: /[^#$|{}]+/, lineBreaks: true },
   integer: /\d+/,
   number: [/[0-9]+\.[0-9]+/, /[0-9]+\.\b/, /\.[0-9]+/, /[0-9]+/],
 });
