@@ -2,7 +2,11 @@ import { ReactNode } from 'react';
 import { Bound, Chunk, Literal, Variants } from './parsed_types';
 
 export function LiteralView({ literal }: { literal: Literal }) {
-  return <span className="text-pink-400 font-bold">{literal.value}</span>;
+  return (
+    <span className="text-pink-400 font-bold cursor-pointer hover:text-pink-700">
+      {literal.value}
+    </span>
+  );
 }
 
 export function VariantView({ variants }: { variants: Variants }) {
