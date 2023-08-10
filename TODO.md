@@ -22,7 +22,7 @@
 - [ ] Inline dynamic prompt
 - [ ] ...
 
-## Dynamic Prompts [from](https://github.com/adieyal/sd-dynamic-prompts/blob/main/docs/SYNTAX.md#syntax-guide)
+## [Dynamic Prompts](https://github.com/adieyal/sd-dynamic-prompts/blob/main/docs/SYNTAX.md#syntax-guide)
 
 - [x] Basic
 - [ ] Weighting
