@@ -4,7 +4,7 @@ const wildcard_enclosure = '__' as const;
 export const basicPromptLexer = moo.compile({
   lmoustache: '{',
   rmoustache: '}',
-  bar: '|',
+  bar: /\s*\|\s*/,
   bound: {
     match: /\d+(?:-\d+)?\$\$/,
   },

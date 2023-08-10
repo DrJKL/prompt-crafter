@@ -8,7 +8,7 @@ export function LiteralView({ literal }: { literal: Literal }) {
 export function VariantView({ variants }: { variants: Variants }) {
   return (
     <span className="text-blue-400">
-      {'{'}
+      {' { '}
       {variants.bound && <BoundView bound={variants.bound} />}
       {variants.variants?.map((v, idx) => (
         <span className="variant-option" key={`variant-${idx}`}>
@@ -16,7 +16,7 @@ export function VariantView({ variants }: { variants: Variants }) {
           {v ? renderChunk(v) : ''}
         </span>
       ))}
-      {'}'}
+      {' } '}
     </span>
   );
 }
