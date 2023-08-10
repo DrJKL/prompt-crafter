@@ -1,6 +1,6 @@
 import { Grammar, Parser } from 'nearley';
-import grammar from '../sdprompt';
-import { basicPromptLexer } from '../sdprompt_lexer';
+import grammar from '../parsing/sdprompt';
+import { basicPromptLexer } from '../parsing/sdprompt_lexer';
 import { RenderType } from './RenderType';
 import { Chunk } from './parsed_types';
 import { ChunkView } from './Renderers';
