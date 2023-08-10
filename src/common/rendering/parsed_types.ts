@@ -1,4 +1,5 @@
 export type ChunkType = 'literal' | 'variants' | 'wildcard';
+export type Chunk = Wildcard | Literal | Bound | Variants;
 
 export interface Wildcard {
   readonly type: 'wildcard';

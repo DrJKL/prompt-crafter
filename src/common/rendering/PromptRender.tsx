@@ -2,6 +2,8 @@ import { Grammar, Parser } from 'nearley';
 import grammar from '../sdprompt';
 import { basicPromptLexer } from '../sdprompt_lexer';
 import { RenderType } from './RenderType';
+import { Chunk } from './parsed_types';
+import { ChunkView } from './Renderers';
 
 export function tokensView(prompt: string, renderType: RenderType) {
   basicPromptLexer.reset(prompt);
@@ -12,7 +14,7 @@ export function tokensView(prompt: string, renderType: RenderType) {
       ));
     case 'tokens':
       return Array.from(basicPromptLexer).map((token) => (
-        <span>{token.type} </span>
+        <span title={JSON.stringify(token)}>{token.type} </span>
       ));
     case 'parsed':
       return parseView(prompt);
@@ -40,9 +42,9 @@ function formattedParseView(prompt: string) {
   const parser = new Parser(Grammar.fromCompiled(grammar));
   try {
     parser.feed(prompt);
-    const [results]: Array<Array<object>> = parser.results; // Strip outer Array
-    return results.map((item) => (
-      <div className="whitespace-pre-wrap">{JSON.stringify(item, null, 2)}</div>
+    const [results]: Array<Array<Chunk>> = parser.results; // Strip outer Array
+    return results.map((chunk, idx) => (
+      <ChunkView chunk={chunk} key={`${idx}-chunk-${JSON.stringify(chunk)}`} />
     ));
   } catch (error: unknown) {
     return (
