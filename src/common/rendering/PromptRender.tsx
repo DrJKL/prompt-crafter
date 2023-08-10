@@ -42,7 +42,11 @@ function formattedParseView(prompt: string) {
   const parser = new Parser(Grammar.fromCompiled(grammar));
   try {
     parser.feed(prompt);
+    if (!parser.results || !parser.results.length) {
+      return <div>Failed to parse...</div>;
+    }
     const [results]: Array<Array<Chunk>> = parser.results; // Strip outer Array
+
     return (
       <div className="whitespace-pre-line">
         {results.map((chunk, idx) => (
@@ -54,10 +58,13 @@ function formattedParseView(prompt: string) {
       </div>
     );
   } catch (error: unknown) {
+    if (!(error instanceof Error)) {
+      return <div>Unknown Error: {`${error}`}</div>;
+    }
     return (
       <div>
         <h1>Failed to parse</h1>
-        <div className="errorMessage">{`${error}`}</div>
+        <div className="errorMessage whitespace-pre-line break-words overflow-x-auto font-mono">{`${error}`}</div>
       </div>
     );
   }

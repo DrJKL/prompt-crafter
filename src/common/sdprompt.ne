@@ -65,7 +65,7 @@
 @lexer basicPromptLexer
 variant_prompt           -> (variant_chunk {% id %}):*                                        {% id %}
 
-variant_chunk            -> (variants | wildcard | variant_literal_sequence)                  {% unwrap %}
+variant_chunk            -> (variants | wildcard | variant_literal_sequence | unknown)                  {% unwrap %}
 variants                 -> %lmoustache bound:? variants_list:?  %rmoustache                  {% constructVariants %}
 variants_list            -> variant (%bar variant {% (data) => data[1][0] %}):*               {% flattenVariantsList %}
 variant                  -> weight:? variant_prompt                                           {% data => data[1] %}
@@ -75,3 +75,4 @@ bound                    -> %bound                                              
 
 wildcard                 -> %wildcard                                                         {% constructWildcard %}
 variant_literal_sequence -> (%variant_literal {% constructLiteral %}):+                       {% unwrap %}
+unknown                  -> %lmoustache [\s\n]:+

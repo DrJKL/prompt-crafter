@@ -110,6 +110,7 @@ const grammar: Grammar = {
     {"name": "variant_chunk$subexpression$1", "symbols": ["variants"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["wildcard"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["variant_literal_sequence"]},
+    {"name": "variant_chunk$subexpression$1", "symbols": ["unknown"]},
     {"name": "variant_chunk", "symbols": ["variant_chunk$subexpression$1"], "postprocess": unwrap},
     {"name": "variants$ebnf$1", "symbols": ["bound"], "postprocess": id},
     {"name": "variants$ebnf$1", "symbols": [], "postprocess": () => null},
@@ -131,7 +132,10 @@ const grammar: Grammar = {
     {"name": "variant_literal_sequence$ebnf$1", "symbols": ["variant_literal_sequence$ebnf$1$subexpression$1"]},
     {"name": "variant_literal_sequence$ebnf$1$subexpression$2", "symbols": [(basicPromptLexer.has("variant_literal") ? {type: "variant_literal"} : variant_literal)], "postprocess": constructLiteral},
     {"name": "variant_literal_sequence$ebnf$1", "symbols": ["variant_literal_sequence$ebnf$1", "variant_literal_sequence$ebnf$1$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
-    {"name": "variant_literal_sequence", "symbols": ["variant_literal_sequence$ebnf$1"], "postprocess": unwrap}
+    {"name": "variant_literal_sequence", "symbols": ["variant_literal_sequence$ebnf$1"], "postprocess": unwrap},
+    {"name": "unknown$ebnf$1", "symbols": [/[\s\n]/]},
+    {"name": "unknown$ebnf$1", "symbols": ["unknown$ebnf$1", /[\s\n]/], "postprocess": (d) => d[0].concat([d[1]])},
+    {"name": "unknown", "symbols": [(basicPromptLexer.has("lmoustache") ? {type: "lmoustache"} : lmoustache), "unknown$ebnf$1"]}
   ],
   ParserStart: "variant_prompt",
 };
