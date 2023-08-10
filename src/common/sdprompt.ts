@@ -10,26 +10,24 @@ declare var number: any;
 declare var integer: any;
 declare var dash: any;
 declare var dollar: any;
-declare var wildcard_enclosure: any;
-declare var path: any;
+declare var wildcard: any;
 declare var variant_literal: any;
 
     // eslint-disable
     // @ts-nocheck
     import {basicPromptLexer} from './sdprompt_lexer';
-    interface Bound {
-        min: string;
-        max: string;
-    }
+    import {Bound, Literal, Wildcard, Variants} from './rendering/parsed_types';
+    
     const DEFAULT_BOUND: Bound = {
-        min: "1",
-        max: "1",
+        type: 'bound',
+        min: 1,
+        max: 1,
     };
     
     const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
     const unwrap = (data: any[]) => data[0][0];
     
-    function wrapVariants([,bound, variants]: any[]) {
+    function wrapVariants([,bound, variants]: any[]): Variants {
         return {
             type: 'variants',
             bound: bound ?? DEFAULT_BOUND,
@@ -41,24 +39,31 @@ declare var variant_literal: any;
         return [firstVariant[0], ...restOfVariants];
     }
 
-    function constructLiteral([literalToken]: any[]) {
+    function constructLiteral([literalToken]: any[]): Literal {
         return {
             type: 'literal',
             value: literalToken.value,
         }
     }
+    function safeNumberParse(value: string): number {
+        const numberMaybe = Number(value);
+        if (isNaN(numberMaybe)) {
+            return 1;
+        }
+        return numberMaybe;
+    }
 
-    function constructBound([minToken, maxToken]: any[]) {
+    function constructBound([minToken, maxToken]: any[]): Bound {
         return ({
             type: 'bound',
-            min: minToken.value,
-            max: maxToken?.value ?? minToken.value,
+            min: safeNumberParse(minToken.value),
+            max: safeNumberParse(maxToken?.value ?? minToken.value),
         });
     }
-    function constructWildcard([,wildcardPath]: any[]) {
+    function constructWildcard([wildcardPath]: any[]): Wildcard {
         return {
             type: 'wildcard',
-            path: wildcardPath,
+            path: wildcardPath.value,
         };
     }
 
@@ -119,7 +124,7 @@ const grammar: Grammar = {
     {"name": "bound$ebnf$1", "symbols": ["bound$ebnf$1$subexpression$1"], "postprocess": id},
     {"name": "bound$ebnf$1", "symbols": [], "postprocess": () => null},
     {"name": "bound", "symbols": [(basicPromptLexer.has("integer") ? {type: "integer"} : integer), "bound$ebnf$1", (basicPromptLexer.has("dollar") ? {type: "dollar"} : dollar), (basicPromptLexer.has("dollar") ? {type: "dollar"} : dollar)], "postprocess": constructBound},
-    {"name": "wildcard", "symbols": [(basicPromptLexer.has("wildcard_enclosure") ? {type: "wildcard_enclosure"} : wildcard_enclosure), (basicPromptLexer.has("path") ? {type: "path"} : path), (basicPromptLexer.has("wildcard_enclosure") ? {type: "wildcard_enclosure"} : wildcard_enclosure)], "postprocess": constructWildcard},
+    {"name": "wildcard", "symbols": [(basicPromptLexer.has("wildcard") ? {type: "wildcard"} : wildcard)], "postprocess": constructWildcard},
     {"name": "variant_literal_sequence$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("variant_literal") ? {type: "variant_literal"} : variant_literal)], "postprocess": constructLiteral},
     {"name": "variant_literal_sequence$ebnf$1", "symbols": ["variant_literal_sequence$ebnf$1$subexpression$1"]},
     {"name": "variant_literal_sequence$ebnf$1$subexpression$2", "symbols": [(basicPromptLexer.has("variant_literal") ? {type: "variant_literal"} : variant_literal)], "postprocess": constructLiteral},
