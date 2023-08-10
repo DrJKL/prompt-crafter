@@ -21,3 +21,11 @@
 - [ ] Generate random using wildcards
 - [ ] Inline dynamic prompt
 - [ ] ...
+
+## Dynamic Prompts [from](https://github.com/adieyal/sd-dynamic-prompts/blob/main/docs/SYNTAX.md#syntax-guide)
+
+- [x] Basic
+- [ ] Weighting
+- [x] Multiple
+- [ ] Custom Separator
+- [ ] Range of Options
