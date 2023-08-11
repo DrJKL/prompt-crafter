@@ -14,7 +14,16 @@ export interface Literal {
 export interface Variants {
   readonly type: 'variants';
   readonly bound: Bound;
-  variants: ReadonlyArray<Literal | Variants | Wildcard>;
+  readonly variants: readonly Chunk[];
+
+  /**
+   * Indices for variant selections.
+   * Indices should be between 0 and variants.length - 1
+   * Length of selections should be
+   *   - >= max(bound.min, 1)
+   *   - <= min(bound.max, variants.length)
+   */
+  readonly selections: readonly number[];
 }
 
 export interface Bound {
