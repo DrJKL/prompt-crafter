@@ -14,7 +14,7 @@ export interface Literal {
 export interface Variants {
   readonly type: 'variants';
   readonly bound: Bound;
-  readonly variants: readonly Chunk[];
+  readonly variants: readonly Chunk[][];
 
   /**
    * Indices for variant selections.

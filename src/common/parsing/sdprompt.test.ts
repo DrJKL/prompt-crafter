@@ -1,30 +1,27 @@
-import { describe, expect, expectTypeOf, it } from 'vitest';
-import { LANDSCAPE_VERY_DYNAMIC } from '../../examples/prompts';
-import grammar from './sdprompt';
 import nearley from 'nearley';
+import { assertType, describe, expect, expectTypeOf, it } from 'vitest';
+import { LANDSCAPE_VERY_DYNAMIC } from '../../examples/prompts';
+import { Bound, Chunk, Variants } from '../rendering/parsed_types';
 import { countType } from './parse_utils';
-import { Bound, Variants } from '../rendering/parsed_types';
+import grammar from './sdprompt';
 
 describe('parser', () => {
   it('should lex a prompt with no weights', () => {
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
     const prompt = `a picture of a dog wearing a fancy hat`;
     parser.feed(prompt);
-    // console.log(JSON.stringify(parser.results));
   });
 
   it('should lex a prompt with wildcards', () => {
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
     const prompt = `a picture of a {dog|cat|frog} wearing a fancy hat`;
     parser.feed(prompt);
-    // console.log(JSON.stringify(parser.results, null, 2));
   });
 
   it('should parse a long dynamic prompt', () => {
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
     const prompt = LANDSCAPE_VERY_DYNAMIC;
     parser.feed(prompt);
-    // console.log(JSON.stringify(parser.results, null, 2));
   });
 
   it('should handle nested wildcards', () => {
@@ -32,7 +29,7 @@ describe('parser', () => {
     const prompt = '{ A | B | { C | D } }';
     parser.feed(prompt);
 
-    const [results] = parser.results;
+    const [results]: Array<Array<Array<Chunk>>> = parser.results;
     expectTypeOf(results).toBeArray();
 
     expect(results.length).toBe(1);
@@ -42,11 +39,21 @@ describe('parser', () => {
     const [variantChunk] = variantPrompt;
     expect(variantChunk.type).toBe('variants');
 
+    if (variantChunk.type !== 'variants') {
+      throw new Error();
+    }
+    assertType<Variants>(variantChunk);
+
     expect(countType(variantChunk.variants, 'literal')).toBe(2);
     expect(countType(variantChunk.variants, 'variants')).toBe(1);
 
     const [, , [nestedVariants]] = variantChunk.variants;
     expect(nestedVariants?.type).toBe('variants');
+
+    if (nestedVariants.type !== 'variants') {
+      throw new Error();
+    }
+    assertType<Variants>(nestedVariants);
 
     expect(countType(nestedVariants.variants, 'literal')).toBe(2);
   });
