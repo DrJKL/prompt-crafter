@@ -82,7 +82,7 @@ export function FancyVariantView({
 }: VariantProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  function handleClick(event: MouseEvent<HTMLButtonElement>) {
+  function handleClick(event: MouseEvent<HTMLAnchorElement>) {
     setAnchorEl(event.currentTarget);
   }
   function handleClose() {
@@ -114,11 +114,15 @@ export function FancyVariantView({
   return (
     <div>
       <Button
+        component="a"
         variant="text"
-        color="primary"
+        color="secondary"
+        size="small"
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
+        sx={{ minWidth: '0' }}
+        title={JSON.stringify(variants)}
         onClick={handleClick}>
         {toText(variant)}
       </Button>
