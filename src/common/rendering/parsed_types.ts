@@ -14,6 +14,7 @@ export interface Bound {
   readonly type: 'bound';
   readonly min: number;
   readonly max: number;
+  readonly separator: string;
 }
 
 export interface Variants {
@@ -26,4 +27,5 @@ export const DEFAULT_BOUND: Bound = {
   type: 'bound',
   min: 1,
   max: 1,
+  separator: ', ',
 };

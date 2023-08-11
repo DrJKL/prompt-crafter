@@ -6,11 +6,11 @@ export const basicPromptLexer = moo.compile({
   rmoustache: '}',
   bar: /\s*\|\s*/,
   bound: [
-    /\d+\$\$/, // min
-    /-\d+\$\$/, // min-omitted
-    /\d+-\$\$/, // max_omitted
-    /\d+-\d+\$\$/, // min-max
-    /\$\$/, // no-bound
+    /\d+\$\$(?:[^$|}]+?\$\$)?/, // min
+    /-\d+\$\$(?:[^$|}]+?\$\$)?/, // min-omitted
+    /\d+-\$\$(?:[^$|}]+?\$\$)?/, // max_omitted
+    /\d+-\d+\$\$(?:[^$|}]+?\$\$)?/, // min-max
+    /\$\$(?:[^$|}]+?\$\$)?/, // no-bound
   ],
   wildcard: {
     match: new RegExp(

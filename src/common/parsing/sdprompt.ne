@@ -5,7 +5,7 @@
     import {basicPromptLexer} from './sdprompt_lexer';
     import {Bound, Literal, Wildcard, Variants, DEFAULT_BOUND} from '../rendering/parsed_types';
     
-    const BOUND_FORMAT = new RegExp('(?<min>\\d+)?(?:(?<dash>-)(?<max>\\d+)?)?\\$\\$');
+    const BOUND_FORMAT = new RegExp('(?<min>\\d+)?(?:(?<dash>-)(?<max>\\d+)?)?\\$\\$(?:(?<separator>[^$]+?)\\$\\$)?');
     
     /* Utility */
     const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
@@ -38,11 +38,13 @@
             const minMaybe = safeNumberParse(matches.groups['min']);
             const maxMaybe = safeNumberParse(matches.groups['max']);
             const min = minMaybe ?? 1;
-            const max = maxMaybe ?? (hasDash ? -1 : minMaybe);
+            const max = maxMaybe ?? (hasDash ? -1 : min);
+            const separator = matches.groups['separator'] ?? ', ';
             return ({
                 type: 'bound',
                 min,
                 max,
+                separator,
             });
         }
         return DEFAULT_BOUND;
@@ -68,16 +70,16 @@
 
 @lexer basicPromptLexer
 
-variant_prompt           -> (variant_chunk {% id %}):*                          {% id %}
+variant_prompt   -> (variant_chunk {% id %}):*                          {% id %}
 
-variant_chunk            -> (variants | wildcard | literal_sequence | unknown)  {% unwrap %}
-variants                 -> %lmoustache bound:? variants_list:?  %rmoustache    {% constructVariants %}
-variants_list            -> variant (%bar variant {% (data) => data[1][0] %}):* {% flattenVariantsList %}
-variant                  -> weight:? variant_prompt                             {% data => data[1] %}
+variant_chunk    -> (variants | wildcard | literal_sequence | unknown)  {% unwrap %}
+variants         -> %lmoustache bound:? variants_list:?  %rmoustache    {% constructVariants %}
+variants_list    -> variant (%bar variant {% (data) => data[1][0] %}):* {% flattenVariantsList %}
+variant          -> weight:? variant_prompt                             {% data => data[1] %}
 
-weight                   -> %number | %integer                                  {% tag('weight')  %}
-bound                    -> %bound                                              {% constructBound %}
+weight           -> %number | %integer                                  {% tag('weight')  %}
+bound            -> %bound                                              {% constructBound %}
 
-wildcard                 -> %wildcard                                           {% constructWildcard %}
-literal_sequence         -> (%literal {% constructLiteral %}):+                 {% unwrap %}
-unknown                  -> %lmoustache [\s\n]:*
+wildcard         -> %wildcard                                           {% constructWildcard %}
+literal_sequence -> (%literal {% constructLiteral %}):+                 {% unwrap %}
+unknown          -> %lmoustache [\s\n]:*

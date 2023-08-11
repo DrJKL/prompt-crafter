@@ -113,4 +113,52 @@ describe('parser', () => {
       expect(bound.max).toBe(3);
     });
   });
+
+  describe('separator', () => {
+    it('should handle bare separator', () => {
+      const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+      const prompt = `{$$ and $$ A|B|C|D|E}`;
+      parser.feed(prompt);
+
+      const [result] = parser.results;
+      const [variants] = result;
+      const { bound }: { bound: Bound } = variants;
+
+      expect(bound.min).toBe(1);
+      expect(bound.max).toBe(1);
+      expect(bound.separator).toBe(' and ');
+    });
+  });
+
+  it('should handle bounds and separator', () => {
+    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+    const prompt = `{2-3$$ and $$ A|B|C|D|E}`;
+    parser.feed(prompt);
+
+    const [result] = parser.results;
+    const [variants] = result;
+    const { bound }: { bound: Bound } = variants;
+
+    expect(bound.min).toBe(2);
+    expect(bound.max).toBe(3);
+    expect(bound.separator).toBe(' and ');
+  });
+
+  it('should handle multiple wildcard sets with separators', () => {
+    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+    const prompt = `{2-3$$ and $$ A|B|C|D|E} {4-5$$ or $$ F|G|H|I|J}`;
+    parser.feed(prompt);
+
+    const [result] = parser.results;
+    const [variants1, _, variants2] = result;
+    const { bound: bounds1 }: { bound: Bound } = variants1;
+    const { bound: bounds2 }: { bound: Bound } = variants2;
+
+    expect(bounds1.min).toBe(2);
+    expect(bounds1.max).toBe(3);
+    expect(bounds1.separator).toBe(' and ');
+    expect(bounds2.min).toBe(4);
+    expect(bounds2.max).toBe(5);
+    expect(bounds2.separator).toBe(' or ');
+  });
 });
