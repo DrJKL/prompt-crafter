@@ -24,11 +24,7 @@ interface ChunkProps extends KeyPath {
 }
 
 export function LiteralView({ literal }: LiteralProps) {
-  return (
-    <span className="text-pink-400 font-bold cursor-pointer hover:text-pink-700">
-      {literal.value}
-    </span>
-  );
+  return <span className="text-pink-400 font-bold ">{literal.value}</span>;
 }
 
 export function VariantView({ variants, path }: VariantProps) {
@@ -112,20 +108,17 @@ export function FancyVariantView({
   }
 
   return (
-    <div>
-      <Button
-        component="a"
-        variant="text"
-        color="secondary"
-        size="small"
+    <>
+      <a
+        className="text-pink-500 font-bold cursor-pointer hover:text-pink-800"
+        aria-roledescription="button"
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        sx={{ minWidth: '0' }}
         title={JSON.stringify(variants)}
         onClick={handleClick}>
         {toText(variant)}
-      </Button>
+      </a>
 
       <Menu
         anchorEl={anchorEl}
@@ -145,7 +138,7 @@ export function FancyVariantView({
           );
         })}
       </Menu>
-    </div>
+    </>
   );
 }
 

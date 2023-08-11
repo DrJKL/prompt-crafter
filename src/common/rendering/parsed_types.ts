@@ -18,10 +18,11 @@ export interface Variants {
 
   /**
    * Indices for variant selections.
-   * Indices should be between 0 and variants.length - 1
+   * Indices should be between -1 and variants.length - 1
    * Length of selections should be
-   *   - >= max(bound.min, 1)
    *   - <= min(bound.max, variants.length)
+   * There should be >= max(min, 1) non-negative indices
+   *
    */
   readonly selections: readonly number[];
 }
