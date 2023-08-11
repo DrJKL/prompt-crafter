@@ -32,8 +32,8 @@ describe('parser', () => {
     const prompt = '{ A | B | { C | D } }';
     parser.feed(prompt);
 
-    const results = parser.results;
-    expectTypeOf(results[0]).toBeArray();
+    const [results] = parser.results;
+    expectTypeOf(results).toBeArray();
 
     expect(results.length).toBe(1);
     const [variantPrompt] = results;
@@ -45,7 +45,7 @@ describe('parser', () => {
     expect(countType(variantChunk.variants, 'literal')).toBe(2);
     expect(countType(variantChunk.variants, 'variants')).toBe(1);
 
-    const [, , nestedVariants] = variantChunk.variants;
+    const [, , [nestedVariants]] = variantChunk.variants;
     expect(nestedVariants?.type).toBe('variants');
 
     expect(countType(nestedVariants.variants, 'literal')).toBe(2);
@@ -56,7 +56,7 @@ describe('parser', () => {
       const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
       const prompt = `{A|B|C|D|E}`;
       parser.feed(prompt);
-      const [result] = parser.results;
+      const [[result]] = parser.results;
       const [variants] = result;
       const { bound }: { bound: Bound } = variants;
       expect(bound.min).toBe(1);
@@ -68,7 +68,7 @@ describe('parser', () => {
       const prompt = `{3$$A|B|C|D|E}`;
       parser.feed(prompt);
 
-      const [result] = parser.results;
+      const [[result]] = parser.results;
       const [variants]: [Variants] = result;
       const { bound }: { bound: Bound } = variants;
 
@@ -80,7 +80,7 @@ describe('parser', () => {
       const prompt = `{3-$$A|B|C|D|E}`;
       parser.feed(prompt);
 
-      const [result] = parser.results;
+      const [[result]] = parser.results;
       const [variants] = result;
       const { bound }: { bound: Bound } = variants;
 
@@ -93,7 +93,7 @@ describe('parser', () => {
       const prompt = `{-3$$A|B|C|D|E}`;
       parser.feed(prompt);
 
-      const [result] = parser.results;
+      const [[result]] = parser.results;
       const [variants] = result;
       const { bound }: { bound: Bound } = variants;
 
@@ -105,7 +105,7 @@ describe('parser', () => {
       const prompt = `{2-3$$A|B|C|D|E}`;
       parser.feed(prompt);
 
-      const [result] = parser.results;
+      const [[result]] = parser.results;
       const [variants] = result;
       const { bound }: { bound: Bound } = variants;
 
@@ -120,7 +120,7 @@ describe('parser', () => {
       const prompt = `{$$ and $$ A|B|C|D|E}`;
       parser.feed(prompt);
 
-      const [result] = parser.results;
+      const [[result]] = parser.results;
       const [variants] = result;
       const { bound }: { bound: Bound } = variants;
 
@@ -135,7 +135,7 @@ describe('parser', () => {
     const prompt = `{2-3$$ and $$ A|B|C|D|E}`;
     parser.feed(prompt);
 
-    const [result] = parser.results;
+    const [[result]] = parser.results;
     const [variants] = result;
     const { bound }: { bound: Bound } = variants;
 
@@ -149,7 +149,7 @@ describe('parser', () => {
     const prompt = `{2-3$$ and $$ A|B|C|D|E} {4-5$$ or $$ F|G|H|I|J}`;
     parser.feed(prompt);
 
-    const [result] = parser.results;
+    const [[result]] = parser.results;
     const [variants1, _, variants2] = result;
     const { bound: bounds1 }: { bound: Bound } = variants1;
     const { bound: bounds2 }: { bound: Bound } = variants2;

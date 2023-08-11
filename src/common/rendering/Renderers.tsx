@@ -36,7 +36,7 @@ export function VariantView({ variants, path }: VariantProps) {
     <span className="text-blue-400">
       {' { '}
       {variants.bound && <BoundView bound={variants.bound} path={path} />}
-      {variants.variants?.map((v, idx) => {
+      {variants.variants?.flat().map((v, idx) => {
         const newPath = [...path, idx];
         return (
           <span className="variant-option" key={`variant-${newPath.join('-')}`}>
@@ -64,13 +64,13 @@ function getLiteralFromVariants(
   variants: Variants,
   path: readonly number[],
 ): Chunk | undefined {
-  let currentSet = variants.variants;
+  let currentSet = variants.variants.flat();
   for (const node of path) {
     const variantsMaybe = currentSet[node];
     if (variantsMaybe?.type !== 'variants') {
       return variantsMaybe;
     }
-    currentSet = variantsMaybe.variants;
+    currentSet = variantsMaybe.variants.flat();
   }
   return undefined;
 }
@@ -132,7 +132,7 @@ export function FancyVariantView({
         open={open}
         onClose={handleClose}
         className="text-blue-400">
-        {variants.variants?.map((v, idx) => {
+        {variants.variants?.flat().map((v, idx) => {
           const newPath = [...path, idx];
           return (
             <MenuItem
@@ -171,7 +171,7 @@ export function BoundView({ bound }: BoundProps) {
 }
 
 export function ChunkView({ chunk, path }: ChunkProps) {
-  return <>{renderChunk(chunk, path)}</>;
+  return renderChunk(chunk, path);
 }
 
 function renderChunk(

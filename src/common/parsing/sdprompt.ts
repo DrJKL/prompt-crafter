@@ -15,15 +15,11 @@ declare var literal: any;
     // eslint-disable
     // @ts-nocheck
     import {basicPromptLexer} from './sdprompt_lexer';
-    import {Bound, Literal, Wildcard, Variants, DEFAULT_BOUND} from '../rendering/parsed_types';
     import {constructVariants, flattenVariantsList, constructBound, constructWildcard, constructLiteral} from './parse_utils';
-    
     
     /* Utility */
     const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
     const unwrap = (data: any[]) => data[0][0];
-    
-
 
 interface NearleyToken {
   value: any;
@@ -58,7 +54,7 @@ const grammar: Grammar = {
     {"name": "variant_prompt$ebnf$1", "symbols": []},
     {"name": "variant_prompt$ebnf$1$subexpression$1", "symbols": ["variant_chunk"], "postprocess": id},
     {"name": "variant_prompt$ebnf$1", "symbols": ["variant_prompt$ebnf$1", "variant_prompt$ebnf$1$subexpression$1"], "postprocess": (d) => d[0].concat([d[1]])},
-    {"name": "variant_prompt", "symbols": ["variant_prompt$ebnf$1"], "postprocess": id},
+    {"name": "variant_prompt", "symbols": ["variant_prompt$ebnf$1"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["variants"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["wildcard"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["literal_sequence"]},

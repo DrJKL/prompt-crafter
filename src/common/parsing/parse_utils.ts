@@ -8,8 +8,8 @@ import {
   Wildcard,
 } from '../rendering/parsed_types';
 
-export function countType(chunks: Chunk[], type: ChunkType): number {
-  return chunks.filter((chunk) => chunk.type === type).length;
+export function countType(chunks: Chunk[][], type: ChunkType): number {
+  return chunks.filter(([chunk]) => chunk.type === type).length;
 }
 const BOUND_FORMAT = new RegExp(
   '(?<min>\\d+)?(?:(?<dash>-)(?<max>\\d+)?)?\\$\\$(?:(?<separator>[^$]+?)\\$\\$)?',
@@ -19,11 +19,14 @@ const BOUND_FORMAT = new RegExp(
 
 // eslint-disable-next-line
 export function flattenVariantsList([firstVariant, restOfVariants]: any[]) {
-  return [firstVariant[0], ...restOfVariants];
+  const flattened = [...firstVariant, ...restOfVariants];
+  // console.table(flattened, ['value']);
+  return flattened;
 }
 
 // eslint-disable-next-line
 export function constructVariants([, boundMaybe, variants]: any[]): Variants {
+  console.table(variants);
   const bound = boundMaybe ?? DEFAULT_BOUND;
   const selections = generateDefaultSelection(bound, variants);
   return {

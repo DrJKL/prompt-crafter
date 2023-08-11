@@ -71,7 +71,7 @@ function formattedParseView(prompt: string) {
     if (!parser.results || !parser.results.length) {
       return <div>Failed to parse...</div>;
     }
-    const [results]: Array<Array<Chunk>> = parser.results; // Strip outer Array
+    const [[results]]: Array<Array<Array<Chunk>>> = parser.results; // Strip outer Array
 
     return (
       <div className="whitespace-nowrap justify-start items-center flex-wrap flex gap-1">
