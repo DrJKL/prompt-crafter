@@ -100,7 +100,7 @@ function App() {
           </LeftResizable>
           <Fill>
             <Fill>
-              <div className="overflow-y-auto h-full whitespace-pre-wrap p-4 pl-6">
+              <div className="overflow-y-auto h-full p-4 pl-6">
                 {tokensView(promptText, renderType)}
               </div>
             </Fill>

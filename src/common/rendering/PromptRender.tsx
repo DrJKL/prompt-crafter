@@ -4,18 +4,14 @@ import { basicPromptLexer } from '../parsing/sdprompt_lexer';
 import { RenderType } from './RenderType';
 import { Chunk } from './parsed_types';
 import { ChunkView } from './Renderers';
+import { Tooltip } from '@mui/material';
 
 export function tokensView(prompt: string, renderType: RenderType) {
-  basicPromptLexer.reset(prompt);
   switch (renderType) {
     case 'raw':
-      return Array.from(basicPromptLexer).map((token) => (
-        <span>{token.value}</span>
-      ));
+      return rawView(prompt);
     case 'tokens':
-      return Array.from(basicPromptLexer).map((token) => (
-        <span title={JSON.stringify(token)}>{token.type} </span>
-      ));
+      return tokenView(prompt);
     case 'parsed':
       return parseView(prompt);
     case 'parsed-formatted':
@@ -23,11 +19,41 @@ export function tokensView(prompt: string, renderType: RenderType) {
   }
 }
 
+function rawView(prompt: string) {
+  basicPromptLexer.reset(prompt);
+  return (
+    <div className="whitespace-pre-wrap">
+      {Array.from(basicPromptLexer).map((token, idx) => (
+        <span key={`${idx}-${token}`}>{token.value}</span>
+      ))}
+    </div>
+  );
+}
+
+function tokenView(prompt: string) {
+  basicPromptLexer.reset(prompt);
+  return (
+    <div className="whitespace-pre-wrap">
+      {Array.from(basicPromptLexer).map((token, idx) => (
+        <Tooltip
+          title={JSON.stringify(token, null, 1)}
+          sx={{ '& .MuiTooltip-popper': { whiteSpace: 'pre-wrap' } }}>
+          <span key={`${idx}-${token}`}>{token.type} </span>
+        </Tooltip>
+      ))}
+    </div>
+  );
+}
+
 function parseView(prompt: string) {
   const parser = new Parser(Grammar.fromCompiled(grammar));
   try {
     parser.feed(prompt);
-    return JSON.stringify(parser.results, null, 2);
+    return (
+      <div className="whitespace-pre-wrap">
+        {JSON.stringify(parser.results, null, 2)}
+      </div>
+    );
   } catch (error: unknown) {
     return (
       <div>
@@ -48,10 +74,11 @@ function formattedParseView(prompt: string) {
     const [results]: Array<Array<Chunk>> = parser.results; // Strip outer Array
 
     return (
-      <div className="whitespace-pre-line">
+      <div className="whitespace-nowrap justify-start items-center flex-wrap flex gap-1">
         {results.map((chunk, idx) => (
           <ChunkView
             chunk={chunk}
+            path={[0, idx]}
             key={`${idx}-chunk-${JSON.stringify(chunk)}`}
           />
         ))}
