@@ -1,5 +1,5 @@
 export type ChunkType = 'literal' | 'variants' | 'wildcard';
-export type Chunk = Wildcard | Literal | Bound | Variants;
+export type Chunk = Wildcard | Literal | Variants;
 
 export interface Wildcard {
   readonly type: 'wildcard';
@@ -10,17 +10,18 @@ export interface Literal {
   readonly type: 'literal';
   readonly value: string;
 }
-export interface Bound {
-  readonly type: 'bound';
-  readonly min: number;
-  readonly max: number;
-  readonly separator: string;
-}
 
 export interface Variants {
   readonly type: 'variants';
   readonly bound: Bound;
   variants: ReadonlyArray<Literal | Variants | Wildcard>;
+}
+
+export interface Bound {
+  readonly type: 'bound';
+  readonly min: number;
+  readonly max: number;
+  readonly separator: string;
 }
 
 export const DEFAULT_BOUND: Bound = {
