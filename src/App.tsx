@@ -38,6 +38,7 @@ function App() {
   const [renderType, setRenderType] = useState<RenderType>(
     getRenderTypeFromLocalStorage(),
   );
+  const [isFancy, setFancy] = useState(true);
   const monaco = useMonaco();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
@@ -88,6 +89,10 @@ function App() {
             renderType={renderType}
             handleDisplayTypeChange={handleDisplayTypeChange}
             rotateSelect={rotateSelect}
+            isFancy={isFancy}
+            changeFancy={(newValue: boolean) => {
+              setFancy(newValue);
+            }}
           />
         </Top>
         <Fill className="p-4 pb-10">
@@ -101,7 +106,7 @@ function App() {
           <Fill>
             <Fill>
               <div className="overflow-y-auto h-full p-4 pl-6">
-                {tokensView(promptText, renderType)}
+                {tokensView(promptText, renderType, isFancy)}
               </div>
             </Fill>
             <BottomResizable

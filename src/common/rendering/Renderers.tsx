@@ -1,10 +1,11 @@
 import { MouseEvent, ReactNode, useState } from 'react';
 import { Bound, Chunk, Literal, Variants } from './parsed_types';
-import { Button, MenuItem, Menu } from '@mui/material';
+import { MenuItem, Menu } from '@mui/material';
 
 interface KeyPath {
-  path: number[];
+  path?: number[];
   handleChange?: (path: number[]) => void;
+  fancy?: boolean;
 }
 
 interface LiteralProps extends KeyPath {
@@ -23,11 +24,11 @@ interface ChunkProps extends KeyPath {
   chunk: Chunk;
 }
 
-export function LiteralView({ literal }: LiteralProps) {
-  return <span className="text-pink-400 font-bold ">{literal.value}</span>;
+function LiteralView({ literal }: LiteralProps) {
+  return <span className="text-pink-400 font-bold">{literal.value}</span>;
 }
 
-export function VariantView({ variants, path }: VariantProps) {
+function VariantView({ variants, path = [0], fancy }: VariantProps) {
   return (
     <span className="text-blue-400">
       {' { '}
@@ -37,7 +38,7 @@ export function VariantView({ variants, path }: VariantProps) {
         return (
           <span className="variant-option" key={`variant-${newPath.join('-')}`}>
             {idx > 0 ? ' | ' : ''}
-            {v ? renderChunk(v) : ''}
+            {v ? ChunkView({ chunk: v, fancy, path: newPath }) : ''}
           </span>
         );
       })}
@@ -71,10 +72,11 @@ function getLiteralFromVariants(
   return undefined;
 }
 
-export function FancyVariantView({
+function FancyVariantView({
   variants,
-  path,
+  path = [0],
   handleChange,
+  fancy,
 }: VariantProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -130,10 +132,27 @@ export function FancyVariantView({
           return (
             <MenuItem
               className="variant-option"
+              disableRipple
               value={idx}
+              sx={{
+                '&:has( > a )': {
+                  // This will probably be broken in Firefox (without a config set for :has)
+                  padding: 0,
+                  '& > a': {
+                    padding: '6px 16px',
+                  },
+                },
+              }}
               onClick={() => selectVariant(v, idx)}
               key={`fancy-variant-${newPath.join('-')}`}>
-              {v ? renderChunk(v, newPath, handleChangeInternal(idx)) : null}
+              {v
+                ? ChunkView({
+                    chunk: v,
+                    path: newPath,
+                    handleChange: handleChangeInternal(idx),
+                    fancy,
+                  })
+                : null}
             </MenuItem>
           );
         })}
@@ -142,7 +161,7 @@ export function FancyVariantView({
   );
 }
 
-export function BoundView({ bound }: BoundProps) {
+function BoundView({ bound }: BoundProps) {
   const defaultRange = bound.min === 1 && bound.max === 1;
   const defaultSeparator = bound.separator === ', ';
 
@@ -163,26 +182,31 @@ export function BoundView({ bound }: BoundProps) {
   );
 }
 
-export function ChunkView({ chunk, path }: ChunkProps) {
-  return renderChunk(chunk, path);
-}
-
-function renderChunk(
-  chunk: Chunk,
+export function ChunkView({
+  chunk,
   path = [0],
-  handleChange?: (path: number[]) => void,
-): ReactNode {
+  handleChange,
+  fancy,
+}: ChunkProps): ReactNode {
   if (!chunk) {
     return <>Ummmm</>;
   }
   switch (chunk.type) {
     case 'literal':
-      return <LiteralView literal={chunk} path={path} />;
+      return <LiteralView literal={chunk} fancy={fancy} path={path} />;
     case 'variants':
-      return (
+      return fancy ? (
         <FancyVariantView
           variants={chunk}
           path={path}
+          fancy={fancy}
+          handleChange={handleChange}
+        />
+      ) : (
+        <VariantView
+          variants={chunk}
+          path={path}
+          fancy={fancy}
           handleChange={handleChange}
         />
       );

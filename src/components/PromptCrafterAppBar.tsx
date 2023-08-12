@@ -8,6 +8,8 @@ import {
   FormControl,
   InputLabel,
   SelectChangeEvent,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import { NavigateNext } from '@mui/icons-material';
 import { RENDER_TYPES, RenderType } from '../common/rendering/RenderType';
@@ -16,11 +18,15 @@ export interface PromptCrafterAppBarProps {
   renderType: RenderType;
   handleDisplayTypeChange: (event: SelectChangeEvent<RenderType>) => void;
   rotateSelect: () => void;
+  isFancy: boolean;
+  changeFancy: (newValue: boolean) => void;
 }
 export function PromptCrafterAppBar({
   renderType,
   handleDisplayTypeChange,
   rotateSelect,
+  isFancy,
+  changeFancy,
 }: PromptCrafterAppBarProps) {
   return (
     <AppBar position="static">
@@ -55,10 +61,23 @@ export function PromptCrafterAppBar({
             <NavigateNext />
           </IconButton>
         </span>
+        <span className="flex-1 items-center flex">
+          <FormControlLabel
+            label="Fancy?"
+            labelPlacement="end"
+            control={
+              <Switch
+                value=""
+                checked={isFancy}
+                onChange={() => changeFancy(!isFancy)}
+              />
+            }
+          />
+        </span>
         <Typography
           className="flex-auto text-right select-none"
           variant="subtitle1">
-          v0.0.2
+          v0.0.3
         </Typography>
       </Toolbar>
     </AppBar>

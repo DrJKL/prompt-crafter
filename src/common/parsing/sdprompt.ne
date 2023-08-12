@@ -15,7 +15,7 @@
 variant_prompt   -> (variant_chunk {% id %}):*                          
 
 variant_chunk    -> (variants | wildcard | literal_sequence | unknown)  {% unwrap %}
-variants         -> %lmoustache bound:? variants_list:?  %rmoustache    {% constructVariants %}
+variants         -> %vstart bound:? variants_list:?  %vend    {% constructVariants %}
 variants_list    -> variant (%bar variant {% (data) => data[1][0] %}):* {% flattenVariantsList %}
 variant          -> weight:? variant_prompt                             {% data => data[1] %}
 
@@ -24,4 +24,4 @@ bound            -> %bound                                              {% const
 
 wildcard         -> %wildcard                                           {% constructWildcard %}
 literal_sequence -> (%literal {% constructLiteral %}):+                 {% unwrap %}
-unknown          -> %lmoustache [\s\n]:*
+unknown          -> %vstart [\s\n]:*

@@ -6,7 +6,11 @@ import { Chunk } from './parsed_types';
 import { ChunkView } from './Renderers';
 import { Tooltip } from '@mui/material';
 
-export function tokensView(prompt: string, renderType: RenderType) {
+export function tokensView(
+  prompt: string,
+  renderType: RenderType,
+  fancy: boolean,
+) {
   switch (renderType) {
     case 'raw':
       return rawView(prompt);
@@ -15,7 +19,7 @@ export function tokensView(prompt: string, renderType: RenderType) {
     case 'parsed':
       return parseView(prompt);
     case 'parsed-formatted':
-      return formattedParseView(prompt);
+      return formattedParseView(prompt, fancy);
   }
 }
 
@@ -36,6 +40,7 @@ function tokenView(prompt: string) {
     <div className="whitespace-pre-wrap">
       {Array.from(basicPromptLexer).map((token, idx) => (
         <Tooltip
+          key={idx}
           title={JSON.stringify(token, null, 1)}
           sx={{ '& .MuiTooltip-popper': { whiteSpace: 'pre-wrap' } }}>
           <span key={`${idx}-${token}`}>{token.type} </span>
@@ -64,7 +69,7 @@ function parseView(prompt: string) {
   }
 }
 
-function formattedParseView(prompt: string) {
+function formattedParseView(prompt: string, fancy = true) {
   const parser = new Parser(Grammar.fromCompiled(grammar));
   try {
     parser.feed(prompt);
@@ -74,11 +79,12 @@ function formattedParseView(prompt: string) {
     const [[results]]: Array<Array<Array<Chunk>>> = parser.results; // Strip outer Array
 
     return (
-      <div className="whitespace-nowrap justify-start items-center flex-wrap flex gap-1">
+      <div className="whitespace-pre-wrap">
         {results.map((chunk, idx) => (
           <ChunkView
             chunk={chunk}
             path={[0, idx]}
+            fancy={fancy}
             key={`${idx}-chunk-${JSON.stringify(chunk)}`}
           />
         ))}

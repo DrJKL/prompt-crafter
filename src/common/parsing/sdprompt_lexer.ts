@@ -2,8 +2,8 @@ import moo from 'moo';
 const wildcard_enclosure = '__' as const;
 
 export const basicPromptLexer = moo.compile({
-  lmoustache: '{',
-  rmoustache: '}',
+  vstart: /\{\s*?/,
+  vend: /\s*?\}/,
   bar: /\s*\|\s*/,
   bound: [
     /\d+\$\$(?:[^$|}]+?\$\$)?/, // min

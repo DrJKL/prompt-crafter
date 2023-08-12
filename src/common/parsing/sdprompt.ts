@@ -3,8 +3,8 @@
 // Bypasses TS6133. Allow declared but unused functions.
 // @ts-ignore
 function id(d: any[]): any { return d[0]; }
-declare var lmoustache: any;
-declare var rmoustache: any;
+declare var vstart: any;
+declare var vend: any;
 declare var bar: any;
 declare var number: any;
 declare var integer: any;
@@ -64,7 +64,7 @@ const grammar: Grammar = {
     {"name": "variants$ebnf$1", "symbols": [], "postprocess": () => null},
     {"name": "variants$ebnf$2", "symbols": ["variants_list"], "postprocess": id},
     {"name": "variants$ebnf$2", "symbols": [], "postprocess": () => null},
-    {"name": "variants", "symbols": [(basicPromptLexer.has("lmoustache") ? {type: "lmoustache"} : lmoustache), "variants$ebnf$1", "variants$ebnf$2", (basicPromptLexer.has("rmoustache") ? {type: "rmoustache"} : rmoustache)], "postprocess": constructVariants},
+    {"name": "variants", "symbols": [(basicPromptLexer.has("vstart") ? {type: "vstart"} : vstart), "variants$ebnf$1", "variants$ebnf$2", (basicPromptLexer.has("vend") ? {type: "vend"} : vend)], "postprocess": constructVariants},
     {"name": "variants_list$ebnf$1", "symbols": []},
     {"name": "variants_list$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("bar") ? {type: "bar"} : bar), "variant"], "postprocess": (data) => data[1][0]},
     {"name": "variants_list$ebnf$1", "symbols": ["variants_list$ebnf$1", "variants_list$ebnf$1$subexpression$1"], "postprocess": (d) => d[0].concat([d[1]])},
@@ -83,7 +83,7 @@ const grammar: Grammar = {
     {"name": "literal_sequence", "symbols": ["literal_sequence$ebnf$1"], "postprocess": unwrap},
     {"name": "unknown$ebnf$1", "symbols": []},
     {"name": "unknown$ebnf$1", "symbols": ["unknown$ebnf$1", /[\s\n]/], "postprocess": (d) => d[0].concat([d[1]])},
-    {"name": "unknown", "symbols": [(basicPromptLexer.has("lmoustache") ? {type: "lmoustache"} : lmoustache), "unknown$ebnf$1"]}
+    {"name": "unknown", "symbols": [(basicPromptLexer.has("vstart") ? {type: "vstart"} : vstart), "unknown$ebnf$1"]}
   ],
   ParserStart: "variant_prompt",
 };
