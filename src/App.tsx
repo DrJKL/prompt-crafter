@@ -1,4 +1,4 @@
-import { CssBaseline, Typography, SelectChangeEvent } from '@mui/material';
+import { CssBaseline, Typography } from '@mui/material';
 import { Editor } from './components/Editor';
 import { useEffect, useRef, useState } from 'react';
 import { useMonaco } from '@monaco-editor/react';
@@ -7,7 +7,6 @@ import monaco from 'monaco-editor';
 import {
   Bottom,
   BottomResizable,
-  CenterType,
   Fill,
   LeftResizable,
   Top,
@@ -15,40 +14,34 @@ import {
 } from 'react-spaces';
 import { HistoryEdu } from '@mui/icons-material';
 import { PromptCrafterAppBar } from './components/PromptCrafterAppBar';
-import {
-  RenderType,
-  isRenderType,
-  nextType,
-} from './common/rendering/RenderType';
+import { nextType } from './common/rendering/RenderType';
 import { tokensView } from './common/rendering/PromptRender';
+import { useImmer } from 'use-immer';
+import {
+  getActivePrompt,
+  getRenderingOptions,
+  saveActivePrompt,
+  saveRenderingOptions,
+} from './common/saving/localstorage';
 
 /** LocalStorage keys */
-const keyActivePrompt = 'pc.active_prompt';
-const keyRenderType = 'pc.prompt_render_type';
-
-function getRenderTypeFromLocalStorage(): RenderType {
-  const currentValue = localStorage.getItem(keyRenderType);
-  return isRenderType(currentValue) ? currentValue : 'raw';
-}
 
 function App() {
-  const [promptText, setPromptText] = useState(
-    localStorage.getItem(keyActivePrompt) ?? '',
+  const [promptText, setPromptText] = useState(getActivePrompt());
+  const [renderingOptions, setRenderingOptions] = useImmer(
+    getRenderingOptions(),
   );
-  const [renderType, setRenderType] = useState<RenderType>(
-    getRenderTypeFromLocalStorage(),
-  );
-  const [isFancy, setFancy] = useState(true);
+
   const monaco = useMonaco();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   useEffect(() => {
-    localStorage.setItem(keyActivePrompt, promptText);
+    saveActivePrompt(promptText);
   }, [promptText]);
 
   useEffect(() => {
-    localStorage.setItem(keyRenderType, renderType);
-  }, [renderType]);
+    saveRenderingOptions(renderingOptions);
+  }, [renderingOptions]);
 
   useEffect(() => {
     if (!monaco) {
@@ -69,15 +62,10 @@ function App() {
     }
   }
 
-  function handleDisplayTypeChange(event: SelectChangeEvent<RenderType>) {
-    const value: unknown = event.target.value;
-    if (isRenderType(value)) {
-      setRenderType(value);
-    }
-  }
-
   function rotateSelect() {
-    setRenderType(nextType(renderType));
+    setRenderingOptions((draft) => {
+      draft.renderType = nextType(draft.renderType);
+    });
   }
 
   return (
@@ -86,13 +74,9 @@ function App() {
       <ViewPort>
         <Top size={64}>
           <PromptCrafterAppBar
-            renderType={renderType}
-            handleDisplayTypeChange={handleDisplayTypeChange}
+            renderingOptions={renderingOptions}
+            setRenderingOptions={setRenderingOptions}
             rotateSelect={rotateSelect}
-            isFancy={isFancy}
-            changeFancy={(newValue: boolean) => {
-              setFancy(newValue);
-            }}
           />
         </Top>
         <Fill className="p-4 pb-10">
@@ -106,7 +90,7 @@ function App() {
           <Fill>
             <Fill>
               <div className="overflow-y-auto h-full p-4 pl-6">
-                {tokensView(promptText, renderType, isFancy)}
+                {tokensView(promptText, renderingOptions)}
               </div>
             </Fill>
             <BottomResizable
@@ -119,7 +103,14 @@ function App() {
             </BottomResizable>
           </Fill>
         </Fill>
-        <Bottom size={'2rem'} centerContent={CenterType.HorizontalVertical}>
+        <Bottom size={'2rem'} className="flex justify-center gap-2">
+          <HistoryEdu color="secondary" />
+          <span>
+            Made with love by{' '}
+            <a target="_blank" href="https://github.com/drjkl/prompt-crafter">
+              DrJKL
+            </a>
+          </span>
           <HistoryEdu color="secondary" />
         </Bottom>
       </ViewPort>

@@ -10,24 +10,35 @@ import {
   SelectChangeEvent,
   FormControlLabel,
   Switch,
+  Slide,
 } from '@mui/material';
 import { NavigateNext } from '@mui/icons-material';
-import { RENDER_TYPES, RenderType } from '../common/rendering/RenderType';
+import {
+  RENDER_TYPES,
+  RenderType,
+  RenderingOptions,
+  isRenderType,
+} from '../common/rendering/RenderType';
+import { Updater } from 'use-immer';
 
 export interface PromptCrafterAppBarProps {
-  renderType: RenderType;
-  handleDisplayTypeChange: (event: SelectChangeEvent<RenderType>) => void;
   rotateSelect: () => void;
-  isFancy: boolean;
-  changeFancy: (newValue: boolean) => void;
+  renderingOptions: RenderingOptions;
+  setRenderingOptions: Updater<RenderingOptions>;
 }
 export function PromptCrafterAppBar({
-  renderType,
-  handleDisplayTypeChange,
   rotateSelect,
-  isFancy,
-  changeFancy,
+  renderingOptions,
+  setRenderingOptions,
 }: PromptCrafterAppBarProps) {
+  function handleDisplayTypeChange(event: SelectChangeEvent<RenderType>) {
+    const value: unknown = event.target.value;
+    if (isRenderType(value)) {
+      setRenderingOptions((draft) => {
+        draft.renderType = value;
+      });
+    }
+  }
   return (
     <AppBar position="static">
       <Toolbar className="flex flex-auto justify-between">
@@ -43,7 +54,7 @@ export function PromptCrafterAppBar({
             <Select
               label="Render Type"
               name="display-type"
-              value={renderType}
+              value={renderingOptions.renderType}
               autoWidth={true}
               onChange={handleDisplayTypeChange}>
               {RENDER_TYPES.map((type) => (
@@ -61,19 +72,44 @@ export function PromptCrafterAppBar({
             <NavigateNext />
           </IconButton>
         </span>
-        <span className="flex-1 items-center flex">
-          <FormControlLabel
-            label="Fancy?"
-            labelPlacement="end"
-            control={
-              <Switch
-                value=""
-                checked={isFancy}
-                onChange={() => changeFancy(!isFancy)}
+        <Slide in={renderingOptions.renderType === 'parsed-formatted'}>
+          <span className="flex">
+            <span className="flex-1 items-center flex">
+              <FormControlLabel
+                label="Fancy?"
+                labelPlacement="end"
+                control={
+                  <Switch
+                    value=""
+                    checked={renderingOptions.fancy}
+                    onChange={() =>
+                      setRenderingOptions((draft) => {
+                        draft.fancy = !draft.fancy;
+                      })
+                    }
+                  />
+                }
               />
-            }
-          />
-        </span>
+            </span>
+            <span className="flex-1 items-center flex">
+              <FormControlLabel
+                label="Dense?"
+                labelPlacement="end"
+                control={
+                  <Switch
+                    value=""
+                    checked={renderingOptions.dense}
+                    onChange={() =>
+                      setRenderingOptions((draft) => {
+                        draft.dense = !draft.dense;
+                      })
+                    }
+                  />
+                }
+              />
+            </span>
+          </span>
+        </Slide>
         <Typography
           className="flex-auto text-right select-none"
           variant="subtitle1">

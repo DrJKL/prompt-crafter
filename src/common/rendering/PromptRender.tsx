@@ -1,16 +1,13 @@
 import { Grammar, Parser } from 'nearley';
 import grammar from '../parsing/sdprompt';
 import { basicPromptLexer } from '../parsing/sdprompt_lexer';
-import { RenderType } from './RenderType';
+import { RenderingOptions } from './RenderType';
 import { Chunk } from './parsed_types';
 import { ChunkView } from './Renderers';
 import { Tooltip } from '@mui/material';
 
-export function tokensView(
-  prompt: string,
-  renderType: RenderType,
-  fancy: boolean,
-) {
+export function tokensView(prompt: string, options: RenderingOptions) {
+  const { renderType, fancy, dense } = options;
   switch (renderType) {
     case 'raw':
       return rawView(prompt);
@@ -19,7 +16,7 @@ export function tokensView(
     case 'parsed':
       return parseView(prompt);
     case 'parsed-formatted':
-      return formattedParseView(prompt, fancy);
+      return formattedParseView(prompt, fancy, dense);
   }
 }
 
@@ -69,7 +66,7 @@ function parseView(prompt: string) {
   }
 }
 
-function formattedParseView(prompt: string, fancy = true) {
+function formattedParseView(prompt: string, fancy = true, dense = true) {
   const parser = new Parser(Grammar.fromCompiled(grammar));
   try {
     parser.feed(prompt);
@@ -79,7 +76,7 @@ function formattedParseView(prompt: string, fancy = true) {
     const [[results]]: Array<Array<Array<Chunk>>> = parser.results; // Strip outer Array
 
     return (
-      <div className="whitespace-pre-wrap">
+      <div className={dense ? 'whitespace-normal' : `whitespace-pre-line`}>
         {results.map((chunk, idx) => (
           <ChunkView
             chunk={chunk}
