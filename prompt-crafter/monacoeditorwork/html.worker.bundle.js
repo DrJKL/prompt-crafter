@@ -1,5 +1,5 @@
 (() => {
-  // node_modules/monaco-editor/esm/vs/base/common/errors.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/errors.js
   var ErrorHandler = class {
     constructor() {
       this.listeners = [];
@@ -85,11 +85,10 @@
     constructor(message) {
       super(message || "An unexpected bug occurred.");
       Object.setPrototypeOf(this, _BugIndicatingError.prototype);
-      debugger;
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/functional.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/functional.js
   function once(fn) {
     const _this = this;
     let didCall = false;
@@ -104,7 +103,7 @@
     };
   }
 
-  // node_modules/monaco-editor/esm/vs/base/common/iterator.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/iterator.js
   var Iterable;
   (function(Iterable2) {
     function is(thing) {
@@ -223,7 +222,7 @@
     Iterable2.consume = consume;
   })(Iterable || (Iterable = {}));
 
-  // node_modules/monaco-editor/esm/vs/base/common/lifecycle.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/lifecycle.js
   var TRACK_DISPOSABLES = false;
   var disposableTracker = null;
   function setDisposableTracker(tracker) {
@@ -397,29 +396,6 @@
   };
   Disposable.None = Object.freeze({ dispose() {
   } });
-  var SafeDisposable = class {
-    constructor() {
-      this.dispose = () => {
-      };
-      this.unset = () => {
-      };
-      this.isset = () => false;
-      trackDisposable(this);
-    }
-    set(fn) {
-      let callback = fn;
-      this.unset = () => callback = void 0;
-      this.isset = () => callback !== void 0;
-      this.dispose = () => {
-        if (callback) {
-          callback();
-          callback = void 0;
-          markAsDisposed(this);
-        }
-      };
-      return this;
-    }
-  };
   var DisposableMap = class {
     constructor() {
       this._store = /* @__PURE__ */ new Map();
@@ -462,12 +438,20 @@
       }
       this._store.set(key, value);
     }
+    /**
+     * Delete the value stored for `key` from this map and also dispose of it.
+     */
+    deleteAndDispose(key) {
+      var _a4;
+      (_a4 = this._store.get(key)) === null || _a4 === void 0 ? void 0 : _a4.dispose();
+      this._store.delete(key);
+    }
     [Symbol.iterator]() {
       return this._store[Symbol.iterator]();
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/linkedList.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/linkedList.js
   var Node = class _Node {
     constructor(element) {
       this.element = element;
@@ -575,158 +559,14 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/nls.js
-  var isPseudo = typeof document !== "undefined" && document.location && document.location.hash.indexOf("pseudo=true") >= 0;
-  function _format(message, args) {
-    let result;
-    if (args.length === 0) {
-      result = message;
-    } else {
-      result = message.replace(/\{(\d+)\}/g, (match, rest) => {
-        const index = rest[0];
-        const arg = args[index];
-        let result2 = match;
-        if (typeof arg === "string") {
-          result2 = arg;
-        } else if (typeof arg === "number" || typeof arg === "boolean" || arg === void 0 || arg === null) {
-          result2 = String(arg);
-        }
-        return result2;
-      });
-    }
-    if (isPseudo) {
-      result = "\uFF3B" + result.replace(/[aouei]/g, "$&$&") + "\uFF3D";
-    }
-    return result;
-  }
-  function localize(data, message, ...args) {
-    return _format(message, args);
-  }
-  function getConfiguredDefaultLocale(_) {
-    return void 0;
-  }
-
-  // node_modules/monaco-editor/esm/vs/base/common/platform.js
-  var _a;
-  var LANGUAGE_DEFAULT = "en";
-  var _isWindows = false;
-  var _isMacintosh = false;
-  var _isLinux = false;
-  var _isLinuxSnap = false;
-  var _isNative = false;
-  var _isWeb = false;
-  var _isElectron = false;
-  var _isIOS = false;
-  var _isCI = false;
-  var _isMobile = false;
-  var _locale = void 0;
-  var _language = LANGUAGE_DEFAULT;
-  var _translationsConfigFile = void 0;
-  var _userAgent = void 0;
-  var globals = typeof self === "object" ? self : typeof global === "object" ? global : {};
-  var nodeProcess = void 0;
-  if (typeof globals.vscode !== "undefined" && typeof globals.vscode.process !== "undefined") {
-    nodeProcess = globals.vscode.process;
-  } else if (typeof process !== "undefined") {
-    nodeProcess = process;
-  }
-  var isElectronProcess = typeof ((_a = nodeProcess === null || nodeProcess === void 0 ? void 0 : nodeProcess.versions) === null || _a === void 0 ? void 0 : _a.electron) === "string";
-  var isElectronRenderer = isElectronProcess && (nodeProcess === null || nodeProcess === void 0 ? void 0 : nodeProcess.type) === "renderer";
-  if (typeof navigator === "object" && !isElectronRenderer) {
-    _userAgent = navigator.userAgent;
-    _isWindows = _userAgent.indexOf("Windows") >= 0;
-    _isMacintosh = _userAgent.indexOf("Macintosh") >= 0;
-    _isIOS = (_userAgent.indexOf("Macintosh") >= 0 || _userAgent.indexOf("iPad") >= 0 || _userAgent.indexOf("iPhone") >= 0) && !!navigator.maxTouchPoints && navigator.maxTouchPoints > 0;
-    _isLinux = _userAgent.indexOf("Linux") >= 0;
-    _isMobile = (_userAgent === null || _userAgent === void 0 ? void 0 : _userAgent.indexOf("Mobi")) >= 0;
-    _isWeb = true;
-    const configuredLocale = getConfiguredDefaultLocale(
-      // This call _must_ be done in the file that calls `nls.getConfiguredDefaultLocale`
-      // to ensure that the NLS AMD Loader plugin has been loaded and configured.
-      // This is because the loader plugin decides what the default locale is based on
-      // how it's able to resolve the strings.
-      localize({ key: "ensureLoaderPluginIsLoaded", comment: ["{Locked}"] }, "_")
-    );
-    _locale = configuredLocale || LANGUAGE_DEFAULT;
-    _language = _locale;
-  } else if (typeof nodeProcess === "object") {
-    _isWindows = nodeProcess.platform === "win32";
-    _isMacintosh = nodeProcess.platform === "darwin";
-    _isLinux = nodeProcess.platform === "linux";
-    _isLinuxSnap = _isLinux && !!nodeProcess.env["SNAP"] && !!nodeProcess.env["SNAP_REVISION"];
-    _isElectron = isElectronProcess;
-    _isCI = !!nodeProcess.env["CI"] || !!nodeProcess.env["BUILD_ARTIFACTSTAGINGDIRECTORY"];
-    _locale = LANGUAGE_DEFAULT;
-    _language = LANGUAGE_DEFAULT;
-    const rawNlsConfig = nodeProcess.env["VSCODE_NLS_CONFIG"];
-    if (rawNlsConfig) {
-      try {
-        const nlsConfig = JSON.parse(rawNlsConfig);
-        const resolved = nlsConfig.availableLanguages["*"];
-        _locale = nlsConfig.locale;
-        _language = resolved ? resolved : LANGUAGE_DEFAULT;
-        _translationsConfigFile = nlsConfig._translationsConfigFile;
-      } catch (e) {
-      }
-    }
-    _isNative = true;
-  } else {
-    console.error("Unable to resolve platform.");
-  }
-  var _platform = 0;
-  if (_isMacintosh) {
-    _platform = 1;
-  } else if (_isWindows) {
-    _platform = 3;
-  } else if (_isLinux) {
-    _platform = 2;
-  }
-  var isWindows = _isWindows;
-  var isMacintosh = _isMacintosh;
-  var isWebWorker = _isWeb && typeof globals.importScripts === "function";
-  var userAgent = _userAgent;
-  var setTimeout0IsFaster = typeof globals.postMessage === "function" && !globals.importScripts;
-  var setTimeout0 = (() => {
-    if (setTimeout0IsFaster) {
-      const pending = [];
-      globals.addEventListener("message", (e) => {
-        if (e.data && e.data.vscodeScheduleAsyncWork) {
-          for (let i = 0, len = pending.length; i < len; i++) {
-            const candidate = pending[i];
-            if (candidate.id === e.data.vscodeScheduleAsyncWork) {
-              pending.splice(i, 1);
-              candidate.callback();
-              return;
-            }
-          }
-        }
-      });
-      let lastId = 0;
-      return (callback) => {
-        const myId = ++lastId;
-        pending.push({
-          id: myId,
-          callback
-        });
-        globals.postMessage({ vscodeScheduleAsyncWork: myId }, "*");
-      };
-    }
-    return (callback) => setTimeout(callback);
-  })();
-  var isChrome = !!(userAgent && userAgent.indexOf("Chrome") >= 0);
-  var isFirefox = !!(userAgent && userAgent.indexOf("Firefox") >= 0);
-  var isSafari = !!(!isChrome && (userAgent && userAgent.indexOf("Safari") >= 0));
-  var isEdge = !!(userAgent && userAgent.indexOf("Edg/") >= 0);
-  var isAndroid = !!(userAgent && userAgent.indexOf("Android") >= 0);
-
-  // node_modules/monaco-editor/esm/vs/base/common/stopwatch.js
-  var hasPerformanceNow = globals.performance && typeof globals.performance.now === "function";
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/stopwatch.js
+  var hasPerformanceNow = globalThis.performance && typeof globalThis.performance.now === "function";
   var StopWatch = class _StopWatch {
-    static create(highResolution = true) {
+    static create(highResolution) {
       return new _StopWatch(highResolution);
     }
     constructor(highResolution) {
-      this._highResolution = hasPerformanceNow && highResolution;
+      this._now = hasPerformanceNow && highResolution === false ? Date.now : globalThis.performance.now.bind(globalThis.performance);
       this._startTime = this._now();
       this._stopTime = -1;
     }
@@ -739,12 +579,9 @@
       }
       return this._now() - this._startTime;
     }
-    _now() {
-      return this._highResolution ? globals.performance.now() : Date.now();
-    }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/event.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/event.js
   var _enableDisposeWithListenerWarning = false;
   var _enableSnapshotPotentialLeakWarning = false;
   var Event;
@@ -962,27 +799,35 @@
         this.event = event;
         this.disposables = new DisposableStore();
       }
+      /** @see {@link Event.map} */
       map(fn) {
         return new ChainableEvent(map(this.event, fn, this.disposables));
       }
+      /** @see {@link Event.forEach} */
       forEach(fn) {
         return new ChainableEvent(forEach(this.event, fn, this.disposables));
       }
       filter(fn) {
         return new ChainableEvent(filter(this.event, fn, this.disposables));
       }
+      /** @see {@link Event.reduce} */
       reduce(merge, initial) {
         return new ChainableEvent(reduce(this.event, merge, initial, this.disposables));
       }
+      /** @see {@link Event.reduce} */
       latch() {
         return new ChainableEvent(latch(this.event, void 0, this.disposables));
       }
       debounce(merge, delay = 100, leading = false, flushOnListenerRemove = false, leakWarningThreshold) {
         return new ChainableEvent(debounce(this.event, merge, delay, leading, flushOnListenerRemove, leakWarningThreshold, this.disposables));
       }
+      /**
+       * Attach a listener to the event.
+       */
       on(listener, thisArgs, disposables) {
         return this.event(listener, thisArgs, disposables);
       }
+      /** @see {@link Event.once} */
       once(listener, thisArgs, disposables) {
         return once3(this.event)(listener, thisArgs, disposables);
       }
@@ -1035,16 +880,16 @@
     }
     Event2.runAndSubscribeWithStore = runAndSubscribeWithStore;
     class EmitterObserver {
-      constructor(obs, store) {
-        this.obs = obs;
+      constructor(_observable, store) {
+        this._observable = _observable;
         this._counter = 0;
         this._hasChanged = false;
         const options = {
           onWillAddFirstListener: () => {
-            obs.addObserver(this);
+            _observable.addObserver(this);
           },
           onDidRemoveLastListener: () => {
-            obs.removeObserver(this);
+            _observable.removeObserver(this);
           }
         };
         if (!store) {
@@ -1058,14 +903,18 @@
       beginUpdate(_observable) {
         this._counter++;
       }
+      handlePossibleChange(_observable) {
+      }
       handleChange(_observable, _change) {
         this._hasChanged = true;
       }
       endUpdate(_observable) {
-        if (--this._counter === 0) {
+        this._counter--;
+        if (this._counter === 0) {
+          this._observable.reportChanges();
           if (this._hasChanged) {
             this._hasChanged = false;
-            this.emitter.fire(this.obs.get());
+            this.emitter.fire(this._observable.get());
           }
         }
       }
@@ -1075,6 +924,40 @@
       return observer.emitter.event;
     }
     Event2.fromObservable = fromObservable;
+    function fromObservableLight(observable) {
+      return (listener) => {
+        let count = 0;
+        let didChange = false;
+        const observer = {
+          beginUpdate() {
+            count++;
+          },
+          endUpdate() {
+            count--;
+            if (count === 0) {
+              observable.reportChanges();
+              if (didChange) {
+                didChange = false;
+                listener();
+              }
+            }
+          },
+          handlePossibleChange() {
+          },
+          handleChange() {
+            didChange = true;
+          }
+        };
+        observable.addObserver(observer);
+        observable.reportChanges();
+        return {
+          dispose() {
+            observable.removeObserver(observer);
+          }
+        };
+      };
+    }
+    Event2.fromObservableLight = fromObservableLight;
   })(Event || (Event = {}));
   var EventProfiling = class _EventProfiling {
     constructor(name) {
@@ -1086,7 +969,7 @@
       _EventProfiling.all.add(this);
     }
     start(listenerCount) {
-      this._stopWatch = new StopWatch(true);
+      this._stopWatch = new StopWatch();
       this.listenerCount = listenerCount;
     }
     stop() {
@@ -1154,21 +1037,28 @@
       console.warn(this.value.split("\n").slice(2).join("\n"));
     }
   };
-  var Listener = class {
-    constructor(callback, callbackThis, stack) {
-      this.callback = callback;
-      this.callbackThis = callbackThis;
-      this.stack = stack;
-      this.subscription = new SafeDisposable();
+  var UniqueContainer = class {
+    constructor(value) {
+      this.value = value;
     }
-    invoke(e) {
-      this.callback.call(this.callbackThis, e);
+  };
+  var compactionThreshold = 2;
+  var forEachListener = (listeners, fn) => {
+    if (listeners instanceof UniqueContainer) {
+      fn(listeners);
+    } else {
+      for (let i = 0; i < listeners.length; i++) {
+        const l = listeners[i];
+        if (l) {
+          fn(l);
+        }
+      }
     }
   };
   var Emitter = class {
     constructor(options) {
       var _a4, _b, _c, _d, _e;
-      this._disposed = false;
+      this._size = 0;
       this._options = options;
       this._leakageMon = _globalLeakWarningThreshold > 0 || ((_a4 = this._options) === null || _a4 === void 0 ? void 0 : _a4.leakWarningThreshold) ? new LeakageMonitor((_c = (_b = this._options) === null || _b === void 0 ? void 0 : _b.leakWarningThreshold) !== null && _c !== void 0 ? _c : _globalLeakWarningThreshold) : void 0;
       this._perfMon = ((_d = this._options) === null || _d === void 0 ? void 0 : _d._profName) ? new EventProfiling(this._options._profName) : void 0;
@@ -1178,22 +1068,22 @@
       var _a4, _b, _c, _d;
       if (!this._disposed) {
         this._disposed = true;
+        if (((_a4 = this._deliveryQueue) === null || _a4 === void 0 ? void 0 : _a4.current) === this) {
+          this._deliveryQueue.reset();
+        }
         if (this._listeners) {
           if (_enableDisposeWithListenerWarning) {
-            const listeners = Array.from(this._listeners);
+            const listeners = this._listeners;
             queueMicrotask(() => {
-              var _a5;
-              for (const listener of listeners) {
-                if (listener.subscription.isset()) {
-                  listener.subscription.unset();
-                  (_a5 = listener.stack) === null || _a5 === void 0 ? void 0 : _a5.print();
-                }
-              }
+              forEachListener(listeners, (l) => {
+                var _a5;
+                return (_a5 = l.stack) === null || _a5 === void 0 ? void 0 : _a5.print();
+              });
             });
           }
-          this._listeners.clear();
+          this._listeners = void 0;
+          this._size = 0;
         }
-        (_a4 = this._deliveryQueue) === null || _a4 === void 0 ? void 0 : _a4.clear(this);
         (_c = (_b = this._options) === null || _b === void 0 ? void 0 : _b.onDidRemoveLastListener) === null || _c === void 0 ? void 0 : _c.call(_b);
         (_d = this._leakageMon) === null || _d === void 0 ? void 0 : _d.dispose();
       }
@@ -1203,141 +1093,169 @@
      * to events from this Emitter
      */
     get event() {
-      if (!this._event) {
-        this._event = (callback, thisArgs, disposables) => {
-          var _a4, _b, _c;
-          if (!this._listeners) {
-            this._listeners = new LinkedList();
-          }
-          if (this._leakageMon && this._listeners.size > this._leakageMon.threshold * 3) {
-            console.warn(`[${this._leakageMon.name}] REFUSES to accept new listeners because it exceeded its threshold by far`);
-            return Disposable.None;
-          }
-          const firstListener = this._listeners.isEmpty();
-          if (firstListener && ((_a4 = this._options) === null || _a4 === void 0 ? void 0 : _a4.onWillAddFirstListener)) {
-            this._options.onWillAddFirstListener(this);
-          }
-          let removeMonitor;
-          let stack;
-          if (this._leakageMon && this._listeners.size >= Math.ceil(this._leakageMon.threshold * 0.2)) {
-            stack = Stacktrace.create();
-            removeMonitor = this._leakageMon.check(stack, this._listeners.size + 1);
-          }
-          if (_enableDisposeWithListenerWarning) {
-            stack = stack !== null && stack !== void 0 ? stack : Stacktrace.create();
-          }
-          const listener = new Listener(callback, thisArgs, stack);
-          const removeListener = this._listeners.push(listener);
-          if (firstListener && ((_b = this._options) === null || _b === void 0 ? void 0 : _b.onDidAddFirstListener)) {
-            this._options.onDidAddFirstListener(this);
-          }
-          if ((_c = this._options) === null || _c === void 0 ? void 0 : _c.onDidAddListener) {
-            this._options.onDidAddListener(this, callback, thisArgs);
-          }
-          const result = listener.subscription.set(() => {
-            var _a5, _b2;
-            removeMonitor === null || removeMonitor === void 0 ? void 0 : removeMonitor();
-            if (!this._disposed) {
-              (_b2 = (_a5 = this._options) === null || _a5 === void 0 ? void 0 : _a5.onWillRemoveListener) === null || _b2 === void 0 ? void 0 : _b2.call(_a5, this);
-              removeListener();
-              if (this._options && this._options.onDidRemoveLastListener) {
-                const hasListeners = this._listeners && !this._listeners.isEmpty();
-                if (!hasListeners) {
-                  this._options.onDidRemoveLastListener(this);
-                }
-              }
-            }
-          });
-          if (disposables instanceof DisposableStore) {
-            disposables.add(result);
-          } else if (Array.isArray(disposables)) {
-            disposables.push(result);
-          }
-          return result;
-        };
-      }
+      var _a4;
+      (_a4 = this._event) !== null && _a4 !== void 0 ? _a4 : this._event = (callback, thisArgs, disposables) => {
+        var _a5, _b, _c, _d, _e;
+        if (this._leakageMon && this._size > this._leakageMon.threshold * 3) {
+          console.warn(`[${this._leakageMon.name}] REFUSES to accept new listeners because it exceeded its threshold by far`);
+          return Disposable.None;
+        }
+        if (this._disposed) {
+          return Disposable.None;
+        }
+        if (thisArgs) {
+          callback = callback.bind(thisArgs);
+        }
+        const contained = new UniqueContainer(callback);
+        let removeMonitor;
+        let stack;
+        if (this._leakageMon && this._size >= Math.ceil(this._leakageMon.threshold * 0.2)) {
+          contained.stack = Stacktrace.create();
+          removeMonitor = this._leakageMon.check(contained.stack, this._size + 1);
+        }
+        if (_enableDisposeWithListenerWarning) {
+          contained.stack = stack !== null && stack !== void 0 ? stack : Stacktrace.create();
+        }
+        if (!this._listeners) {
+          (_b = (_a5 = this._options) === null || _a5 === void 0 ? void 0 : _a5.onWillAddFirstListener) === null || _b === void 0 ? void 0 : _b.call(_a5, this);
+          this._listeners = contained;
+          (_d = (_c = this._options) === null || _c === void 0 ? void 0 : _c.onDidAddFirstListener) === null || _d === void 0 ? void 0 : _d.call(_c, this);
+        } else if (this._listeners instanceof UniqueContainer) {
+          (_e = this._deliveryQueue) !== null && _e !== void 0 ? _e : this._deliveryQueue = new EventDeliveryQueuePrivate();
+          this._listeners = [this._listeners, contained];
+        } else {
+          this._listeners.push(contained);
+        }
+        this._size++;
+        const result = toDisposable(() => {
+          removeMonitor === null || removeMonitor === void 0 ? void 0 : removeMonitor();
+          this._removeListener(contained);
+        });
+        if (disposables instanceof DisposableStore) {
+          disposables.add(result);
+        } else if (Array.isArray(disposables)) {
+          disposables.push(result);
+        }
+        return result;
+      };
       return this._event;
+    }
+    _removeListener(listener) {
+      var _a4, _b, _c, _d;
+      (_b = (_a4 = this._options) === null || _a4 === void 0 ? void 0 : _a4.onWillRemoveListener) === null || _b === void 0 ? void 0 : _b.call(_a4, this);
+      if (!this._listeners) {
+        return;
+      }
+      if (this._size === 1) {
+        this._listeners = void 0;
+        (_d = (_c = this._options) === null || _c === void 0 ? void 0 : _c.onDidRemoveLastListener) === null || _d === void 0 ? void 0 : _d.call(_c, this);
+        this._size = 0;
+        return;
+      }
+      const listeners = this._listeners;
+      const index = listeners.indexOf(listener);
+      if (index === -1) {
+        console.log("disposed?", this._disposed);
+        console.log("size?", this._size);
+        console.log("arr?", JSON.stringify(this._listeners));
+        throw new Error("Attempted to dispose unknown listener");
+      }
+      this._size--;
+      listeners[index] = void 0;
+      const adjustDeliveryQueue = this._deliveryQueue.current === this;
+      if (this._size * compactionThreshold <= listeners.length) {
+        let n = 0;
+        for (let i = 0; i < listeners.length; i++) {
+          if (listeners[i]) {
+            listeners[n++] = listeners[i];
+          } else if (adjustDeliveryQueue) {
+            this._deliveryQueue.end--;
+            if (n < this._deliveryQueue.i) {
+              this._deliveryQueue.i--;
+            }
+          }
+        }
+        listeners.length = n;
+      }
+    }
+    _deliver(listener, value) {
+      var _a4;
+      if (!listener) {
+        return;
+      }
+      const errorHandler2 = ((_a4 = this._options) === null || _a4 === void 0 ? void 0 : _a4.onListenerError) || onUnexpectedError;
+      if (!errorHandler2) {
+        listener.value(value);
+        return;
+      }
+      try {
+        listener.value(value);
+      } catch (e) {
+        errorHandler2(e);
+      }
+    }
+    /** Delivers items in the queue. Assumes the queue is ready to go. */
+    _deliverQueue(dq) {
+      const listeners = dq.current._listeners;
+      while (dq.i < dq.end) {
+        this._deliver(listeners[dq.i++], dq.value);
+      }
+      dq.reset();
     }
     /**
      * To be kept private to fire an event to
      * subscribers
      */
     fire(event) {
-      var _a4, _b;
-      if (this._listeners) {
-        if (!this._deliveryQueue) {
-          this._deliveryQueue = new PrivateEventDeliveryQueue();
-        }
-        for (const listener of this._listeners) {
-          this._deliveryQueue.push(this, listener, event);
-        }
-        (_a4 = this._perfMon) === null || _a4 === void 0 ? void 0 : _a4.start(this._deliveryQueue.size);
-        this._deliveryQueue.deliver();
+      var _a4, _b, _c, _d;
+      if ((_a4 = this._deliveryQueue) === null || _a4 === void 0 ? void 0 : _a4.current) {
+        this._deliverQueue(this._deliveryQueue);
         (_b = this._perfMon) === null || _b === void 0 ? void 0 : _b.stop();
       }
+      (_c = this._perfMon) === null || _c === void 0 ? void 0 : _c.start(this._size);
+      if (!this._listeners) {
+      } else if (this._listeners instanceof UniqueContainer) {
+        this._deliver(this._listeners, event);
+      } else {
+        const dq = this._deliveryQueue;
+        dq.enqueue(this, event, this._listeners.length);
+        this._deliverQueue(dq);
+      }
+      (_d = this._perfMon) === null || _d === void 0 ? void 0 : _d.stop();
     }
     hasListeners() {
-      if (!this._listeners) {
-        return false;
-      }
-      return !this._listeners.isEmpty();
+      return this._size > 0;
     }
   };
-  var EventDeliveryQueue = class {
+  var EventDeliveryQueuePrivate = class {
     constructor() {
-      this._queue = new LinkedList();
+      this.i = -1;
+      this.end = 0;
     }
-    get size() {
-      return this._queue.size;
+    enqueue(emitter, value, end) {
+      this.i = 0;
+      this.end = end;
+      this.current = emitter;
+      this.value = value;
     }
-    push(emitter, listener, event) {
-      this._queue.push(new EventDeliveryQueueElement(emitter, listener, event));
-    }
-    clear(emitter) {
-      const newQueue = new LinkedList();
-      for (const element of this._queue) {
-        if (element.emitter !== emitter) {
-          newQueue.push(element);
-        }
-      }
-      this._queue = newQueue;
-    }
-    deliver() {
-      while (this._queue.size > 0) {
-        const element = this._queue.shift();
-        try {
-          element.listener.invoke(element.event);
-        } catch (e) {
-          onUnexpectedError(e);
-        }
-      }
-    }
-  };
-  var PrivateEventDeliveryQueue = class extends EventDeliveryQueue {
-    clear(emitter) {
-      this._queue.clear();
-    }
-  };
-  var EventDeliveryQueueElement = class {
-    constructor(emitter, listener, event) {
-      this.emitter = emitter;
-      this.listener = listener;
-      this.event = event;
+    reset() {
+      this.i = this.end;
+      this.current = void 0;
+      this.value = void 0;
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/types.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/types.js
   function isString(str) {
     return typeof str === "string";
   }
 
-  // node_modules/monaco-editor/esm/vs/base/common/objects.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/objects.js
   function getAllPropertyNames(obj) {
     let res = [];
-    let proto = Object.getPrototypeOf(obj);
-    while (Object.prototype !== proto) {
-      res = res.concat(Object.getOwnPropertyNames(proto));
-      proto = Object.getPrototypeOf(proto);
+    while (Object.prototype !== obj) {
+      res = res.concat(Object.getOwnPropertyNames(obj));
+      obj = Object.getPrototypeOf(obj);
     }
     return res;
   }
@@ -1364,7 +1282,154 @@
     return result;
   }
 
-  // node_modules/monaco-editor/esm/vs/base/common/cache.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/nls.js
+  var isPseudo = typeof document !== "undefined" && document.location && document.location.hash.indexOf("pseudo=true") >= 0;
+  function _format(message, args) {
+    let result;
+    if (args.length === 0) {
+      result = message;
+    } else {
+      result = message.replace(/\{(\d+)\}/g, (match, rest) => {
+        const index = rest[0];
+        const arg = args[index];
+        let result2 = match;
+        if (typeof arg === "string") {
+          result2 = arg;
+        } else if (typeof arg === "number" || typeof arg === "boolean" || arg === void 0 || arg === null) {
+          result2 = String(arg);
+        }
+        return result2;
+      });
+    }
+    if (isPseudo) {
+      result = "\uFF3B" + result.replace(/[aouei]/g, "$&$&") + "\uFF3D";
+    }
+    return result;
+  }
+  function localize(data, message, ...args) {
+    return _format(message, args);
+  }
+  function getConfiguredDefaultLocale(_) {
+    return void 0;
+  }
+
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/platform.js
+  var _a;
+  var LANGUAGE_DEFAULT = "en";
+  var _isWindows = false;
+  var _isMacintosh = false;
+  var _isLinux = false;
+  var _isLinuxSnap = false;
+  var _isNative = false;
+  var _isWeb = false;
+  var _isElectron = false;
+  var _isIOS = false;
+  var _isCI = false;
+  var _isMobile = false;
+  var _locale = void 0;
+  var _language = LANGUAGE_DEFAULT;
+  var _platformLocale = LANGUAGE_DEFAULT;
+  var _translationsConfigFile = void 0;
+  var _userAgent = void 0;
+  var globals = typeof self === "object" ? self : typeof global === "object" ? global : {};
+  var nodeProcess = void 0;
+  if (typeof globals.vscode !== "undefined" && typeof globals.vscode.process !== "undefined") {
+    nodeProcess = globals.vscode.process;
+  } else if (typeof process !== "undefined") {
+    nodeProcess = process;
+  }
+  var isElectronProcess = typeof ((_a = nodeProcess === null || nodeProcess === void 0 ? void 0 : nodeProcess.versions) === null || _a === void 0 ? void 0 : _a.electron) === "string";
+  var isElectronRenderer = isElectronProcess && (nodeProcess === null || nodeProcess === void 0 ? void 0 : nodeProcess.type) === "renderer";
+  if (typeof navigator === "object" && !isElectronRenderer) {
+    _userAgent = navigator.userAgent;
+    _isWindows = _userAgent.indexOf("Windows") >= 0;
+    _isMacintosh = _userAgent.indexOf("Macintosh") >= 0;
+    _isIOS = (_userAgent.indexOf("Macintosh") >= 0 || _userAgent.indexOf("iPad") >= 0 || _userAgent.indexOf("iPhone") >= 0) && !!navigator.maxTouchPoints && navigator.maxTouchPoints > 0;
+    _isLinux = _userAgent.indexOf("Linux") >= 0;
+    _isMobile = (_userAgent === null || _userAgent === void 0 ? void 0 : _userAgent.indexOf("Mobi")) >= 0;
+    _isWeb = true;
+    const configuredLocale = getConfiguredDefaultLocale(
+      // This call _must_ be done in the file that calls `nls.getConfiguredDefaultLocale`
+      // to ensure that the NLS AMD Loader plugin has been loaded and configured.
+      // This is because the loader plugin decides what the default locale is based on
+      // how it's able to resolve the strings.
+      localize({ key: "ensureLoaderPluginIsLoaded", comment: ["{Locked}"] }, "_")
+    );
+    _locale = configuredLocale || LANGUAGE_DEFAULT;
+    _language = _locale;
+    _platformLocale = navigator.language;
+  } else if (typeof nodeProcess === "object") {
+    _isWindows = nodeProcess.platform === "win32";
+    _isMacintosh = nodeProcess.platform === "darwin";
+    _isLinux = nodeProcess.platform === "linux";
+    _isLinuxSnap = _isLinux && !!nodeProcess.env["SNAP"] && !!nodeProcess.env["SNAP_REVISION"];
+    _isElectron = isElectronProcess;
+    _isCI = !!nodeProcess.env["CI"] || !!nodeProcess.env["BUILD_ARTIFACTSTAGINGDIRECTORY"];
+    _locale = LANGUAGE_DEFAULT;
+    _language = LANGUAGE_DEFAULT;
+    const rawNlsConfig = nodeProcess.env["VSCODE_NLS_CONFIG"];
+    if (rawNlsConfig) {
+      try {
+        const nlsConfig = JSON.parse(rawNlsConfig);
+        const resolved = nlsConfig.availableLanguages["*"];
+        _locale = nlsConfig.locale;
+        _platformLocale = nlsConfig.osLocale;
+        _language = resolved ? resolved : LANGUAGE_DEFAULT;
+        _translationsConfigFile = nlsConfig._translationsConfigFile;
+      } catch (e) {
+      }
+    }
+    _isNative = true;
+  } else {
+    console.error("Unable to resolve platform.");
+  }
+  var _platform = 0;
+  if (_isMacintosh) {
+    _platform = 1;
+  } else if (_isWindows) {
+    _platform = 3;
+  } else if (_isLinux) {
+    _platform = 2;
+  }
+  var isWindows = _isWindows;
+  var isMacintosh = _isMacintosh;
+  var isWebWorker = _isWeb && typeof globals.importScripts === "function";
+  var userAgent = _userAgent;
+  var setTimeout0IsFaster = typeof globals.postMessage === "function" && !globals.importScripts;
+  var setTimeout0 = (() => {
+    if (setTimeout0IsFaster) {
+      const pending = [];
+      globals.addEventListener("message", (e) => {
+        if (e.data && e.data.vscodeScheduleAsyncWork) {
+          for (let i = 0, len = pending.length; i < len; i++) {
+            const candidate = pending[i];
+            if (candidate.id === e.data.vscodeScheduleAsyncWork) {
+              pending.splice(i, 1);
+              candidate.callback();
+              return;
+            }
+          }
+        }
+      });
+      let lastId = 0;
+      return (callback) => {
+        const myId = ++lastId;
+        pending.push({
+          id: myId,
+          callback
+        });
+        globals.postMessage({ vscodeScheduleAsyncWork: myId }, "*");
+      };
+    }
+    return (callback) => setTimeout(callback);
+  })();
+  var isChrome = !!(userAgent && userAgent.indexOf("Chrome") >= 0);
+  var isFirefox = !!(userAgent && userAgent.indexOf("Firefox") >= 0);
+  var isSafari = !!(!isChrome && (userAgent && userAgent.indexOf("Safari") >= 0));
+  var isEdge = !!(userAgent && userAgent.indexOf("Edg/") >= 0);
+  var isAndroid = !!(userAgent && userAgent.indexOf("Android") >= 0);
+
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/cache.js
   var LRUCachedFunction = class {
     constructor(fn) {
       this.fn = fn;
@@ -1381,7 +1446,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/lazy.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/lazy.js
   var Lazy = class {
     constructor(executor) {
       this.executor = executor;
@@ -1416,7 +1481,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/strings.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/strings.js
   var _a2;
   function escapeRegExpCharacters(value) {
     return value.replace(/[\\\{\}\*\+\?\|\^\$\.\[\]\(\)]/g, "\\$&");
@@ -1540,7 +1605,7 @@
   };
   _a2 = AmbiguousCharacters;
   AmbiguousCharacters.ambiguousCharacterData = new Lazy(() => {
-    return JSON.parse('{"_common":[8232,32,8233,32,5760,32,8192,32,8193,32,8194,32,8195,32,8196,32,8197,32,8198,32,8200,32,8201,32,8202,32,8287,32,8199,32,8239,32,2042,95,65101,95,65102,95,65103,95,8208,45,8209,45,8210,45,65112,45,1748,45,8259,45,727,45,8722,45,10134,45,11450,45,1549,44,1643,44,8218,44,184,44,42233,44,894,59,2307,58,2691,58,1417,58,1795,58,1796,58,5868,58,65072,58,6147,58,6153,58,8282,58,1475,58,760,58,42889,58,8758,58,720,58,42237,58,451,33,11601,33,660,63,577,63,2429,63,5038,63,42731,63,119149,46,8228,46,1793,46,1794,46,42510,46,68176,46,1632,46,1776,46,42232,46,1373,96,65287,96,8219,96,8242,96,1370,96,1523,96,8175,96,65344,96,900,96,8189,96,8125,96,8127,96,8190,96,697,96,884,96,712,96,714,96,715,96,756,96,699,96,701,96,700,96,702,96,42892,96,1497,96,2036,96,2037,96,5194,96,5836,96,94033,96,94034,96,65339,91,10088,40,10098,40,12308,40,64830,40,65341,93,10089,41,10099,41,12309,41,64831,41,10100,123,119060,123,10101,125,65342,94,8270,42,1645,42,8727,42,66335,42,5941,47,8257,47,8725,47,8260,47,9585,47,10187,47,10744,47,119354,47,12755,47,12339,47,11462,47,20031,47,12035,47,65340,92,65128,92,8726,92,10189,92,10741,92,10745,92,119311,92,119355,92,12756,92,20022,92,12034,92,42872,38,708,94,710,94,5869,43,10133,43,66203,43,8249,60,10094,60,706,60,119350,60,5176,60,5810,60,5120,61,11840,61,12448,61,42239,61,8250,62,10095,62,707,62,119351,62,5171,62,94015,62,8275,126,732,126,8128,126,8764,126,65372,124,65293,45,120784,50,120794,50,120804,50,120814,50,120824,50,130034,50,42842,50,423,50,1000,50,42564,50,5311,50,42735,50,119302,51,120785,51,120795,51,120805,51,120815,51,120825,51,130035,51,42923,51,540,51,439,51,42858,51,11468,51,1248,51,94011,51,71882,51,120786,52,120796,52,120806,52,120816,52,120826,52,130036,52,5070,52,71855,52,120787,53,120797,53,120807,53,120817,53,120827,53,130037,53,444,53,71867,53,120788,54,120798,54,120808,54,120818,54,120828,54,130038,54,11474,54,5102,54,71893,54,119314,55,120789,55,120799,55,120809,55,120819,55,120829,55,130039,55,66770,55,71878,55,2819,56,2538,56,2666,56,125131,56,120790,56,120800,56,120810,56,120820,56,120830,56,130040,56,547,56,546,56,66330,56,2663,57,2920,57,2541,57,3437,57,120791,57,120801,57,120811,57,120821,57,120831,57,130041,57,42862,57,11466,57,71884,57,71852,57,71894,57,9082,97,65345,97,119834,97,119886,97,119938,97,119990,97,120042,97,120094,97,120146,97,120198,97,120250,97,120302,97,120354,97,120406,97,120458,97,593,97,945,97,120514,97,120572,97,120630,97,120688,97,120746,97,65313,65,119808,65,119860,65,119912,65,119964,65,120016,65,120068,65,120120,65,120172,65,120224,65,120276,65,120328,65,120380,65,120432,65,913,65,120488,65,120546,65,120604,65,120662,65,120720,65,5034,65,5573,65,42222,65,94016,65,66208,65,119835,98,119887,98,119939,98,119991,98,120043,98,120095,98,120147,98,120199,98,120251,98,120303,98,120355,98,120407,98,120459,98,388,98,5071,98,5234,98,5551,98,65314,66,8492,66,119809,66,119861,66,119913,66,120017,66,120069,66,120121,66,120173,66,120225,66,120277,66,120329,66,120381,66,120433,66,42932,66,914,66,120489,66,120547,66,120605,66,120663,66,120721,66,5108,66,5623,66,42192,66,66178,66,66209,66,66305,66,65347,99,8573,99,119836,99,119888,99,119940,99,119992,99,120044,99,120096,99,120148,99,120200,99,120252,99,120304,99,120356,99,120408,99,120460,99,7428,99,1010,99,11429,99,43951,99,66621,99,128844,67,71922,67,71913,67,65315,67,8557,67,8450,67,8493,67,119810,67,119862,67,119914,67,119966,67,120018,67,120174,67,120226,67,120278,67,120330,67,120382,67,120434,67,1017,67,11428,67,5087,67,42202,67,66210,67,66306,67,66581,67,66844,67,8574,100,8518,100,119837,100,119889,100,119941,100,119993,100,120045,100,120097,100,120149,100,120201,100,120253,100,120305,100,120357,100,120409,100,120461,100,1281,100,5095,100,5231,100,42194,100,8558,68,8517,68,119811,68,119863,68,119915,68,119967,68,120019,68,120071,68,120123,68,120175,68,120227,68,120279,68,120331,68,120383,68,120435,68,5024,68,5598,68,5610,68,42195,68,8494,101,65349,101,8495,101,8519,101,119838,101,119890,101,119942,101,120046,101,120098,101,120150,101,120202,101,120254,101,120306,101,120358,101,120410,101,120462,101,43826,101,1213,101,8959,69,65317,69,8496,69,119812,69,119864,69,119916,69,120020,69,120072,69,120124,69,120176,69,120228,69,120280,69,120332,69,120384,69,120436,69,917,69,120492,69,120550,69,120608,69,120666,69,120724,69,11577,69,5036,69,42224,69,71846,69,71854,69,66182,69,119839,102,119891,102,119943,102,119995,102,120047,102,120099,102,120151,102,120203,102,120255,102,120307,102,120359,102,120411,102,120463,102,43829,102,42905,102,383,102,7837,102,1412,102,119315,70,8497,70,119813,70,119865,70,119917,70,120021,70,120073,70,120125,70,120177,70,120229,70,120281,70,120333,70,120385,70,120437,70,42904,70,988,70,120778,70,5556,70,42205,70,71874,70,71842,70,66183,70,66213,70,66853,70,65351,103,8458,103,119840,103,119892,103,119944,103,120048,103,120100,103,120152,103,120204,103,120256,103,120308,103,120360,103,120412,103,120464,103,609,103,7555,103,397,103,1409,103,119814,71,119866,71,119918,71,119970,71,120022,71,120074,71,120126,71,120178,71,120230,71,120282,71,120334,71,120386,71,120438,71,1292,71,5056,71,5107,71,42198,71,65352,104,8462,104,119841,104,119945,104,119997,104,120049,104,120101,104,120153,104,120205,104,120257,104,120309,104,120361,104,120413,104,120465,104,1211,104,1392,104,5058,104,65320,72,8459,72,8460,72,8461,72,119815,72,119867,72,119919,72,120023,72,120179,72,120231,72,120283,72,120335,72,120387,72,120439,72,919,72,120494,72,120552,72,120610,72,120668,72,120726,72,11406,72,5051,72,5500,72,42215,72,66255,72,731,105,9075,105,65353,105,8560,105,8505,105,8520,105,119842,105,119894,105,119946,105,119998,105,120050,105,120102,105,120154,105,120206,105,120258,105,120310,105,120362,105,120414,105,120466,105,120484,105,618,105,617,105,953,105,8126,105,890,105,120522,105,120580,105,120638,105,120696,105,120754,105,1110,105,42567,105,1231,105,43893,105,5029,105,71875,105,65354,106,8521,106,119843,106,119895,106,119947,106,119999,106,120051,106,120103,106,120155,106,120207,106,120259,106,120311,106,120363,106,120415,106,120467,106,1011,106,1112,106,65322,74,119817,74,119869,74,119921,74,119973,74,120025,74,120077,74,120129,74,120181,74,120233,74,120285,74,120337,74,120389,74,120441,74,42930,74,895,74,1032,74,5035,74,5261,74,42201,74,119844,107,119896,107,119948,107,120000,107,120052,107,120104,107,120156,107,120208,107,120260,107,120312,107,120364,107,120416,107,120468,107,8490,75,65323,75,119818,75,119870,75,119922,75,119974,75,120026,75,120078,75,120130,75,120182,75,120234,75,120286,75,120338,75,120390,75,120442,75,922,75,120497,75,120555,75,120613,75,120671,75,120729,75,11412,75,5094,75,5845,75,42199,75,66840,75,1472,108,8739,73,9213,73,65512,73,1633,108,1777,73,66336,108,125127,108,120783,73,120793,73,120803,73,120813,73,120823,73,130033,73,65321,73,8544,73,8464,73,8465,73,119816,73,119868,73,119920,73,120024,73,120128,73,120180,73,120232,73,120284,73,120336,73,120388,73,120440,73,65356,108,8572,73,8467,108,119845,108,119897,108,119949,108,120001,108,120053,108,120105,73,120157,73,120209,73,120261,73,120313,73,120365,73,120417,73,120469,73,448,73,120496,73,120554,73,120612,73,120670,73,120728,73,11410,73,1030,73,1216,73,1493,108,1503,108,1575,108,126464,108,126592,108,65166,108,65165,108,1994,108,11599,73,5825,73,42226,73,93992,73,66186,124,66313,124,119338,76,8556,76,8466,76,119819,76,119871,76,119923,76,120027,76,120079,76,120131,76,120183,76,120235,76,120287,76,120339,76,120391,76,120443,76,11472,76,5086,76,5290,76,42209,76,93974,76,71843,76,71858,76,66587,76,66854,76,65325,77,8559,77,8499,77,119820,77,119872,77,119924,77,120028,77,120080,77,120132,77,120184,77,120236,77,120288,77,120340,77,120392,77,120444,77,924,77,120499,77,120557,77,120615,77,120673,77,120731,77,1018,77,11416,77,5047,77,5616,77,5846,77,42207,77,66224,77,66321,77,119847,110,119899,110,119951,110,120003,110,120055,110,120107,110,120159,110,120211,110,120263,110,120315,110,120367,110,120419,110,120471,110,1400,110,1404,110,65326,78,8469,78,119821,78,119873,78,119925,78,119977,78,120029,78,120081,78,120185,78,120237,78,120289,78,120341,78,120393,78,120445,78,925,78,120500,78,120558,78,120616,78,120674,78,120732,78,11418,78,42208,78,66835,78,3074,111,3202,111,3330,111,3458,111,2406,111,2662,111,2790,111,3046,111,3174,111,3302,111,3430,111,3664,111,3792,111,4160,111,1637,111,1781,111,65359,111,8500,111,119848,111,119900,111,119952,111,120056,111,120108,111,120160,111,120212,111,120264,111,120316,111,120368,111,120420,111,120472,111,7439,111,7441,111,43837,111,959,111,120528,111,120586,111,120644,111,120702,111,120760,111,963,111,120532,111,120590,111,120648,111,120706,111,120764,111,11423,111,4351,111,1413,111,1505,111,1607,111,126500,111,126564,111,126596,111,65259,111,65260,111,65258,111,65257,111,1726,111,64428,111,64429,111,64427,111,64426,111,1729,111,64424,111,64425,111,64423,111,64422,111,1749,111,3360,111,4125,111,66794,111,71880,111,71895,111,66604,111,1984,79,2534,79,2918,79,12295,79,70864,79,71904,79,120782,79,120792,79,120802,79,120812,79,120822,79,130032,79,65327,79,119822,79,119874,79,119926,79,119978,79,120030,79,120082,79,120134,79,120186,79,120238,79,120290,79,120342,79,120394,79,120446,79,927,79,120502,79,120560,79,120618,79,120676,79,120734,79,11422,79,1365,79,11604,79,4816,79,2848,79,66754,79,42227,79,71861,79,66194,79,66219,79,66564,79,66838,79,9076,112,65360,112,119849,112,119901,112,119953,112,120005,112,120057,112,120109,112,120161,112,120213,112,120265,112,120317,112,120369,112,120421,112,120473,112,961,112,120530,112,120544,112,120588,112,120602,112,120646,112,120660,112,120704,112,120718,112,120762,112,120776,112,11427,112,65328,80,8473,80,119823,80,119875,80,119927,80,119979,80,120031,80,120083,80,120187,80,120239,80,120291,80,120343,80,120395,80,120447,80,929,80,120504,80,120562,80,120620,80,120678,80,120736,80,11426,80,5090,80,5229,80,42193,80,66197,80,119850,113,119902,113,119954,113,120006,113,120058,113,120110,113,120162,113,120214,113,120266,113,120318,113,120370,113,120422,113,120474,113,1307,113,1379,113,1382,113,8474,81,119824,81,119876,81,119928,81,119980,81,120032,81,120084,81,120188,81,120240,81,120292,81,120344,81,120396,81,120448,81,11605,81,119851,114,119903,114,119955,114,120007,114,120059,114,120111,114,120163,114,120215,114,120267,114,120319,114,120371,114,120423,114,120475,114,43847,114,43848,114,7462,114,11397,114,43905,114,119318,82,8475,82,8476,82,8477,82,119825,82,119877,82,119929,82,120033,82,120189,82,120241,82,120293,82,120345,82,120397,82,120449,82,422,82,5025,82,5074,82,66740,82,5511,82,42211,82,94005,82,65363,115,119852,115,119904,115,119956,115,120008,115,120060,115,120112,115,120164,115,120216,115,120268,115,120320,115,120372,115,120424,115,120476,115,42801,115,445,115,1109,115,43946,115,71873,115,66632,115,65331,83,119826,83,119878,83,119930,83,119982,83,120034,83,120086,83,120138,83,120190,83,120242,83,120294,83,120346,83,120398,83,120450,83,1029,83,1359,83,5077,83,5082,83,42210,83,94010,83,66198,83,66592,83,119853,116,119905,116,119957,116,120009,116,120061,116,120113,116,120165,116,120217,116,120269,116,120321,116,120373,116,120425,116,120477,116,8868,84,10201,84,128872,84,65332,84,119827,84,119879,84,119931,84,119983,84,120035,84,120087,84,120139,84,120191,84,120243,84,120295,84,120347,84,120399,84,120451,84,932,84,120507,84,120565,84,120623,84,120681,84,120739,84,11430,84,5026,84,42196,84,93962,84,71868,84,66199,84,66225,84,66325,84,119854,117,119906,117,119958,117,120010,117,120062,117,120114,117,120166,117,120218,117,120270,117,120322,117,120374,117,120426,117,120478,117,42911,117,7452,117,43854,117,43858,117,651,117,965,117,120534,117,120592,117,120650,117,120708,117,120766,117,1405,117,66806,117,71896,117,8746,85,8899,85,119828,85,119880,85,119932,85,119984,85,120036,85,120088,85,120140,85,120192,85,120244,85,120296,85,120348,85,120400,85,120452,85,1357,85,4608,85,66766,85,5196,85,42228,85,94018,85,71864,85,8744,118,8897,118,65366,118,8564,118,119855,118,119907,118,119959,118,120011,118,120063,118,120115,118,120167,118,120219,118,120271,118,120323,118,120375,118,120427,118,120479,118,7456,118,957,118,120526,118,120584,118,120642,118,120700,118,120758,118,1141,118,1496,118,71430,118,43945,118,71872,118,119309,86,1639,86,1783,86,8548,86,119829,86,119881,86,119933,86,119985,86,120037,86,120089,86,120141,86,120193,86,120245,86,120297,86,120349,86,120401,86,120453,86,1140,86,11576,86,5081,86,5167,86,42719,86,42214,86,93960,86,71840,86,66845,86,623,119,119856,119,119908,119,119960,119,120012,119,120064,119,120116,119,120168,119,120220,119,120272,119,120324,119,120376,119,120428,119,120480,119,7457,119,1121,119,1309,119,1377,119,71434,119,71438,119,71439,119,43907,119,71919,87,71910,87,119830,87,119882,87,119934,87,119986,87,120038,87,120090,87,120142,87,120194,87,120246,87,120298,87,120350,87,120402,87,120454,87,1308,87,5043,87,5076,87,42218,87,5742,120,10539,120,10540,120,10799,120,65368,120,8569,120,119857,120,119909,120,119961,120,120013,120,120065,120,120117,120,120169,120,120221,120,120273,120,120325,120,120377,120,120429,120,120481,120,5441,120,5501,120,5741,88,9587,88,66338,88,71916,88,65336,88,8553,88,119831,88,119883,88,119935,88,119987,88,120039,88,120091,88,120143,88,120195,88,120247,88,120299,88,120351,88,120403,88,120455,88,42931,88,935,88,120510,88,120568,88,120626,88,120684,88,120742,88,11436,88,11613,88,5815,88,42219,88,66192,88,66228,88,66327,88,66855,88,611,121,7564,121,65369,121,119858,121,119910,121,119962,121,120014,121,120066,121,120118,121,120170,121,120222,121,120274,121,120326,121,120378,121,120430,121,120482,121,655,121,7935,121,43866,121,947,121,8509,121,120516,121,120574,121,120632,121,120690,121,120748,121,1199,121,4327,121,71900,121,65337,89,119832,89,119884,89,119936,89,119988,89,120040,89,120092,89,120144,89,120196,89,120248,89,120300,89,120352,89,120404,89,120456,89,933,89,978,89,120508,89,120566,89,120624,89,120682,89,120740,89,11432,89,1198,89,5033,89,5053,89,42220,89,94019,89,71844,89,66226,89,119859,122,119911,122,119963,122,120015,122,120067,122,120119,122,120171,122,120223,122,120275,122,120327,122,120379,122,120431,122,120483,122,7458,122,43923,122,71876,122,66293,90,71909,90,65338,90,8484,90,8488,90,119833,90,119885,90,119937,90,119989,90,120041,90,120197,90,120249,90,120301,90,120353,90,120405,90,120457,90,918,90,120493,90,120551,90,120609,90,120667,90,120725,90,5059,90,42204,90,71849,90,65282,34,65284,36,65285,37,65286,38,65290,42,65291,43,65294,46,65295,47,65296,48,65297,49,65298,50,65299,51,65300,52,65301,53,65302,54,65303,55,65304,56,65305,57,65308,60,65309,61,65310,62,65312,64,65316,68,65318,70,65319,71,65324,76,65329,81,65330,82,65333,85,65334,86,65335,87,65343,95,65346,98,65348,100,65350,102,65355,107,65357,109,65358,110,65361,113,65362,114,65364,116,65365,117,65367,119,65370,122,65371,123,65373,125],"_default":[160,32,8211,45,65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"cs":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"de":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"es":[8211,45,65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"fr":[65374,126,65306,58,65281,33,8216,96,8245,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"it":[160,32,8211,45,65374,126,65306,58,65281,33,8216,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"ja":[8211,45,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65292,44,65307,59],"ko":[8211,45,65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"pl":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"pt-BR":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"qps-ploc":[160,32,8211,45,65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"ru":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,305,105,921,73,1009,112,215,120,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"tr":[160,32,8211,45,65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"zh-hans":[65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65288,40,65289,41],"zh-hant":[8211,45,65374,126,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65307,59]}');
+    return JSON.parse('{"_common":[8232,32,8233,32,5760,32,8192,32,8193,32,8194,32,8195,32,8196,32,8197,32,8198,32,8200,32,8201,32,8202,32,8287,32,8199,32,8239,32,2042,95,65101,95,65102,95,65103,95,8208,45,8209,45,8210,45,65112,45,1748,45,8259,45,727,45,8722,45,10134,45,11450,45,1549,44,1643,44,8218,44,184,44,42233,44,894,59,2307,58,2691,58,1417,58,1795,58,1796,58,5868,58,65072,58,6147,58,6153,58,8282,58,1475,58,760,58,42889,58,8758,58,720,58,42237,58,451,33,11601,33,660,63,577,63,2429,63,5038,63,42731,63,119149,46,8228,46,1793,46,1794,46,42510,46,68176,46,1632,46,1776,46,42232,46,1373,96,65287,96,8219,96,8242,96,1370,96,1523,96,8175,96,65344,96,900,96,8189,96,8125,96,8127,96,8190,96,697,96,884,96,712,96,714,96,715,96,756,96,699,96,701,96,700,96,702,96,42892,96,1497,96,2036,96,2037,96,5194,96,5836,96,94033,96,94034,96,65339,91,10088,40,10098,40,12308,40,64830,40,65341,93,10089,41,10099,41,12309,41,64831,41,10100,123,119060,123,10101,125,65342,94,8270,42,1645,42,8727,42,66335,42,5941,47,8257,47,8725,47,8260,47,9585,47,10187,47,10744,47,119354,47,12755,47,12339,47,11462,47,20031,47,12035,47,65340,92,65128,92,8726,92,10189,92,10741,92,10745,92,119311,92,119355,92,12756,92,20022,92,12034,92,42872,38,708,94,710,94,5869,43,10133,43,66203,43,8249,60,10094,60,706,60,119350,60,5176,60,5810,60,5120,61,11840,61,12448,61,42239,61,8250,62,10095,62,707,62,119351,62,5171,62,94015,62,8275,126,732,126,8128,126,8764,126,65372,124,65293,45,120784,50,120794,50,120804,50,120814,50,120824,50,130034,50,42842,50,423,50,1000,50,42564,50,5311,50,42735,50,119302,51,120785,51,120795,51,120805,51,120815,51,120825,51,130035,51,42923,51,540,51,439,51,42858,51,11468,51,1248,51,94011,51,71882,51,120786,52,120796,52,120806,52,120816,52,120826,52,130036,52,5070,52,71855,52,120787,53,120797,53,120807,53,120817,53,120827,53,130037,53,444,53,71867,53,120788,54,120798,54,120808,54,120818,54,120828,54,130038,54,11474,54,5102,54,71893,54,119314,55,120789,55,120799,55,120809,55,120819,55,120829,55,130039,55,66770,55,71878,55,2819,56,2538,56,2666,56,125131,56,120790,56,120800,56,120810,56,120820,56,120830,56,130040,56,547,56,546,56,66330,56,2663,57,2920,57,2541,57,3437,57,120791,57,120801,57,120811,57,120821,57,120831,57,130041,57,42862,57,11466,57,71884,57,71852,57,71894,57,9082,97,65345,97,119834,97,119886,97,119938,97,119990,97,120042,97,120094,97,120146,97,120198,97,120250,97,120302,97,120354,97,120406,97,120458,97,593,97,945,97,120514,97,120572,97,120630,97,120688,97,120746,97,65313,65,119808,65,119860,65,119912,65,119964,65,120016,65,120068,65,120120,65,120172,65,120224,65,120276,65,120328,65,120380,65,120432,65,913,65,120488,65,120546,65,120604,65,120662,65,120720,65,5034,65,5573,65,42222,65,94016,65,66208,65,119835,98,119887,98,119939,98,119991,98,120043,98,120095,98,120147,98,120199,98,120251,98,120303,98,120355,98,120407,98,120459,98,388,98,5071,98,5234,98,5551,98,65314,66,8492,66,119809,66,119861,66,119913,66,120017,66,120069,66,120121,66,120173,66,120225,66,120277,66,120329,66,120381,66,120433,66,42932,66,914,66,120489,66,120547,66,120605,66,120663,66,120721,66,5108,66,5623,66,42192,66,66178,66,66209,66,66305,66,65347,99,8573,99,119836,99,119888,99,119940,99,119992,99,120044,99,120096,99,120148,99,120200,99,120252,99,120304,99,120356,99,120408,99,120460,99,7428,99,1010,99,11429,99,43951,99,66621,99,128844,67,71922,67,71913,67,65315,67,8557,67,8450,67,8493,67,119810,67,119862,67,119914,67,119966,67,120018,67,120174,67,120226,67,120278,67,120330,67,120382,67,120434,67,1017,67,11428,67,5087,67,42202,67,66210,67,66306,67,66581,67,66844,67,8574,100,8518,100,119837,100,119889,100,119941,100,119993,100,120045,100,120097,100,120149,100,120201,100,120253,100,120305,100,120357,100,120409,100,120461,100,1281,100,5095,100,5231,100,42194,100,8558,68,8517,68,119811,68,119863,68,119915,68,119967,68,120019,68,120071,68,120123,68,120175,68,120227,68,120279,68,120331,68,120383,68,120435,68,5024,68,5598,68,5610,68,42195,68,8494,101,65349,101,8495,101,8519,101,119838,101,119890,101,119942,101,120046,101,120098,101,120150,101,120202,101,120254,101,120306,101,120358,101,120410,101,120462,101,43826,101,1213,101,8959,69,65317,69,8496,69,119812,69,119864,69,119916,69,120020,69,120072,69,120124,69,120176,69,120228,69,120280,69,120332,69,120384,69,120436,69,917,69,120492,69,120550,69,120608,69,120666,69,120724,69,11577,69,5036,69,42224,69,71846,69,71854,69,66182,69,119839,102,119891,102,119943,102,119995,102,120047,102,120099,102,120151,102,120203,102,120255,102,120307,102,120359,102,120411,102,120463,102,43829,102,42905,102,383,102,7837,102,1412,102,119315,70,8497,70,119813,70,119865,70,119917,70,120021,70,120073,70,120125,70,120177,70,120229,70,120281,70,120333,70,120385,70,120437,70,42904,70,988,70,120778,70,5556,70,42205,70,71874,70,71842,70,66183,70,66213,70,66853,70,65351,103,8458,103,119840,103,119892,103,119944,103,120048,103,120100,103,120152,103,120204,103,120256,103,120308,103,120360,103,120412,103,120464,103,609,103,7555,103,397,103,1409,103,119814,71,119866,71,119918,71,119970,71,120022,71,120074,71,120126,71,120178,71,120230,71,120282,71,120334,71,120386,71,120438,71,1292,71,5056,71,5107,71,42198,71,65352,104,8462,104,119841,104,119945,104,119997,104,120049,104,120101,104,120153,104,120205,104,120257,104,120309,104,120361,104,120413,104,120465,104,1211,104,1392,104,5058,104,65320,72,8459,72,8460,72,8461,72,119815,72,119867,72,119919,72,120023,72,120179,72,120231,72,120283,72,120335,72,120387,72,120439,72,919,72,120494,72,120552,72,120610,72,120668,72,120726,72,11406,72,5051,72,5500,72,42215,72,66255,72,731,105,9075,105,65353,105,8560,105,8505,105,8520,105,119842,105,119894,105,119946,105,119998,105,120050,105,120102,105,120154,105,120206,105,120258,105,120310,105,120362,105,120414,105,120466,105,120484,105,618,105,617,105,953,105,8126,105,890,105,120522,105,120580,105,120638,105,120696,105,120754,105,1110,105,42567,105,1231,105,43893,105,5029,105,71875,105,65354,106,8521,106,119843,106,119895,106,119947,106,119999,106,120051,106,120103,106,120155,106,120207,106,120259,106,120311,106,120363,106,120415,106,120467,106,1011,106,1112,106,65322,74,119817,74,119869,74,119921,74,119973,74,120025,74,120077,74,120129,74,120181,74,120233,74,120285,74,120337,74,120389,74,120441,74,42930,74,895,74,1032,74,5035,74,5261,74,42201,74,119844,107,119896,107,119948,107,120000,107,120052,107,120104,107,120156,107,120208,107,120260,107,120312,107,120364,107,120416,107,120468,107,8490,75,65323,75,119818,75,119870,75,119922,75,119974,75,120026,75,120078,75,120130,75,120182,75,120234,75,120286,75,120338,75,120390,75,120442,75,922,75,120497,75,120555,75,120613,75,120671,75,120729,75,11412,75,5094,75,5845,75,42199,75,66840,75,1472,108,8739,73,9213,73,65512,73,1633,108,1777,73,66336,108,125127,108,120783,73,120793,73,120803,73,120813,73,120823,73,130033,73,65321,73,8544,73,8464,73,8465,73,119816,73,119868,73,119920,73,120024,73,120128,73,120180,73,120232,73,120284,73,120336,73,120388,73,120440,73,65356,108,8572,73,8467,108,119845,108,119897,108,119949,108,120001,108,120053,108,120105,73,120157,73,120209,73,120261,73,120313,73,120365,73,120417,73,120469,73,448,73,120496,73,120554,73,120612,73,120670,73,120728,73,11410,73,1030,73,1216,73,1493,108,1503,108,1575,108,126464,108,126592,108,65166,108,65165,108,1994,108,11599,73,5825,73,42226,73,93992,73,66186,124,66313,124,119338,76,8556,76,8466,76,119819,76,119871,76,119923,76,120027,76,120079,76,120131,76,120183,76,120235,76,120287,76,120339,76,120391,76,120443,76,11472,76,5086,76,5290,76,42209,76,93974,76,71843,76,71858,76,66587,76,66854,76,65325,77,8559,77,8499,77,119820,77,119872,77,119924,77,120028,77,120080,77,120132,77,120184,77,120236,77,120288,77,120340,77,120392,77,120444,77,924,77,120499,77,120557,77,120615,77,120673,77,120731,77,1018,77,11416,77,5047,77,5616,77,5846,77,42207,77,66224,77,66321,77,119847,110,119899,110,119951,110,120003,110,120055,110,120107,110,120159,110,120211,110,120263,110,120315,110,120367,110,120419,110,120471,110,1400,110,1404,110,65326,78,8469,78,119821,78,119873,78,119925,78,119977,78,120029,78,120081,78,120185,78,120237,78,120289,78,120341,78,120393,78,120445,78,925,78,120500,78,120558,78,120616,78,120674,78,120732,78,11418,78,42208,78,66835,78,3074,111,3202,111,3330,111,3458,111,2406,111,2662,111,2790,111,3046,111,3174,111,3302,111,3430,111,3664,111,3792,111,4160,111,1637,111,1781,111,65359,111,8500,111,119848,111,119900,111,119952,111,120056,111,120108,111,120160,111,120212,111,120264,111,120316,111,120368,111,120420,111,120472,111,7439,111,7441,111,43837,111,959,111,120528,111,120586,111,120644,111,120702,111,120760,111,963,111,120532,111,120590,111,120648,111,120706,111,120764,111,11423,111,4351,111,1413,111,1505,111,1607,111,126500,111,126564,111,126596,111,65259,111,65260,111,65258,111,65257,111,1726,111,64428,111,64429,111,64427,111,64426,111,1729,111,64424,111,64425,111,64423,111,64422,111,1749,111,3360,111,4125,111,66794,111,71880,111,71895,111,66604,111,1984,79,2534,79,2918,79,12295,79,70864,79,71904,79,120782,79,120792,79,120802,79,120812,79,120822,79,130032,79,65327,79,119822,79,119874,79,119926,79,119978,79,120030,79,120082,79,120134,79,120186,79,120238,79,120290,79,120342,79,120394,79,120446,79,927,79,120502,79,120560,79,120618,79,120676,79,120734,79,11422,79,1365,79,11604,79,4816,79,2848,79,66754,79,42227,79,71861,79,66194,79,66219,79,66564,79,66838,79,9076,112,65360,112,119849,112,119901,112,119953,112,120005,112,120057,112,120109,112,120161,112,120213,112,120265,112,120317,112,120369,112,120421,112,120473,112,961,112,120530,112,120544,112,120588,112,120602,112,120646,112,120660,112,120704,112,120718,112,120762,112,120776,112,11427,112,65328,80,8473,80,119823,80,119875,80,119927,80,119979,80,120031,80,120083,80,120187,80,120239,80,120291,80,120343,80,120395,80,120447,80,929,80,120504,80,120562,80,120620,80,120678,80,120736,80,11426,80,5090,80,5229,80,42193,80,66197,80,119850,113,119902,113,119954,113,120006,113,120058,113,120110,113,120162,113,120214,113,120266,113,120318,113,120370,113,120422,113,120474,113,1307,113,1379,113,1382,113,8474,81,119824,81,119876,81,119928,81,119980,81,120032,81,120084,81,120188,81,120240,81,120292,81,120344,81,120396,81,120448,81,11605,81,119851,114,119903,114,119955,114,120007,114,120059,114,120111,114,120163,114,120215,114,120267,114,120319,114,120371,114,120423,114,120475,114,43847,114,43848,114,7462,114,11397,114,43905,114,119318,82,8475,82,8476,82,8477,82,119825,82,119877,82,119929,82,120033,82,120189,82,120241,82,120293,82,120345,82,120397,82,120449,82,422,82,5025,82,5074,82,66740,82,5511,82,42211,82,94005,82,65363,115,119852,115,119904,115,119956,115,120008,115,120060,115,120112,115,120164,115,120216,115,120268,115,120320,115,120372,115,120424,115,120476,115,42801,115,445,115,1109,115,43946,115,71873,115,66632,115,65331,83,119826,83,119878,83,119930,83,119982,83,120034,83,120086,83,120138,83,120190,83,120242,83,120294,83,120346,83,120398,83,120450,83,1029,83,1359,83,5077,83,5082,83,42210,83,94010,83,66198,83,66592,83,119853,116,119905,116,119957,116,120009,116,120061,116,120113,116,120165,116,120217,116,120269,116,120321,116,120373,116,120425,116,120477,116,8868,84,10201,84,128872,84,65332,84,119827,84,119879,84,119931,84,119983,84,120035,84,120087,84,120139,84,120191,84,120243,84,120295,84,120347,84,120399,84,120451,84,932,84,120507,84,120565,84,120623,84,120681,84,120739,84,11430,84,5026,84,42196,84,93962,84,71868,84,66199,84,66225,84,66325,84,119854,117,119906,117,119958,117,120010,117,120062,117,120114,117,120166,117,120218,117,120270,117,120322,117,120374,117,120426,117,120478,117,42911,117,7452,117,43854,117,43858,117,651,117,965,117,120534,117,120592,117,120650,117,120708,117,120766,117,1405,117,66806,117,71896,117,8746,85,8899,85,119828,85,119880,85,119932,85,119984,85,120036,85,120088,85,120140,85,120192,85,120244,85,120296,85,120348,85,120400,85,120452,85,1357,85,4608,85,66766,85,5196,85,42228,85,94018,85,71864,85,8744,118,8897,118,65366,118,8564,118,119855,118,119907,118,119959,118,120011,118,120063,118,120115,118,120167,118,120219,118,120271,118,120323,118,120375,118,120427,118,120479,118,7456,118,957,118,120526,118,120584,118,120642,118,120700,118,120758,118,1141,118,1496,118,71430,118,43945,118,71872,118,119309,86,1639,86,1783,86,8548,86,119829,86,119881,86,119933,86,119985,86,120037,86,120089,86,120141,86,120193,86,120245,86,120297,86,120349,86,120401,86,120453,86,1140,86,11576,86,5081,86,5167,86,42719,86,42214,86,93960,86,71840,86,66845,86,623,119,119856,119,119908,119,119960,119,120012,119,120064,119,120116,119,120168,119,120220,119,120272,119,120324,119,120376,119,120428,119,120480,119,7457,119,1121,119,1309,119,1377,119,71434,119,71438,119,71439,119,43907,119,71919,87,71910,87,119830,87,119882,87,119934,87,119986,87,120038,87,120090,87,120142,87,120194,87,120246,87,120298,87,120350,87,120402,87,120454,87,1308,87,5043,87,5076,87,42218,87,5742,120,10539,120,10540,120,10799,120,65368,120,8569,120,119857,120,119909,120,119961,120,120013,120,120065,120,120117,120,120169,120,120221,120,120273,120,120325,120,120377,120,120429,120,120481,120,5441,120,5501,120,5741,88,9587,88,66338,88,71916,88,65336,88,8553,88,119831,88,119883,88,119935,88,119987,88,120039,88,120091,88,120143,88,120195,88,120247,88,120299,88,120351,88,120403,88,120455,88,42931,88,935,88,120510,88,120568,88,120626,88,120684,88,120742,88,11436,88,11613,88,5815,88,42219,88,66192,88,66228,88,66327,88,66855,88,611,121,7564,121,65369,121,119858,121,119910,121,119962,121,120014,121,120066,121,120118,121,120170,121,120222,121,120274,121,120326,121,120378,121,120430,121,120482,121,655,121,7935,121,43866,121,947,121,8509,121,120516,121,120574,121,120632,121,120690,121,120748,121,1199,121,4327,121,71900,121,65337,89,119832,89,119884,89,119936,89,119988,89,120040,89,120092,89,120144,89,120196,89,120248,89,120300,89,120352,89,120404,89,120456,89,933,89,978,89,120508,89,120566,89,120624,89,120682,89,120740,89,11432,89,1198,89,5033,89,5053,89,42220,89,94019,89,71844,89,66226,89,119859,122,119911,122,119963,122,120015,122,120067,122,120119,122,120171,122,120223,122,120275,122,120327,122,120379,122,120431,122,120483,122,7458,122,43923,122,71876,122,66293,90,71909,90,65338,90,8484,90,8488,90,119833,90,119885,90,119937,90,119989,90,120041,90,120197,90,120249,90,120301,90,120353,90,120405,90,120457,90,918,90,120493,90,120551,90,120609,90,120667,90,120725,90,5059,90,42204,90,71849,90,65282,34,65284,36,65285,37,65286,38,65290,42,65291,43,65294,46,65295,47,65296,48,65297,49,65298,50,65299,51,65300,52,65301,53,65302,54,65303,55,65304,56,65305,57,65308,60,65309,61,65310,62,65312,64,65316,68,65318,70,65319,71,65324,76,65329,81,65330,82,65333,85,65334,86,65335,87,65343,95,65346,98,65348,100,65350,102,65355,107,65357,109,65358,110,65361,113,65362,114,65364,116,65365,117,65367,119,65370,122,65371,123,65373,125,119846,109],"_default":[160,32,8211,45,65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"cs":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"de":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"es":[8211,45,65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"fr":[65374,126,65306,58,65281,33,8216,96,8245,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"it":[160,32,8211,45,65374,126,65306,58,65281,33,8216,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"ja":[8211,45,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65292,44,65307,59],"ko":[8211,45,65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"pl":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"pt-BR":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"qps-ploc":[160,32,8211,45,65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"ru":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,305,105,921,73,1009,112,215,120,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"tr":[160,32,8211,45,65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],"zh-hans":[65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65288,40,65289,41],"zh-hant":[8211,45,65374,126,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65307,59]}');
   });
   AmbiguousCharacters.cache = new LRUCachedFunction((locales) => {
     function arrayToMap(arr) {
@@ -1603,7 +1668,7 @@
   };
   InvisibleCharacters._data = void 0;
 
-  // node_modules/monaco-editor/esm/vs/base/common/worker/simpleWorker.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/worker/simpleWorker.js
   var INITIALIZE = "$initialize";
   var RequestMessage = class {
     constructor(vsWorker, req, method, args) {
@@ -1884,10 +1949,10 @@
           delete loaderConfig["trustedTypesPolicy"];
         }
         loaderConfig.catchError = true;
-        globals.require.config(loaderConfig);
+        globalThis.require.config(loaderConfig);
       }
       return new Promise((resolve2, reject) => {
-        const req = globals.require;
+        const req = globalThis.require;
         req([moduleId], (module) => {
           this._requestHandler = module.create(hostProxy);
           if (!this._requestHandler) {
@@ -1900,7 +1965,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/diff/diffChange.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/diff/diffChange.js
   var DiffChange = class {
     /**
      * Constructs a new DiffChange with the given sequence information
@@ -1926,7 +1991,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/hash.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/hash.js
   function numberHash(val, initialHashVal) {
     return (initialHashVal << 5) - initialHashVal + val | 0;
   }
@@ -2124,7 +2189,7 @@
   };
   StringSHA1._bigBlock32 = new DataView(new ArrayBuffer(320));
 
-  // node_modules/monaco-editor/esm/vs/base/common/diff/diff.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/diff/diff.js
   var StringDiffSequence = class {
     constructor(source) {
       this.source = source;
@@ -2861,7 +2926,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/process.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/process.js
   var safeProcess;
   if (typeof globals.vscode !== "undefined" && typeof globals.vscode.process !== "undefined") {
     const sandboxProcess = globals.vscode.process;
@@ -2916,7 +2981,7 @@
   var env = safeProcess.env;
   var platform = safeProcess.platform;
 
-  // node_modules/monaco-editor/esm/vs/base/common/path.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/path.js
   var CHAR_UPPERCASE_A = 65;
   var CHAR_LOWERCASE_A = 97;
   var CHAR_UPPERCASE_Z = 90;
@@ -3964,7 +4029,7 @@
   var extname = platformIsWin32 ? win32.extname : posix.extname;
   var sep = platformIsWin32 ? win32.sep : posix.sep;
 
-  // node_modules/monaco-editor/esm/vs/base/common/uri.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/uri.js
   var _schemePattern = /^\w[\w\d+.-]*$/;
   var _singleSlashStart = /^\//;
   var _doubleSlashStart = /^\/\//;
@@ -4155,9 +4220,15 @@
       }
       return new Uri("file", authority, path, _empty, _empty);
     }
-    static from(components) {
-      const result = new Uri(components.scheme, components.authority, components.path, components.query, components.fragment);
-      _validateUri(result, true);
+    /**
+     * Creates new URI from uri components.
+     *
+     * Unless `strict` is `true` the scheme is defaults to be `file`. This function performs
+     * validation and should be used for untrusted uri components retrieved from storage,
+     * user input, command arguments etc
+     */
+    static from(components, strict) {
+      const result = new Uri(components.scheme, components.authority, components.path, components.query, components.fragment, strict);
       return result;
     }
     /**
@@ -4198,14 +4269,15 @@
       return this;
     }
     static revive(data) {
+      var _a4, _b;
       if (!data) {
         return data;
       } else if (data instanceof _URI) {
         return data;
       } else {
         const result = new Uri(data);
-        result._formatted = data.external;
-        result._fsPath = data._sep === _pathSepMarker ? data.fsPath : null;
+        result._formatted = (_a4 = data.external) !== null && _a4 !== void 0 ? _a4 : null;
+        result._fsPath = data._sep === _pathSepMarker ? (_b = data.fsPath) !== null && _b !== void 0 ? _b : null : null;
         return result;
       }
     }
@@ -4489,7 +4561,7 @@
     return str.replace(_rEncodedAsHex, (match) => decodeURIComponentGraceful(match));
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/common/core/position.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/core/position.js
   var Position = class _Position {
     constructor(lineNumber, column) {
       this.lineNumber = lineNumber;
@@ -4612,7 +4684,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/core/range.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/core/range.js
   var Range = class _Range {
     constructor(startLineNumber, startColumn, endLineNumber, endColumn) {
       if (startLineNumber > endLineNumber || startLineNumber === endLineNumber && startColumn > endColumn) {
@@ -4983,7 +5055,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/arrays.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/arrays.js
   var CompareResult;
   (function(CompareResult2) {
     function isLessThan(result) {
@@ -5046,7 +5118,7 @@
   CallbackIterable.empty = new CallbackIterable((_callback) => {
   });
 
-  // node_modules/monaco-editor/esm/vs/base/common/uint.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/uint.js
   function toUint8(v) {
     if (v < 0) {
       return 0;
@@ -5066,7 +5138,7 @@
     return v | 0;
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/common/model/prefixSumComputer.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/model/prefixSumComputer.js
   var PrefixSumComputer = class {
     constructor(values) {
       this.values = values;
@@ -5202,7 +5274,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/model/mirrorTextModel.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/model/mirrorTextModel.js
   var MirrorTextModel = class {
     constructor(uri, lines, eol, versionId) {
       this._uri = uri;
@@ -5293,7 +5365,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/core/wordHelper.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/core/wordHelper.js
   var USUAL_WORD_SEPARATORS = "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?";
   function createWordRegExp(allowInWords = "") {
     let source = "(-?\\d*\\.\\d\\w*)|([^";
@@ -5393,7 +5465,7 @@
     return null;
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/common/core/characterClassifier.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/core/characterClassifier.js
   var CharacterClassifier = class _CharacterClassifier {
     constructor(_defaultValue) {
       const defaultValue = toUint8(_defaultValue);
@@ -5427,7 +5499,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/languages/linkComputer.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/languages/linkComputer.js
   var Uint8Matrix = class {
     constructor(rows, cols, defaultValue) {
       const data = new Uint8Array(rows * cols);
@@ -5790,7 +5862,7 @@
     return LinkComputer.computeLinks(model);
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/common/languages/supports/inplaceReplaceSupport.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/languages/supports/inplaceReplaceSupport.js
   var BasicInplaceReplace = class {
     constructor() {
       this._defaultValueSet = [
@@ -5869,7 +5941,7 @@
   };
   BasicInplaceReplace.INSTANCE = new BasicInplaceReplace();
 
-  // node_modules/monaco-editor/esm/vs/base/common/cancellation.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/cancellation.js
   var shortcutEvent = Object.freeze(function(callback, context) {
     const handle = setTimeout(callback.bind(context), 0);
     return { dispose() {
@@ -5966,7 +6038,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/keyCodes.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/keyCodes.js
   var KeyCodeStrMap = class {
     constructor() {
       this._keyCodeToStr = [];
@@ -5996,249 +6068,249 @@
   for (let i = 0; i <= 193; i++) {
     IMMUTABLE_CODE_TO_KEY_CODE[i] = -1;
   }
-  for (let i = 0; i <= 127; i++) {
+  for (let i = 0; i <= 132; i++) {
     IMMUTABLE_KEY_CODE_TO_CODE[i] = -1;
   }
   (function() {
     const empty = "";
     const mappings = [
-      // keyCodeOrd, immutable, scanCode, scanCodeStr, keyCode, keyCodeStr, eventKeyCode, vkey, usUserSettingsLabel, generalUserSettingsLabel
-      [0, 1, 0, "None", 0, "unknown", 0, "VK_UNKNOWN", empty, empty],
-      [0, 1, 1, "Hyper", 0, empty, 0, empty, empty, empty],
-      [0, 1, 2, "Super", 0, empty, 0, empty, empty, empty],
-      [0, 1, 3, "Fn", 0, empty, 0, empty, empty, empty],
-      [0, 1, 4, "FnLock", 0, empty, 0, empty, empty, empty],
-      [0, 1, 5, "Suspend", 0, empty, 0, empty, empty, empty],
-      [0, 1, 6, "Resume", 0, empty, 0, empty, empty, empty],
-      [0, 1, 7, "Turbo", 0, empty, 0, empty, empty, empty],
-      [0, 1, 8, "Sleep", 0, empty, 0, "VK_SLEEP", empty, empty],
-      [0, 1, 9, "WakeUp", 0, empty, 0, empty, empty, empty],
-      [31, 0, 10, "KeyA", 31, "A", 65, "VK_A", empty, empty],
-      [32, 0, 11, "KeyB", 32, "B", 66, "VK_B", empty, empty],
-      [33, 0, 12, "KeyC", 33, "C", 67, "VK_C", empty, empty],
-      [34, 0, 13, "KeyD", 34, "D", 68, "VK_D", empty, empty],
-      [35, 0, 14, "KeyE", 35, "E", 69, "VK_E", empty, empty],
-      [36, 0, 15, "KeyF", 36, "F", 70, "VK_F", empty, empty],
-      [37, 0, 16, "KeyG", 37, "G", 71, "VK_G", empty, empty],
-      [38, 0, 17, "KeyH", 38, "H", 72, "VK_H", empty, empty],
-      [39, 0, 18, "KeyI", 39, "I", 73, "VK_I", empty, empty],
-      [40, 0, 19, "KeyJ", 40, "J", 74, "VK_J", empty, empty],
-      [41, 0, 20, "KeyK", 41, "K", 75, "VK_K", empty, empty],
-      [42, 0, 21, "KeyL", 42, "L", 76, "VK_L", empty, empty],
-      [43, 0, 22, "KeyM", 43, "M", 77, "VK_M", empty, empty],
-      [44, 0, 23, "KeyN", 44, "N", 78, "VK_N", empty, empty],
-      [45, 0, 24, "KeyO", 45, "O", 79, "VK_O", empty, empty],
-      [46, 0, 25, "KeyP", 46, "P", 80, "VK_P", empty, empty],
-      [47, 0, 26, "KeyQ", 47, "Q", 81, "VK_Q", empty, empty],
-      [48, 0, 27, "KeyR", 48, "R", 82, "VK_R", empty, empty],
-      [49, 0, 28, "KeyS", 49, "S", 83, "VK_S", empty, empty],
-      [50, 0, 29, "KeyT", 50, "T", 84, "VK_T", empty, empty],
-      [51, 0, 30, "KeyU", 51, "U", 85, "VK_U", empty, empty],
-      [52, 0, 31, "KeyV", 52, "V", 86, "VK_V", empty, empty],
-      [53, 0, 32, "KeyW", 53, "W", 87, "VK_W", empty, empty],
-      [54, 0, 33, "KeyX", 54, "X", 88, "VK_X", empty, empty],
-      [55, 0, 34, "KeyY", 55, "Y", 89, "VK_Y", empty, empty],
-      [56, 0, 35, "KeyZ", 56, "Z", 90, "VK_Z", empty, empty],
-      [22, 0, 36, "Digit1", 22, "1", 49, "VK_1", empty, empty],
-      [23, 0, 37, "Digit2", 23, "2", 50, "VK_2", empty, empty],
-      [24, 0, 38, "Digit3", 24, "3", 51, "VK_3", empty, empty],
-      [25, 0, 39, "Digit4", 25, "4", 52, "VK_4", empty, empty],
-      [26, 0, 40, "Digit5", 26, "5", 53, "VK_5", empty, empty],
-      [27, 0, 41, "Digit6", 27, "6", 54, "VK_6", empty, empty],
-      [28, 0, 42, "Digit7", 28, "7", 55, "VK_7", empty, empty],
-      [29, 0, 43, "Digit8", 29, "8", 56, "VK_8", empty, empty],
-      [30, 0, 44, "Digit9", 30, "9", 57, "VK_9", empty, empty],
-      [21, 0, 45, "Digit0", 21, "0", 48, "VK_0", empty, empty],
-      [3, 1, 46, "Enter", 3, "Enter", 13, "VK_RETURN", empty, empty],
-      [9, 1, 47, "Escape", 9, "Escape", 27, "VK_ESCAPE", empty, empty],
-      [1, 1, 48, "Backspace", 1, "Backspace", 8, "VK_BACK", empty, empty],
-      [2, 1, 49, "Tab", 2, "Tab", 9, "VK_TAB", empty, empty],
-      [10, 1, 50, "Space", 10, "Space", 32, "VK_SPACE", empty, empty],
-      [83, 0, 51, "Minus", 83, "-", 189, "VK_OEM_MINUS", "-", "OEM_MINUS"],
-      [81, 0, 52, "Equal", 81, "=", 187, "VK_OEM_PLUS", "=", "OEM_PLUS"],
-      [87, 0, 53, "BracketLeft", 87, "[", 219, "VK_OEM_4", "[", "OEM_4"],
-      [89, 0, 54, "BracketRight", 89, "]", 221, "VK_OEM_6", "]", "OEM_6"],
-      [88, 0, 55, "Backslash", 88, "\\", 220, "VK_OEM_5", "\\", "OEM_5"],
-      [0, 0, 56, "IntlHash", 0, empty, 0, empty, empty, empty],
-      [80, 0, 57, "Semicolon", 80, ";", 186, "VK_OEM_1", ";", "OEM_1"],
-      [90, 0, 58, "Quote", 90, "'", 222, "VK_OEM_7", "'", "OEM_7"],
-      [86, 0, 59, "Backquote", 86, "`", 192, "VK_OEM_3", "`", "OEM_3"],
-      [82, 0, 60, "Comma", 82, ",", 188, "VK_OEM_COMMA", ",", "OEM_COMMA"],
-      [84, 0, 61, "Period", 84, ".", 190, "VK_OEM_PERIOD", ".", "OEM_PERIOD"],
-      [85, 0, 62, "Slash", 85, "/", 191, "VK_OEM_2", "/", "OEM_2"],
-      [8, 1, 63, "CapsLock", 8, "CapsLock", 20, "VK_CAPITAL", empty, empty],
-      [59, 1, 64, "F1", 59, "F1", 112, "VK_F1", empty, empty],
-      [60, 1, 65, "F2", 60, "F2", 113, "VK_F2", empty, empty],
-      [61, 1, 66, "F3", 61, "F3", 114, "VK_F3", empty, empty],
-      [62, 1, 67, "F4", 62, "F4", 115, "VK_F4", empty, empty],
-      [63, 1, 68, "F5", 63, "F5", 116, "VK_F5", empty, empty],
-      [64, 1, 69, "F6", 64, "F6", 117, "VK_F6", empty, empty],
-      [65, 1, 70, "F7", 65, "F7", 118, "VK_F7", empty, empty],
-      [66, 1, 71, "F8", 66, "F8", 119, "VK_F8", empty, empty],
-      [67, 1, 72, "F9", 67, "F9", 120, "VK_F9", empty, empty],
-      [68, 1, 73, "F10", 68, "F10", 121, "VK_F10", empty, empty],
-      [69, 1, 74, "F11", 69, "F11", 122, "VK_F11", empty, empty],
-      [70, 1, 75, "F12", 70, "F12", 123, "VK_F12", empty, empty],
-      [0, 1, 76, "PrintScreen", 0, empty, 0, empty, empty, empty],
-      [79, 1, 77, "ScrollLock", 79, "ScrollLock", 145, "VK_SCROLL", empty, empty],
-      [7, 1, 78, "Pause", 7, "PauseBreak", 19, "VK_PAUSE", empty, empty],
-      [19, 1, 79, "Insert", 19, "Insert", 45, "VK_INSERT", empty, empty],
-      [14, 1, 80, "Home", 14, "Home", 36, "VK_HOME", empty, empty],
-      [11, 1, 81, "PageUp", 11, "PageUp", 33, "VK_PRIOR", empty, empty],
-      [20, 1, 82, "Delete", 20, "Delete", 46, "VK_DELETE", empty, empty],
-      [13, 1, 83, "End", 13, "End", 35, "VK_END", empty, empty],
-      [12, 1, 84, "PageDown", 12, "PageDown", 34, "VK_NEXT", empty, empty],
-      [17, 1, 85, "ArrowRight", 17, "RightArrow", 39, "VK_RIGHT", "Right", empty],
-      [15, 1, 86, "ArrowLeft", 15, "LeftArrow", 37, "VK_LEFT", "Left", empty],
-      [18, 1, 87, "ArrowDown", 18, "DownArrow", 40, "VK_DOWN", "Down", empty],
-      [16, 1, 88, "ArrowUp", 16, "UpArrow", 38, "VK_UP", "Up", empty],
-      [78, 1, 89, "NumLock", 78, "NumLock", 144, "VK_NUMLOCK", empty, empty],
-      [108, 1, 90, "NumpadDivide", 108, "NumPad_Divide", 111, "VK_DIVIDE", empty, empty],
-      [103, 1, 91, "NumpadMultiply", 103, "NumPad_Multiply", 106, "VK_MULTIPLY", empty, empty],
-      [106, 1, 92, "NumpadSubtract", 106, "NumPad_Subtract", 109, "VK_SUBTRACT", empty, empty],
-      [104, 1, 93, "NumpadAdd", 104, "NumPad_Add", 107, "VK_ADD", empty, empty],
-      [3, 1, 94, "NumpadEnter", 3, empty, 0, empty, empty, empty],
-      [94, 1, 95, "Numpad1", 94, "NumPad1", 97, "VK_NUMPAD1", empty, empty],
-      [95, 1, 96, "Numpad2", 95, "NumPad2", 98, "VK_NUMPAD2", empty, empty],
-      [96, 1, 97, "Numpad3", 96, "NumPad3", 99, "VK_NUMPAD3", empty, empty],
-      [97, 1, 98, "Numpad4", 97, "NumPad4", 100, "VK_NUMPAD4", empty, empty],
-      [98, 1, 99, "Numpad5", 98, "NumPad5", 101, "VK_NUMPAD5", empty, empty],
-      [99, 1, 100, "Numpad6", 99, "NumPad6", 102, "VK_NUMPAD6", empty, empty],
-      [100, 1, 101, "Numpad7", 100, "NumPad7", 103, "VK_NUMPAD7", empty, empty],
-      [101, 1, 102, "Numpad8", 101, "NumPad8", 104, "VK_NUMPAD8", empty, empty],
-      [102, 1, 103, "Numpad9", 102, "NumPad9", 105, "VK_NUMPAD9", empty, empty],
-      [93, 1, 104, "Numpad0", 93, "NumPad0", 96, "VK_NUMPAD0", empty, empty],
-      [107, 1, 105, "NumpadDecimal", 107, "NumPad_Decimal", 110, "VK_DECIMAL", empty, empty],
-      [92, 0, 106, "IntlBackslash", 92, "OEM_102", 226, "VK_OEM_102", empty, empty],
-      [58, 1, 107, "ContextMenu", 58, "ContextMenu", 93, empty, empty, empty],
-      [0, 1, 108, "Power", 0, empty, 0, empty, empty, empty],
-      [0, 1, 109, "NumpadEqual", 0, empty, 0, empty, empty, empty],
-      [71, 1, 110, "F13", 71, "F13", 124, "VK_F13", empty, empty],
-      [72, 1, 111, "F14", 72, "F14", 125, "VK_F14", empty, empty],
-      [73, 1, 112, "F15", 73, "F15", 126, "VK_F15", empty, empty],
-      [74, 1, 113, "F16", 74, "F16", 127, "VK_F16", empty, empty],
-      [75, 1, 114, "F17", 75, "F17", 128, "VK_F17", empty, empty],
-      [76, 1, 115, "F18", 76, "F18", 129, "VK_F18", empty, empty],
-      [77, 1, 116, "F19", 77, "F19", 130, "VK_F19", empty, empty],
-      [0, 1, 117, "F20", 0, empty, 0, "VK_F20", empty, empty],
-      [0, 1, 118, "F21", 0, empty, 0, "VK_F21", empty, empty],
-      [0, 1, 119, "F22", 0, empty, 0, "VK_F22", empty, empty],
-      [0, 1, 120, "F23", 0, empty, 0, "VK_F23", empty, empty],
-      [0, 1, 121, "F24", 0, empty, 0, "VK_F24", empty, empty],
-      [0, 1, 122, "Open", 0, empty, 0, empty, empty, empty],
-      [0, 1, 123, "Help", 0, empty, 0, empty, empty, empty],
-      [0, 1, 124, "Select", 0, empty, 0, empty, empty, empty],
-      [0, 1, 125, "Again", 0, empty, 0, empty, empty, empty],
-      [0, 1, 126, "Undo", 0, empty, 0, empty, empty, empty],
-      [0, 1, 127, "Cut", 0, empty, 0, empty, empty, empty],
-      [0, 1, 128, "Copy", 0, empty, 0, empty, empty, empty],
-      [0, 1, 129, "Paste", 0, empty, 0, empty, empty, empty],
-      [0, 1, 130, "Find", 0, empty, 0, empty, empty, empty],
-      [0, 1, 131, "AudioVolumeMute", 112, "AudioVolumeMute", 173, "VK_VOLUME_MUTE", empty, empty],
-      [0, 1, 132, "AudioVolumeUp", 113, "AudioVolumeUp", 175, "VK_VOLUME_UP", empty, empty],
-      [0, 1, 133, "AudioVolumeDown", 114, "AudioVolumeDown", 174, "VK_VOLUME_DOWN", empty, empty],
-      [105, 1, 134, "NumpadComma", 105, "NumPad_Separator", 108, "VK_SEPARATOR", empty, empty],
-      [110, 0, 135, "IntlRo", 110, "ABNT_C1", 193, "VK_ABNT_C1", empty, empty],
-      [0, 1, 136, "KanaMode", 0, empty, 0, empty, empty, empty],
-      [0, 0, 137, "IntlYen", 0, empty, 0, empty, empty, empty],
-      [0, 1, 138, "Convert", 0, empty, 0, empty, empty, empty],
-      [0, 1, 139, "NonConvert", 0, empty, 0, empty, empty, empty],
-      [0, 1, 140, "Lang1", 0, empty, 0, empty, empty, empty],
-      [0, 1, 141, "Lang2", 0, empty, 0, empty, empty, empty],
-      [0, 1, 142, "Lang3", 0, empty, 0, empty, empty, empty],
-      [0, 1, 143, "Lang4", 0, empty, 0, empty, empty, empty],
-      [0, 1, 144, "Lang5", 0, empty, 0, empty, empty, empty],
-      [0, 1, 145, "Abort", 0, empty, 0, empty, empty, empty],
-      [0, 1, 146, "Props", 0, empty, 0, empty, empty, empty],
-      [0, 1, 147, "NumpadParenLeft", 0, empty, 0, empty, empty, empty],
-      [0, 1, 148, "NumpadParenRight", 0, empty, 0, empty, empty, empty],
-      [0, 1, 149, "NumpadBackspace", 0, empty, 0, empty, empty, empty],
-      [0, 1, 150, "NumpadMemoryStore", 0, empty, 0, empty, empty, empty],
-      [0, 1, 151, "NumpadMemoryRecall", 0, empty, 0, empty, empty, empty],
-      [0, 1, 152, "NumpadMemoryClear", 0, empty, 0, empty, empty, empty],
-      [0, 1, 153, "NumpadMemoryAdd", 0, empty, 0, empty, empty, empty],
-      [0, 1, 154, "NumpadMemorySubtract", 0, empty, 0, empty, empty, empty],
-      [0, 1, 155, "NumpadClear", 126, "Clear", 12, "VK_CLEAR", empty, empty],
-      [0, 1, 156, "NumpadClearEntry", 0, empty, 0, empty, empty, empty],
-      [5, 1, 0, empty, 5, "Ctrl", 17, "VK_CONTROL", empty, empty],
-      [4, 1, 0, empty, 4, "Shift", 16, "VK_SHIFT", empty, empty],
-      [6, 1, 0, empty, 6, "Alt", 18, "VK_MENU", empty, empty],
-      [57, 1, 0, empty, 57, "Meta", 0, "VK_COMMAND", empty, empty],
-      [5, 1, 157, "ControlLeft", 5, empty, 0, "VK_LCONTROL", empty, empty],
-      [4, 1, 158, "ShiftLeft", 4, empty, 0, "VK_LSHIFT", empty, empty],
-      [6, 1, 159, "AltLeft", 6, empty, 0, "VK_LMENU", empty, empty],
-      [57, 1, 160, "MetaLeft", 57, empty, 0, "VK_LWIN", empty, empty],
-      [5, 1, 161, "ControlRight", 5, empty, 0, "VK_RCONTROL", empty, empty],
-      [4, 1, 162, "ShiftRight", 4, empty, 0, "VK_RSHIFT", empty, empty],
-      [6, 1, 163, "AltRight", 6, empty, 0, "VK_RMENU", empty, empty],
-      [57, 1, 164, "MetaRight", 57, empty, 0, "VK_RWIN", empty, empty],
-      [0, 1, 165, "BrightnessUp", 0, empty, 0, empty, empty, empty],
-      [0, 1, 166, "BrightnessDown", 0, empty, 0, empty, empty, empty],
-      [0, 1, 167, "MediaPlay", 0, empty, 0, empty, empty, empty],
-      [0, 1, 168, "MediaRecord", 0, empty, 0, empty, empty, empty],
-      [0, 1, 169, "MediaFastForward", 0, empty, 0, empty, empty, empty],
-      [0, 1, 170, "MediaRewind", 0, empty, 0, empty, empty, empty],
-      [114, 1, 171, "MediaTrackNext", 119, "MediaTrackNext", 176, "VK_MEDIA_NEXT_TRACK", empty, empty],
-      [115, 1, 172, "MediaTrackPrevious", 120, "MediaTrackPrevious", 177, "VK_MEDIA_PREV_TRACK", empty, empty],
-      [116, 1, 173, "MediaStop", 121, "MediaStop", 178, "VK_MEDIA_STOP", empty, empty],
-      [0, 1, 174, "Eject", 0, empty, 0, empty, empty, empty],
-      [117, 1, 175, "MediaPlayPause", 122, "MediaPlayPause", 179, "VK_MEDIA_PLAY_PAUSE", empty, empty],
-      [0, 1, 176, "MediaSelect", 123, "LaunchMediaPlayer", 181, "VK_MEDIA_LAUNCH_MEDIA_SELECT", empty, empty],
-      [0, 1, 177, "LaunchMail", 124, "LaunchMail", 180, "VK_MEDIA_LAUNCH_MAIL", empty, empty],
-      [0, 1, 178, "LaunchApp2", 125, "LaunchApp2", 183, "VK_MEDIA_LAUNCH_APP2", empty, empty],
-      [0, 1, 179, "LaunchApp1", 0, empty, 0, "VK_MEDIA_LAUNCH_APP1", empty, empty],
-      [0, 1, 180, "SelectTask", 0, empty, 0, empty, empty, empty],
-      [0, 1, 181, "LaunchScreenSaver", 0, empty, 0, empty, empty, empty],
-      [0, 1, 182, "BrowserSearch", 115, "BrowserSearch", 170, "VK_BROWSER_SEARCH", empty, empty],
-      [0, 1, 183, "BrowserHome", 116, "BrowserHome", 172, "VK_BROWSER_HOME", empty, empty],
-      [112, 1, 184, "BrowserBack", 117, "BrowserBack", 166, "VK_BROWSER_BACK", empty, empty],
-      [113, 1, 185, "BrowserForward", 118, "BrowserForward", 167, "VK_BROWSER_FORWARD", empty, empty],
-      [0, 1, 186, "BrowserStop", 0, empty, 0, "VK_BROWSER_STOP", empty, empty],
-      [0, 1, 187, "BrowserRefresh", 0, empty, 0, "VK_BROWSER_REFRESH", empty, empty],
-      [0, 1, 188, "BrowserFavorites", 0, empty, 0, "VK_BROWSER_FAVORITES", empty, empty],
-      [0, 1, 189, "ZoomToggle", 0, empty, 0, empty, empty, empty],
-      [0, 1, 190, "MailReply", 0, empty, 0, empty, empty, empty],
-      [0, 1, 191, "MailForward", 0, empty, 0, empty, empty, empty],
-      [0, 1, 192, "MailSend", 0, empty, 0, empty, empty, empty],
+      // immutable, scanCode, scanCodeStr, keyCode, keyCodeStr, eventKeyCode, vkey, usUserSettingsLabel, generalUserSettingsLabel
+      [1, 0, "None", 0, "unknown", 0, "VK_UNKNOWN", empty, empty],
+      [1, 1, "Hyper", 0, empty, 0, empty, empty, empty],
+      [1, 2, "Super", 0, empty, 0, empty, empty, empty],
+      [1, 3, "Fn", 0, empty, 0, empty, empty, empty],
+      [1, 4, "FnLock", 0, empty, 0, empty, empty, empty],
+      [1, 5, "Suspend", 0, empty, 0, empty, empty, empty],
+      [1, 6, "Resume", 0, empty, 0, empty, empty, empty],
+      [1, 7, "Turbo", 0, empty, 0, empty, empty, empty],
+      [1, 8, "Sleep", 0, empty, 0, "VK_SLEEP", empty, empty],
+      [1, 9, "WakeUp", 0, empty, 0, empty, empty, empty],
+      [0, 10, "KeyA", 31, "A", 65, "VK_A", empty, empty],
+      [0, 11, "KeyB", 32, "B", 66, "VK_B", empty, empty],
+      [0, 12, "KeyC", 33, "C", 67, "VK_C", empty, empty],
+      [0, 13, "KeyD", 34, "D", 68, "VK_D", empty, empty],
+      [0, 14, "KeyE", 35, "E", 69, "VK_E", empty, empty],
+      [0, 15, "KeyF", 36, "F", 70, "VK_F", empty, empty],
+      [0, 16, "KeyG", 37, "G", 71, "VK_G", empty, empty],
+      [0, 17, "KeyH", 38, "H", 72, "VK_H", empty, empty],
+      [0, 18, "KeyI", 39, "I", 73, "VK_I", empty, empty],
+      [0, 19, "KeyJ", 40, "J", 74, "VK_J", empty, empty],
+      [0, 20, "KeyK", 41, "K", 75, "VK_K", empty, empty],
+      [0, 21, "KeyL", 42, "L", 76, "VK_L", empty, empty],
+      [0, 22, "KeyM", 43, "M", 77, "VK_M", empty, empty],
+      [0, 23, "KeyN", 44, "N", 78, "VK_N", empty, empty],
+      [0, 24, "KeyO", 45, "O", 79, "VK_O", empty, empty],
+      [0, 25, "KeyP", 46, "P", 80, "VK_P", empty, empty],
+      [0, 26, "KeyQ", 47, "Q", 81, "VK_Q", empty, empty],
+      [0, 27, "KeyR", 48, "R", 82, "VK_R", empty, empty],
+      [0, 28, "KeyS", 49, "S", 83, "VK_S", empty, empty],
+      [0, 29, "KeyT", 50, "T", 84, "VK_T", empty, empty],
+      [0, 30, "KeyU", 51, "U", 85, "VK_U", empty, empty],
+      [0, 31, "KeyV", 52, "V", 86, "VK_V", empty, empty],
+      [0, 32, "KeyW", 53, "W", 87, "VK_W", empty, empty],
+      [0, 33, "KeyX", 54, "X", 88, "VK_X", empty, empty],
+      [0, 34, "KeyY", 55, "Y", 89, "VK_Y", empty, empty],
+      [0, 35, "KeyZ", 56, "Z", 90, "VK_Z", empty, empty],
+      [0, 36, "Digit1", 22, "1", 49, "VK_1", empty, empty],
+      [0, 37, "Digit2", 23, "2", 50, "VK_2", empty, empty],
+      [0, 38, "Digit3", 24, "3", 51, "VK_3", empty, empty],
+      [0, 39, "Digit4", 25, "4", 52, "VK_4", empty, empty],
+      [0, 40, "Digit5", 26, "5", 53, "VK_5", empty, empty],
+      [0, 41, "Digit6", 27, "6", 54, "VK_6", empty, empty],
+      [0, 42, "Digit7", 28, "7", 55, "VK_7", empty, empty],
+      [0, 43, "Digit8", 29, "8", 56, "VK_8", empty, empty],
+      [0, 44, "Digit9", 30, "9", 57, "VK_9", empty, empty],
+      [0, 45, "Digit0", 21, "0", 48, "VK_0", empty, empty],
+      [1, 46, "Enter", 3, "Enter", 13, "VK_RETURN", empty, empty],
+      [1, 47, "Escape", 9, "Escape", 27, "VK_ESCAPE", empty, empty],
+      [1, 48, "Backspace", 1, "Backspace", 8, "VK_BACK", empty, empty],
+      [1, 49, "Tab", 2, "Tab", 9, "VK_TAB", empty, empty],
+      [1, 50, "Space", 10, "Space", 32, "VK_SPACE", empty, empty],
+      [0, 51, "Minus", 88, "-", 189, "VK_OEM_MINUS", "-", "OEM_MINUS"],
+      [0, 52, "Equal", 86, "=", 187, "VK_OEM_PLUS", "=", "OEM_PLUS"],
+      [0, 53, "BracketLeft", 92, "[", 219, "VK_OEM_4", "[", "OEM_4"],
+      [0, 54, "BracketRight", 94, "]", 221, "VK_OEM_6", "]", "OEM_6"],
+      [0, 55, "Backslash", 93, "\\", 220, "VK_OEM_5", "\\", "OEM_5"],
+      [0, 56, "IntlHash", 0, empty, 0, empty, empty, empty],
+      [0, 57, "Semicolon", 85, ";", 186, "VK_OEM_1", ";", "OEM_1"],
+      [0, 58, "Quote", 95, "'", 222, "VK_OEM_7", "'", "OEM_7"],
+      [0, 59, "Backquote", 91, "`", 192, "VK_OEM_3", "`", "OEM_3"],
+      [0, 60, "Comma", 87, ",", 188, "VK_OEM_COMMA", ",", "OEM_COMMA"],
+      [0, 61, "Period", 89, ".", 190, "VK_OEM_PERIOD", ".", "OEM_PERIOD"],
+      [0, 62, "Slash", 90, "/", 191, "VK_OEM_2", "/", "OEM_2"],
+      [1, 63, "CapsLock", 8, "CapsLock", 20, "VK_CAPITAL", empty, empty],
+      [1, 64, "F1", 59, "F1", 112, "VK_F1", empty, empty],
+      [1, 65, "F2", 60, "F2", 113, "VK_F2", empty, empty],
+      [1, 66, "F3", 61, "F3", 114, "VK_F3", empty, empty],
+      [1, 67, "F4", 62, "F4", 115, "VK_F4", empty, empty],
+      [1, 68, "F5", 63, "F5", 116, "VK_F5", empty, empty],
+      [1, 69, "F6", 64, "F6", 117, "VK_F6", empty, empty],
+      [1, 70, "F7", 65, "F7", 118, "VK_F7", empty, empty],
+      [1, 71, "F8", 66, "F8", 119, "VK_F8", empty, empty],
+      [1, 72, "F9", 67, "F9", 120, "VK_F9", empty, empty],
+      [1, 73, "F10", 68, "F10", 121, "VK_F10", empty, empty],
+      [1, 74, "F11", 69, "F11", 122, "VK_F11", empty, empty],
+      [1, 75, "F12", 70, "F12", 123, "VK_F12", empty, empty],
+      [1, 76, "PrintScreen", 0, empty, 0, empty, empty, empty],
+      [1, 77, "ScrollLock", 84, "ScrollLock", 145, "VK_SCROLL", empty, empty],
+      [1, 78, "Pause", 7, "PauseBreak", 19, "VK_PAUSE", empty, empty],
+      [1, 79, "Insert", 19, "Insert", 45, "VK_INSERT", empty, empty],
+      [1, 80, "Home", 14, "Home", 36, "VK_HOME", empty, empty],
+      [1, 81, "PageUp", 11, "PageUp", 33, "VK_PRIOR", empty, empty],
+      [1, 82, "Delete", 20, "Delete", 46, "VK_DELETE", empty, empty],
+      [1, 83, "End", 13, "End", 35, "VK_END", empty, empty],
+      [1, 84, "PageDown", 12, "PageDown", 34, "VK_NEXT", empty, empty],
+      [1, 85, "ArrowRight", 17, "RightArrow", 39, "VK_RIGHT", "Right", empty],
+      [1, 86, "ArrowLeft", 15, "LeftArrow", 37, "VK_LEFT", "Left", empty],
+      [1, 87, "ArrowDown", 18, "DownArrow", 40, "VK_DOWN", "Down", empty],
+      [1, 88, "ArrowUp", 16, "UpArrow", 38, "VK_UP", "Up", empty],
+      [1, 89, "NumLock", 83, "NumLock", 144, "VK_NUMLOCK", empty, empty],
+      [1, 90, "NumpadDivide", 113, "NumPad_Divide", 111, "VK_DIVIDE", empty, empty],
+      [1, 91, "NumpadMultiply", 108, "NumPad_Multiply", 106, "VK_MULTIPLY", empty, empty],
+      [1, 92, "NumpadSubtract", 111, "NumPad_Subtract", 109, "VK_SUBTRACT", empty, empty],
+      [1, 93, "NumpadAdd", 109, "NumPad_Add", 107, "VK_ADD", empty, empty],
+      [1, 94, "NumpadEnter", 3, empty, 0, empty, empty, empty],
+      [1, 95, "Numpad1", 99, "NumPad1", 97, "VK_NUMPAD1", empty, empty],
+      [1, 96, "Numpad2", 100, "NumPad2", 98, "VK_NUMPAD2", empty, empty],
+      [1, 97, "Numpad3", 101, "NumPad3", 99, "VK_NUMPAD3", empty, empty],
+      [1, 98, "Numpad4", 102, "NumPad4", 100, "VK_NUMPAD4", empty, empty],
+      [1, 99, "Numpad5", 103, "NumPad5", 101, "VK_NUMPAD5", empty, empty],
+      [1, 100, "Numpad6", 104, "NumPad6", 102, "VK_NUMPAD6", empty, empty],
+      [1, 101, "Numpad7", 105, "NumPad7", 103, "VK_NUMPAD7", empty, empty],
+      [1, 102, "Numpad8", 106, "NumPad8", 104, "VK_NUMPAD8", empty, empty],
+      [1, 103, "Numpad9", 107, "NumPad9", 105, "VK_NUMPAD9", empty, empty],
+      [1, 104, "Numpad0", 98, "NumPad0", 96, "VK_NUMPAD0", empty, empty],
+      [1, 105, "NumpadDecimal", 112, "NumPad_Decimal", 110, "VK_DECIMAL", empty, empty],
+      [0, 106, "IntlBackslash", 97, "OEM_102", 226, "VK_OEM_102", empty, empty],
+      [1, 107, "ContextMenu", 58, "ContextMenu", 93, empty, empty, empty],
+      [1, 108, "Power", 0, empty, 0, empty, empty, empty],
+      [1, 109, "NumpadEqual", 0, empty, 0, empty, empty, empty],
+      [1, 110, "F13", 71, "F13", 124, "VK_F13", empty, empty],
+      [1, 111, "F14", 72, "F14", 125, "VK_F14", empty, empty],
+      [1, 112, "F15", 73, "F15", 126, "VK_F15", empty, empty],
+      [1, 113, "F16", 74, "F16", 127, "VK_F16", empty, empty],
+      [1, 114, "F17", 75, "F17", 128, "VK_F17", empty, empty],
+      [1, 115, "F18", 76, "F18", 129, "VK_F18", empty, empty],
+      [1, 116, "F19", 77, "F19", 130, "VK_F19", empty, empty],
+      [1, 117, "F20", 78, "F20", 131, "VK_F20", empty, empty],
+      [1, 118, "F21", 79, "F21", 132, "VK_F21", empty, empty],
+      [1, 119, "F22", 80, "F22", 133, "VK_F22", empty, empty],
+      [1, 120, "F23", 81, "F23", 134, "VK_F23", empty, empty],
+      [1, 121, "F24", 82, "F24", 135, "VK_F24", empty, empty],
+      [1, 122, "Open", 0, empty, 0, empty, empty, empty],
+      [1, 123, "Help", 0, empty, 0, empty, empty, empty],
+      [1, 124, "Select", 0, empty, 0, empty, empty, empty],
+      [1, 125, "Again", 0, empty, 0, empty, empty, empty],
+      [1, 126, "Undo", 0, empty, 0, empty, empty, empty],
+      [1, 127, "Cut", 0, empty, 0, empty, empty, empty],
+      [1, 128, "Copy", 0, empty, 0, empty, empty, empty],
+      [1, 129, "Paste", 0, empty, 0, empty, empty, empty],
+      [1, 130, "Find", 0, empty, 0, empty, empty, empty],
+      [1, 131, "AudioVolumeMute", 117, "AudioVolumeMute", 173, "VK_VOLUME_MUTE", empty, empty],
+      [1, 132, "AudioVolumeUp", 118, "AudioVolumeUp", 175, "VK_VOLUME_UP", empty, empty],
+      [1, 133, "AudioVolumeDown", 119, "AudioVolumeDown", 174, "VK_VOLUME_DOWN", empty, empty],
+      [1, 134, "NumpadComma", 110, "NumPad_Separator", 108, "VK_SEPARATOR", empty, empty],
+      [0, 135, "IntlRo", 115, "ABNT_C1", 193, "VK_ABNT_C1", empty, empty],
+      [1, 136, "KanaMode", 0, empty, 0, empty, empty, empty],
+      [0, 137, "IntlYen", 0, empty, 0, empty, empty, empty],
+      [1, 138, "Convert", 0, empty, 0, empty, empty, empty],
+      [1, 139, "NonConvert", 0, empty, 0, empty, empty, empty],
+      [1, 140, "Lang1", 0, empty, 0, empty, empty, empty],
+      [1, 141, "Lang2", 0, empty, 0, empty, empty, empty],
+      [1, 142, "Lang3", 0, empty, 0, empty, empty, empty],
+      [1, 143, "Lang4", 0, empty, 0, empty, empty, empty],
+      [1, 144, "Lang5", 0, empty, 0, empty, empty, empty],
+      [1, 145, "Abort", 0, empty, 0, empty, empty, empty],
+      [1, 146, "Props", 0, empty, 0, empty, empty, empty],
+      [1, 147, "NumpadParenLeft", 0, empty, 0, empty, empty, empty],
+      [1, 148, "NumpadParenRight", 0, empty, 0, empty, empty, empty],
+      [1, 149, "NumpadBackspace", 0, empty, 0, empty, empty, empty],
+      [1, 150, "NumpadMemoryStore", 0, empty, 0, empty, empty, empty],
+      [1, 151, "NumpadMemoryRecall", 0, empty, 0, empty, empty, empty],
+      [1, 152, "NumpadMemoryClear", 0, empty, 0, empty, empty, empty],
+      [1, 153, "NumpadMemoryAdd", 0, empty, 0, empty, empty, empty],
+      [1, 154, "NumpadMemorySubtract", 0, empty, 0, empty, empty, empty],
+      [1, 155, "NumpadClear", 131, "Clear", 12, "VK_CLEAR", empty, empty],
+      [1, 156, "NumpadClearEntry", 0, empty, 0, empty, empty, empty],
+      [1, 0, empty, 5, "Ctrl", 17, "VK_CONTROL", empty, empty],
+      [1, 0, empty, 4, "Shift", 16, "VK_SHIFT", empty, empty],
+      [1, 0, empty, 6, "Alt", 18, "VK_MENU", empty, empty],
+      [1, 0, empty, 57, "Meta", 91, "VK_COMMAND", empty, empty],
+      [1, 157, "ControlLeft", 5, empty, 0, "VK_LCONTROL", empty, empty],
+      [1, 158, "ShiftLeft", 4, empty, 0, "VK_LSHIFT", empty, empty],
+      [1, 159, "AltLeft", 6, empty, 0, "VK_LMENU", empty, empty],
+      [1, 160, "MetaLeft", 57, empty, 0, "VK_LWIN", empty, empty],
+      [1, 161, "ControlRight", 5, empty, 0, "VK_RCONTROL", empty, empty],
+      [1, 162, "ShiftRight", 4, empty, 0, "VK_RSHIFT", empty, empty],
+      [1, 163, "AltRight", 6, empty, 0, "VK_RMENU", empty, empty],
+      [1, 164, "MetaRight", 57, empty, 0, "VK_RWIN", empty, empty],
+      [1, 165, "BrightnessUp", 0, empty, 0, empty, empty, empty],
+      [1, 166, "BrightnessDown", 0, empty, 0, empty, empty, empty],
+      [1, 167, "MediaPlay", 0, empty, 0, empty, empty, empty],
+      [1, 168, "MediaRecord", 0, empty, 0, empty, empty, empty],
+      [1, 169, "MediaFastForward", 0, empty, 0, empty, empty, empty],
+      [1, 170, "MediaRewind", 0, empty, 0, empty, empty, empty],
+      [1, 171, "MediaTrackNext", 124, "MediaTrackNext", 176, "VK_MEDIA_NEXT_TRACK", empty, empty],
+      [1, 172, "MediaTrackPrevious", 125, "MediaTrackPrevious", 177, "VK_MEDIA_PREV_TRACK", empty, empty],
+      [1, 173, "MediaStop", 126, "MediaStop", 178, "VK_MEDIA_STOP", empty, empty],
+      [1, 174, "Eject", 0, empty, 0, empty, empty, empty],
+      [1, 175, "MediaPlayPause", 127, "MediaPlayPause", 179, "VK_MEDIA_PLAY_PAUSE", empty, empty],
+      [1, 176, "MediaSelect", 128, "LaunchMediaPlayer", 181, "VK_MEDIA_LAUNCH_MEDIA_SELECT", empty, empty],
+      [1, 177, "LaunchMail", 129, "LaunchMail", 180, "VK_MEDIA_LAUNCH_MAIL", empty, empty],
+      [1, 178, "LaunchApp2", 130, "LaunchApp2", 183, "VK_MEDIA_LAUNCH_APP2", empty, empty],
+      [1, 179, "LaunchApp1", 0, empty, 0, "VK_MEDIA_LAUNCH_APP1", empty, empty],
+      [1, 180, "SelectTask", 0, empty, 0, empty, empty, empty],
+      [1, 181, "LaunchScreenSaver", 0, empty, 0, empty, empty, empty],
+      [1, 182, "BrowserSearch", 120, "BrowserSearch", 170, "VK_BROWSER_SEARCH", empty, empty],
+      [1, 183, "BrowserHome", 121, "BrowserHome", 172, "VK_BROWSER_HOME", empty, empty],
+      [1, 184, "BrowserBack", 122, "BrowserBack", 166, "VK_BROWSER_BACK", empty, empty],
+      [1, 185, "BrowserForward", 123, "BrowserForward", 167, "VK_BROWSER_FORWARD", empty, empty],
+      [1, 186, "BrowserStop", 0, empty, 0, "VK_BROWSER_STOP", empty, empty],
+      [1, 187, "BrowserRefresh", 0, empty, 0, "VK_BROWSER_REFRESH", empty, empty],
+      [1, 188, "BrowserFavorites", 0, empty, 0, "VK_BROWSER_FAVORITES", empty, empty],
+      [1, 189, "ZoomToggle", 0, empty, 0, empty, empty, empty],
+      [1, 190, "MailReply", 0, empty, 0, empty, empty, empty],
+      [1, 191, "MailForward", 0, empty, 0, empty, empty, empty],
+      [1, 192, "MailSend", 0, empty, 0, empty, empty, empty],
       // See https://lists.w3.org/Archives/Public/www-dom/2010JulSep/att-0182/keyCode-spec.html
       // If an Input Method Editor is processing key input and the event is keydown, return 229.
-      [109, 1, 0, empty, 109, "KeyInComposition", 229, empty, empty, empty],
-      [111, 1, 0, empty, 111, "ABNT_C2", 194, "VK_ABNT_C2", empty, empty],
-      [91, 1, 0, empty, 91, "OEM_8", 223, "VK_OEM_8", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_KANA", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_HANGUL", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_JUNJA", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_FINAL", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_HANJA", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_KANJI", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_CONVERT", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_NONCONVERT", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_ACCEPT", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_MODECHANGE", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_SELECT", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_PRINT", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_EXECUTE", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_SNAPSHOT", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_HELP", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_APPS", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_PROCESSKEY", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_PACKET", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_DBE_SBCSCHAR", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_DBE_DBCSCHAR", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_ATTN", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_CRSEL", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_EXSEL", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_EREOF", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_PLAY", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_ZOOM", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_NONAME", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_PA1", empty, empty],
-      [0, 1, 0, empty, 0, empty, 0, "VK_OEM_CLEAR", empty, empty]
+      [1, 0, empty, 114, "KeyInComposition", 229, empty, empty, empty],
+      [1, 0, empty, 116, "ABNT_C2", 194, "VK_ABNT_C2", empty, empty],
+      [1, 0, empty, 96, "OEM_8", 223, "VK_OEM_8", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_KANA", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_HANGUL", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_JUNJA", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_FINAL", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_HANJA", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_KANJI", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_CONVERT", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_NONCONVERT", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_ACCEPT", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_MODECHANGE", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_SELECT", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_PRINT", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_EXECUTE", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_SNAPSHOT", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_HELP", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_APPS", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_PROCESSKEY", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_PACKET", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_DBE_SBCSCHAR", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_DBE_DBCSCHAR", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_ATTN", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_CRSEL", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_EXSEL", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_EREOF", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_PLAY", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_ZOOM", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_NONAME", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_PA1", empty, empty],
+      [1, 0, empty, 0, empty, 0, "VK_OEM_CLEAR", empty, empty]
     ];
     const seenKeyCode = [];
     const seenScanCode = [];
     for (const mapping of mappings) {
-      const [_keyCodeOrd, immutable, scanCode, scanCodeStr, keyCode, keyCodeStr, eventKeyCode, vkey, usUserSettingsLabel, generalUserSettingsLabel] = mapping;
+      const [immutable, scanCode, scanCodeStr, keyCode, keyCodeStr, eventKeyCode, vkey, usUserSettingsLabel, generalUserSettingsLabel] = mapping;
       if (!seenScanCode[scanCode]) {
         seenScanCode[scanCode] = true;
         scanCodeIntToStr[scanCode] = scanCodeStr;
@@ -6295,7 +6367,7 @@
     }
     KeyCodeUtils2.fromUserSettings = fromUserSettings;
     function toElectronAccelerator(keyCode) {
-      if (keyCode >= 93 && keyCode <= 108) {
+      if (keyCode >= 98 && keyCode <= 113) {
         return null;
       }
       switch (keyCode) {
@@ -6317,7 +6389,7 @@
     return (firstPart | chordPart) >>> 0;
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/common/core/selection.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/core/selection.js
   var Selection = class _Selection extends Range {
     constructor(selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn) {
       super(selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn);
@@ -6443,7 +6515,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/codicons.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/codicons.js
   var _codiconFontCharacters = /* @__PURE__ */ Object.create(null);
   function register(id, fontCharacter) {
     if (isString(fontCharacter)) {
@@ -6975,6 +7047,9 @@
     gitPullRequestNewChanges: register("git-pull-request-new-changes", 60428),
     searchFuzzy: register("search-fuzzy", 60429),
     commentDraft: register("comment-draft", 60430),
+    send: register("send", 60431),
+    sparkle: register("sparkle", 60432),
+    insert: register("insert", 60433),
     // derived icons, that could become separate icons
     dialogError: register("dialog-error", "error"),
     dialogWarning: register("dialog-warning", "warning"),
@@ -6996,7 +7071,7 @@
     quickInputBack: register("quick-input-back", "arrow-left")
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/tokenizationRegistry.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/tokenizationRegistry.js
   var __awaiter = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve2) {
@@ -7026,28 +7101,31 @@
   };
   var TokenizationRegistry = class {
     constructor() {
-      this._map = /* @__PURE__ */ new Map();
+      this._tokenizationSupports = /* @__PURE__ */ new Map();
       this._factories = /* @__PURE__ */ new Map();
       this._onDidChange = new Emitter();
       this.onDidChange = this._onDidChange.event;
       this._colorMap = null;
     }
-    fire(languages) {
+    handleChange(languageIds) {
       this._onDidChange.fire({
-        changedLanguages: languages,
+        changedLanguages: languageIds,
         changedColorMap: false
       });
     }
-    register(language, support) {
-      this._map.set(language, support);
-      this.fire([language]);
+    register(languageId, support) {
+      this._tokenizationSupports.set(languageId, support);
+      this.handleChange([languageId]);
       return toDisposable(() => {
-        if (this._map.get(language) !== support) {
+        if (this._tokenizationSupports.get(languageId) !== support) {
           return;
         }
-        this._map.delete(language);
-        this.fire([language]);
+        this._tokenizationSupports.delete(languageId);
+        this.handleChange([languageId]);
       });
+    }
+    get(languageId) {
+      return this._tokenizationSupports.get(languageId) || null;
     }
     registerFactory(languageId, factory) {
       var _a4;
@@ -7077,9 +7155,6 @@
         return this.get(languageId);
       });
     }
-    get(language) {
-      return this._map.get(language) || null;
-    }
     isResolved(languageId) {
       const tokenizationSupport = this.get(languageId);
       if (tokenizationSupport) {
@@ -7094,7 +7169,7 @@
     setColorMap(colorMap) {
       this._colorMap = colorMap;
       this._onDidChange.fire({
-        changedLanguages: Array.from(this._map.keys()),
+        changedLanguages: Array.from(this._tokenizationSupports.keys()),
         changedColorMap: true
       });
     }
@@ -7138,7 +7213,7 @@
     }
     _create() {
       return __awaiter(this, void 0, void 0, function* () {
-        const value = yield Promise.resolve(this._factory.createTokenizationSupport());
+        const value = yield this._factory.tokenizationSupport;
         this._isResolved = true;
         if (value && !this._isDisposed) {
           this._register(this._registry.register(this._languageId, value));
@@ -7147,7 +7222,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/languages.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/languages.js
   var Token = class {
     constructor(offset, type, language) {
       this.offset = offset;
@@ -7377,6 +7452,112 @@
     DocumentHighlightKind4[DocumentHighlightKind4["Read"] = 1] = "Read";
     DocumentHighlightKind4[DocumentHighlightKind4["Write"] = 2] = "Write";
   })(DocumentHighlightKind || (DocumentHighlightKind = {}));
+  var symbolKindNames = {
+    [
+      17
+      /* SymbolKind.Array */
+    ]: localize("Array", "array"),
+    [
+      16
+      /* SymbolKind.Boolean */
+    ]: localize("Boolean", "boolean"),
+    [
+      4
+      /* SymbolKind.Class */
+    ]: localize("Class", "class"),
+    [
+      13
+      /* SymbolKind.Constant */
+    ]: localize("Constant", "constant"),
+    [
+      8
+      /* SymbolKind.Constructor */
+    ]: localize("Constructor", "constructor"),
+    [
+      9
+      /* SymbolKind.Enum */
+    ]: localize("Enum", "enumeration"),
+    [
+      21
+      /* SymbolKind.EnumMember */
+    ]: localize("EnumMember", "enumeration member"),
+    [
+      23
+      /* SymbolKind.Event */
+    ]: localize("Event", "event"),
+    [
+      7
+      /* SymbolKind.Field */
+    ]: localize("Field", "field"),
+    [
+      0
+      /* SymbolKind.File */
+    ]: localize("File", "file"),
+    [
+      11
+      /* SymbolKind.Function */
+    ]: localize("Function", "function"),
+    [
+      10
+      /* SymbolKind.Interface */
+    ]: localize("Interface", "interface"),
+    [
+      19
+      /* SymbolKind.Key */
+    ]: localize("Key", "key"),
+    [
+      5
+      /* SymbolKind.Method */
+    ]: localize("Method", "method"),
+    [
+      1
+      /* SymbolKind.Module */
+    ]: localize("Module", "module"),
+    [
+      2
+      /* SymbolKind.Namespace */
+    ]: localize("Namespace", "namespace"),
+    [
+      20
+      /* SymbolKind.Null */
+    ]: localize("Null", "null"),
+    [
+      15
+      /* SymbolKind.Number */
+    ]: localize("Number", "number"),
+    [
+      18
+      /* SymbolKind.Object */
+    ]: localize("Object", "object"),
+    [
+      24
+      /* SymbolKind.Operator */
+    ]: localize("Operator", "operator"),
+    [
+      3
+      /* SymbolKind.Package */
+    ]: localize("Package", "package"),
+    [
+      6
+      /* SymbolKind.Property */
+    ]: localize("Property", "property"),
+    [
+      14
+      /* SymbolKind.String */
+    ]: localize("String", "string"),
+    [
+      22
+      /* SymbolKind.Struct */
+    ]: localize("Struct", "struct"),
+    [
+      25
+      /* SymbolKind.TypeParameter */
+    ]: localize("TypeParameter", "type parameter"),
+    [
+      12
+      /* SymbolKind.Variable */
+    ]: localize("Variable", "variable")
+  };
   var SymbolKinds;
   (function(SymbolKinds2) {
     const byKind = /* @__PURE__ */ new Map();
@@ -7462,7 +7643,7 @@
   })(InlayHintKind || (InlayHintKind = {}));
   var TokenizationRegistry2 = new TokenizationRegistry();
 
-  // node_modules/monaco-editor/esm/vs/editor/common/standalone/standaloneEnums.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/standalone/standaloneEnums.js
   var AccessibilitySupport;
   (function(AccessibilitySupport2) {
     AccessibilitySupport2[AccessibilitySupport2["Unknown"] = 0] = "Unknown";
@@ -7563,141 +7744,147 @@
     EditorOption2[EditorOption2["accessibilitySupport"] = 2] = "accessibilitySupport";
     EditorOption2[EditorOption2["accessibilityPageSize"] = 3] = "accessibilityPageSize";
     EditorOption2[EditorOption2["ariaLabel"] = 4] = "ariaLabel";
-    EditorOption2[EditorOption2["autoClosingBrackets"] = 5] = "autoClosingBrackets";
-    EditorOption2[EditorOption2["autoClosingDelete"] = 6] = "autoClosingDelete";
-    EditorOption2[EditorOption2["autoClosingOvertype"] = 7] = "autoClosingOvertype";
-    EditorOption2[EditorOption2["autoClosingQuotes"] = 8] = "autoClosingQuotes";
-    EditorOption2[EditorOption2["autoIndent"] = 9] = "autoIndent";
-    EditorOption2[EditorOption2["automaticLayout"] = 10] = "automaticLayout";
-    EditorOption2[EditorOption2["autoSurround"] = 11] = "autoSurround";
-    EditorOption2[EditorOption2["bracketPairColorization"] = 12] = "bracketPairColorization";
-    EditorOption2[EditorOption2["guides"] = 13] = "guides";
-    EditorOption2[EditorOption2["codeLens"] = 14] = "codeLens";
-    EditorOption2[EditorOption2["codeLensFontFamily"] = 15] = "codeLensFontFamily";
-    EditorOption2[EditorOption2["codeLensFontSize"] = 16] = "codeLensFontSize";
-    EditorOption2[EditorOption2["colorDecorators"] = 17] = "colorDecorators";
-    EditorOption2[EditorOption2["colorDecoratorsLimit"] = 18] = "colorDecoratorsLimit";
-    EditorOption2[EditorOption2["columnSelection"] = 19] = "columnSelection";
-    EditorOption2[EditorOption2["comments"] = 20] = "comments";
-    EditorOption2[EditorOption2["contextmenu"] = 21] = "contextmenu";
-    EditorOption2[EditorOption2["copyWithSyntaxHighlighting"] = 22] = "copyWithSyntaxHighlighting";
-    EditorOption2[EditorOption2["cursorBlinking"] = 23] = "cursorBlinking";
-    EditorOption2[EditorOption2["cursorSmoothCaretAnimation"] = 24] = "cursorSmoothCaretAnimation";
-    EditorOption2[EditorOption2["cursorStyle"] = 25] = "cursorStyle";
-    EditorOption2[EditorOption2["cursorSurroundingLines"] = 26] = "cursorSurroundingLines";
-    EditorOption2[EditorOption2["cursorSurroundingLinesStyle"] = 27] = "cursorSurroundingLinesStyle";
-    EditorOption2[EditorOption2["cursorWidth"] = 28] = "cursorWidth";
-    EditorOption2[EditorOption2["disableLayerHinting"] = 29] = "disableLayerHinting";
-    EditorOption2[EditorOption2["disableMonospaceOptimizations"] = 30] = "disableMonospaceOptimizations";
-    EditorOption2[EditorOption2["domReadOnly"] = 31] = "domReadOnly";
-    EditorOption2[EditorOption2["dragAndDrop"] = 32] = "dragAndDrop";
-    EditorOption2[EditorOption2["dropIntoEditor"] = 33] = "dropIntoEditor";
-    EditorOption2[EditorOption2["emptySelectionClipboard"] = 34] = "emptySelectionClipboard";
-    EditorOption2[EditorOption2["experimentalWhitespaceRendering"] = 35] = "experimentalWhitespaceRendering";
-    EditorOption2[EditorOption2["extraEditorClassName"] = 36] = "extraEditorClassName";
-    EditorOption2[EditorOption2["fastScrollSensitivity"] = 37] = "fastScrollSensitivity";
-    EditorOption2[EditorOption2["find"] = 38] = "find";
-    EditorOption2[EditorOption2["fixedOverflowWidgets"] = 39] = "fixedOverflowWidgets";
-    EditorOption2[EditorOption2["folding"] = 40] = "folding";
-    EditorOption2[EditorOption2["foldingStrategy"] = 41] = "foldingStrategy";
-    EditorOption2[EditorOption2["foldingHighlight"] = 42] = "foldingHighlight";
-    EditorOption2[EditorOption2["foldingImportsByDefault"] = 43] = "foldingImportsByDefault";
-    EditorOption2[EditorOption2["foldingMaximumRegions"] = 44] = "foldingMaximumRegions";
-    EditorOption2[EditorOption2["unfoldOnClickAfterEndOfLine"] = 45] = "unfoldOnClickAfterEndOfLine";
-    EditorOption2[EditorOption2["fontFamily"] = 46] = "fontFamily";
-    EditorOption2[EditorOption2["fontInfo"] = 47] = "fontInfo";
-    EditorOption2[EditorOption2["fontLigatures"] = 48] = "fontLigatures";
-    EditorOption2[EditorOption2["fontSize"] = 49] = "fontSize";
-    EditorOption2[EditorOption2["fontWeight"] = 50] = "fontWeight";
-    EditorOption2[EditorOption2["fontVariations"] = 51] = "fontVariations";
-    EditorOption2[EditorOption2["formatOnPaste"] = 52] = "formatOnPaste";
-    EditorOption2[EditorOption2["formatOnType"] = 53] = "formatOnType";
-    EditorOption2[EditorOption2["glyphMargin"] = 54] = "glyphMargin";
-    EditorOption2[EditorOption2["gotoLocation"] = 55] = "gotoLocation";
-    EditorOption2[EditorOption2["hideCursorInOverviewRuler"] = 56] = "hideCursorInOverviewRuler";
-    EditorOption2[EditorOption2["hover"] = 57] = "hover";
-    EditorOption2[EditorOption2["inDiffEditor"] = 58] = "inDiffEditor";
-    EditorOption2[EditorOption2["inlineSuggest"] = 59] = "inlineSuggest";
-    EditorOption2[EditorOption2["letterSpacing"] = 60] = "letterSpacing";
-    EditorOption2[EditorOption2["lightbulb"] = 61] = "lightbulb";
-    EditorOption2[EditorOption2["lineDecorationsWidth"] = 62] = "lineDecorationsWidth";
-    EditorOption2[EditorOption2["lineHeight"] = 63] = "lineHeight";
-    EditorOption2[EditorOption2["lineNumbers"] = 64] = "lineNumbers";
-    EditorOption2[EditorOption2["lineNumbersMinChars"] = 65] = "lineNumbersMinChars";
-    EditorOption2[EditorOption2["linkedEditing"] = 66] = "linkedEditing";
-    EditorOption2[EditorOption2["links"] = 67] = "links";
-    EditorOption2[EditorOption2["matchBrackets"] = 68] = "matchBrackets";
-    EditorOption2[EditorOption2["minimap"] = 69] = "minimap";
-    EditorOption2[EditorOption2["mouseStyle"] = 70] = "mouseStyle";
-    EditorOption2[EditorOption2["mouseWheelScrollSensitivity"] = 71] = "mouseWheelScrollSensitivity";
-    EditorOption2[EditorOption2["mouseWheelZoom"] = 72] = "mouseWheelZoom";
-    EditorOption2[EditorOption2["multiCursorMergeOverlapping"] = 73] = "multiCursorMergeOverlapping";
-    EditorOption2[EditorOption2["multiCursorModifier"] = 74] = "multiCursorModifier";
-    EditorOption2[EditorOption2["multiCursorPaste"] = 75] = "multiCursorPaste";
-    EditorOption2[EditorOption2["multiCursorLimit"] = 76] = "multiCursorLimit";
-    EditorOption2[EditorOption2["occurrencesHighlight"] = 77] = "occurrencesHighlight";
-    EditorOption2[EditorOption2["overviewRulerBorder"] = 78] = "overviewRulerBorder";
-    EditorOption2[EditorOption2["overviewRulerLanes"] = 79] = "overviewRulerLanes";
-    EditorOption2[EditorOption2["padding"] = 80] = "padding";
-    EditorOption2[EditorOption2["parameterHints"] = 81] = "parameterHints";
-    EditorOption2[EditorOption2["peekWidgetDefaultFocus"] = 82] = "peekWidgetDefaultFocus";
-    EditorOption2[EditorOption2["definitionLinkOpensInPeek"] = 83] = "definitionLinkOpensInPeek";
-    EditorOption2[EditorOption2["quickSuggestions"] = 84] = "quickSuggestions";
-    EditorOption2[EditorOption2["quickSuggestionsDelay"] = 85] = "quickSuggestionsDelay";
-    EditorOption2[EditorOption2["readOnly"] = 86] = "readOnly";
-    EditorOption2[EditorOption2["renameOnType"] = 87] = "renameOnType";
-    EditorOption2[EditorOption2["renderControlCharacters"] = 88] = "renderControlCharacters";
-    EditorOption2[EditorOption2["renderFinalNewline"] = 89] = "renderFinalNewline";
-    EditorOption2[EditorOption2["renderLineHighlight"] = 90] = "renderLineHighlight";
-    EditorOption2[EditorOption2["renderLineHighlightOnlyWhenFocus"] = 91] = "renderLineHighlightOnlyWhenFocus";
-    EditorOption2[EditorOption2["renderValidationDecorations"] = 92] = "renderValidationDecorations";
-    EditorOption2[EditorOption2["renderWhitespace"] = 93] = "renderWhitespace";
-    EditorOption2[EditorOption2["revealHorizontalRightPadding"] = 94] = "revealHorizontalRightPadding";
-    EditorOption2[EditorOption2["roundedSelection"] = 95] = "roundedSelection";
-    EditorOption2[EditorOption2["rulers"] = 96] = "rulers";
-    EditorOption2[EditorOption2["scrollbar"] = 97] = "scrollbar";
-    EditorOption2[EditorOption2["scrollBeyondLastColumn"] = 98] = "scrollBeyondLastColumn";
-    EditorOption2[EditorOption2["scrollBeyondLastLine"] = 99] = "scrollBeyondLastLine";
-    EditorOption2[EditorOption2["scrollPredominantAxis"] = 100] = "scrollPredominantAxis";
-    EditorOption2[EditorOption2["selectionClipboard"] = 101] = "selectionClipboard";
-    EditorOption2[EditorOption2["selectionHighlight"] = 102] = "selectionHighlight";
-    EditorOption2[EditorOption2["selectOnLineNumbers"] = 103] = "selectOnLineNumbers";
-    EditorOption2[EditorOption2["showFoldingControls"] = 104] = "showFoldingControls";
-    EditorOption2[EditorOption2["showUnused"] = 105] = "showUnused";
-    EditorOption2[EditorOption2["snippetSuggestions"] = 106] = "snippetSuggestions";
-    EditorOption2[EditorOption2["smartSelect"] = 107] = "smartSelect";
-    EditorOption2[EditorOption2["smoothScrolling"] = 108] = "smoothScrolling";
-    EditorOption2[EditorOption2["stickyScroll"] = 109] = "stickyScroll";
-    EditorOption2[EditorOption2["stickyTabStops"] = 110] = "stickyTabStops";
-    EditorOption2[EditorOption2["stopRenderingLineAfter"] = 111] = "stopRenderingLineAfter";
-    EditorOption2[EditorOption2["suggest"] = 112] = "suggest";
-    EditorOption2[EditorOption2["suggestFontSize"] = 113] = "suggestFontSize";
-    EditorOption2[EditorOption2["suggestLineHeight"] = 114] = "suggestLineHeight";
-    EditorOption2[EditorOption2["suggestOnTriggerCharacters"] = 115] = "suggestOnTriggerCharacters";
-    EditorOption2[EditorOption2["suggestSelection"] = 116] = "suggestSelection";
-    EditorOption2[EditorOption2["tabCompletion"] = 117] = "tabCompletion";
-    EditorOption2[EditorOption2["tabIndex"] = 118] = "tabIndex";
-    EditorOption2[EditorOption2["unicodeHighlighting"] = 119] = "unicodeHighlighting";
-    EditorOption2[EditorOption2["unusualLineTerminators"] = 120] = "unusualLineTerminators";
-    EditorOption2[EditorOption2["useShadowDOM"] = 121] = "useShadowDOM";
-    EditorOption2[EditorOption2["useTabStops"] = 122] = "useTabStops";
-    EditorOption2[EditorOption2["wordBreak"] = 123] = "wordBreak";
-    EditorOption2[EditorOption2["wordSeparators"] = 124] = "wordSeparators";
-    EditorOption2[EditorOption2["wordWrap"] = 125] = "wordWrap";
-    EditorOption2[EditorOption2["wordWrapBreakAfterCharacters"] = 126] = "wordWrapBreakAfterCharacters";
-    EditorOption2[EditorOption2["wordWrapBreakBeforeCharacters"] = 127] = "wordWrapBreakBeforeCharacters";
-    EditorOption2[EditorOption2["wordWrapColumn"] = 128] = "wordWrapColumn";
-    EditorOption2[EditorOption2["wordWrapOverride1"] = 129] = "wordWrapOverride1";
-    EditorOption2[EditorOption2["wordWrapOverride2"] = 130] = "wordWrapOverride2";
-    EditorOption2[EditorOption2["wrappingIndent"] = 131] = "wrappingIndent";
-    EditorOption2[EditorOption2["wrappingStrategy"] = 132] = "wrappingStrategy";
-    EditorOption2[EditorOption2["showDeprecated"] = 133] = "showDeprecated";
-    EditorOption2[EditorOption2["inlayHints"] = 134] = "inlayHints";
-    EditorOption2[EditorOption2["editorClassName"] = 135] = "editorClassName";
-    EditorOption2[EditorOption2["pixelRatio"] = 136] = "pixelRatio";
-    EditorOption2[EditorOption2["tabFocusMode"] = 137] = "tabFocusMode";
-    EditorOption2[EditorOption2["layoutInfo"] = 138] = "layoutInfo";
-    EditorOption2[EditorOption2["wrappingInfo"] = 139] = "wrappingInfo";
+    EditorOption2[EditorOption2["ariaRequired"] = 5] = "ariaRequired";
+    EditorOption2[EditorOption2["autoClosingBrackets"] = 6] = "autoClosingBrackets";
+    EditorOption2[EditorOption2["screenReaderAnnounceInlineSuggestion"] = 7] = "screenReaderAnnounceInlineSuggestion";
+    EditorOption2[EditorOption2["autoClosingDelete"] = 8] = "autoClosingDelete";
+    EditorOption2[EditorOption2["autoClosingOvertype"] = 9] = "autoClosingOvertype";
+    EditorOption2[EditorOption2["autoClosingQuotes"] = 10] = "autoClosingQuotes";
+    EditorOption2[EditorOption2["autoIndent"] = 11] = "autoIndent";
+    EditorOption2[EditorOption2["automaticLayout"] = 12] = "automaticLayout";
+    EditorOption2[EditorOption2["autoSurround"] = 13] = "autoSurround";
+    EditorOption2[EditorOption2["bracketPairColorization"] = 14] = "bracketPairColorization";
+    EditorOption2[EditorOption2["guides"] = 15] = "guides";
+    EditorOption2[EditorOption2["codeLens"] = 16] = "codeLens";
+    EditorOption2[EditorOption2["codeLensFontFamily"] = 17] = "codeLensFontFamily";
+    EditorOption2[EditorOption2["codeLensFontSize"] = 18] = "codeLensFontSize";
+    EditorOption2[EditorOption2["colorDecorators"] = 19] = "colorDecorators";
+    EditorOption2[EditorOption2["colorDecoratorsLimit"] = 20] = "colorDecoratorsLimit";
+    EditorOption2[EditorOption2["columnSelection"] = 21] = "columnSelection";
+    EditorOption2[EditorOption2["comments"] = 22] = "comments";
+    EditorOption2[EditorOption2["contextmenu"] = 23] = "contextmenu";
+    EditorOption2[EditorOption2["copyWithSyntaxHighlighting"] = 24] = "copyWithSyntaxHighlighting";
+    EditorOption2[EditorOption2["cursorBlinking"] = 25] = "cursorBlinking";
+    EditorOption2[EditorOption2["cursorSmoothCaretAnimation"] = 26] = "cursorSmoothCaretAnimation";
+    EditorOption2[EditorOption2["cursorStyle"] = 27] = "cursorStyle";
+    EditorOption2[EditorOption2["cursorSurroundingLines"] = 28] = "cursorSurroundingLines";
+    EditorOption2[EditorOption2["cursorSurroundingLinesStyle"] = 29] = "cursorSurroundingLinesStyle";
+    EditorOption2[EditorOption2["cursorWidth"] = 30] = "cursorWidth";
+    EditorOption2[EditorOption2["disableLayerHinting"] = 31] = "disableLayerHinting";
+    EditorOption2[EditorOption2["disableMonospaceOptimizations"] = 32] = "disableMonospaceOptimizations";
+    EditorOption2[EditorOption2["domReadOnly"] = 33] = "domReadOnly";
+    EditorOption2[EditorOption2["dragAndDrop"] = 34] = "dragAndDrop";
+    EditorOption2[EditorOption2["dropIntoEditor"] = 35] = "dropIntoEditor";
+    EditorOption2[EditorOption2["emptySelectionClipboard"] = 36] = "emptySelectionClipboard";
+    EditorOption2[EditorOption2["experimentalWhitespaceRendering"] = 37] = "experimentalWhitespaceRendering";
+    EditorOption2[EditorOption2["extraEditorClassName"] = 38] = "extraEditorClassName";
+    EditorOption2[EditorOption2["fastScrollSensitivity"] = 39] = "fastScrollSensitivity";
+    EditorOption2[EditorOption2["find"] = 40] = "find";
+    EditorOption2[EditorOption2["fixedOverflowWidgets"] = 41] = "fixedOverflowWidgets";
+    EditorOption2[EditorOption2["folding"] = 42] = "folding";
+    EditorOption2[EditorOption2["foldingStrategy"] = 43] = "foldingStrategy";
+    EditorOption2[EditorOption2["foldingHighlight"] = 44] = "foldingHighlight";
+    EditorOption2[EditorOption2["foldingImportsByDefault"] = 45] = "foldingImportsByDefault";
+    EditorOption2[EditorOption2["foldingMaximumRegions"] = 46] = "foldingMaximumRegions";
+    EditorOption2[EditorOption2["unfoldOnClickAfterEndOfLine"] = 47] = "unfoldOnClickAfterEndOfLine";
+    EditorOption2[EditorOption2["fontFamily"] = 48] = "fontFamily";
+    EditorOption2[EditorOption2["fontInfo"] = 49] = "fontInfo";
+    EditorOption2[EditorOption2["fontLigatures"] = 50] = "fontLigatures";
+    EditorOption2[EditorOption2["fontSize"] = 51] = "fontSize";
+    EditorOption2[EditorOption2["fontWeight"] = 52] = "fontWeight";
+    EditorOption2[EditorOption2["fontVariations"] = 53] = "fontVariations";
+    EditorOption2[EditorOption2["formatOnPaste"] = 54] = "formatOnPaste";
+    EditorOption2[EditorOption2["formatOnType"] = 55] = "formatOnType";
+    EditorOption2[EditorOption2["glyphMargin"] = 56] = "glyphMargin";
+    EditorOption2[EditorOption2["gotoLocation"] = 57] = "gotoLocation";
+    EditorOption2[EditorOption2["hideCursorInOverviewRuler"] = 58] = "hideCursorInOverviewRuler";
+    EditorOption2[EditorOption2["hover"] = 59] = "hover";
+    EditorOption2[EditorOption2["inDiffEditor"] = 60] = "inDiffEditor";
+    EditorOption2[EditorOption2["inlineSuggest"] = 61] = "inlineSuggest";
+    EditorOption2[EditorOption2["letterSpacing"] = 62] = "letterSpacing";
+    EditorOption2[EditorOption2["lightbulb"] = 63] = "lightbulb";
+    EditorOption2[EditorOption2["lineDecorationsWidth"] = 64] = "lineDecorationsWidth";
+    EditorOption2[EditorOption2["lineHeight"] = 65] = "lineHeight";
+    EditorOption2[EditorOption2["lineNumbers"] = 66] = "lineNumbers";
+    EditorOption2[EditorOption2["lineNumbersMinChars"] = 67] = "lineNumbersMinChars";
+    EditorOption2[EditorOption2["linkedEditing"] = 68] = "linkedEditing";
+    EditorOption2[EditorOption2["links"] = 69] = "links";
+    EditorOption2[EditorOption2["matchBrackets"] = 70] = "matchBrackets";
+    EditorOption2[EditorOption2["minimap"] = 71] = "minimap";
+    EditorOption2[EditorOption2["mouseStyle"] = 72] = "mouseStyle";
+    EditorOption2[EditorOption2["mouseWheelScrollSensitivity"] = 73] = "mouseWheelScrollSensitivity";
+    EditorOption2[EditorOption2["mouseWheelZoom"] = 74] = "mouseWheelZoom";
+    EditorOption2[EditorOption2["multiCursorMergeOverlapping"] = 75] = "multiCursorMergeOverlapping";
+    EditorOption2[EditorOption2["multiCursorModifier"] = 76] = "multiCursorModifier";
+    EditorOption2[EditorOption2["multiCursorPaste"] = 77] = "multiCursorPaste";
+    EditorOption2[EditorOption2["multiCursorLimit"] = 78] = "multiCursorLimit";
+    EditorOption2[EditorOption2["occurrencesHighlight"] = 79] = "occurrencesHighlight";
+    EditorOption2[EditorOption2["overviewRulerBorder"] = 80] = "overviewRulerBorder";
+    EditorOption2[EditorOption2["overviewRulerLanes"] = 81] = "overviewRulerLanes";
+    EditorOption2[EditorOption2["padding"] = 82] = "padding";
+    EditorOption2[EditorOption2["pasteAs"] = 83] = "pasteAs";
+    EditorOption2[EditorOption2["parameterHints"] = 84] = "parameterHints";
+    EditorOption2[EditorOption2["peekWidgetDefaultFocus"] = 85] = "peekWidgetDefaultFocus";
+    EditorOption2[EditorOption2["definitionLinkOpensInPeek"] = 86] = "definitionLinkOpensInPeek";
+    EditorOption2[EditorOption2["quickSuggestions"] = 87] = "quickSuggestions";
+    EditorOption2[EditorOption2["quickSuggestionsDelay"] = 88] = "quickSuggestionsDelay";
+    EditorOption2[EditorOption2["readOnly"] = 89] = "readOnly";
+    EditorOption2[EditorOption2["readOnlyMessage"] = 90] = "readOnlyMessage";
+    EditorOption2[EditorOption2["renameOnType"] = 91] = "renameOnType";
+    EditorOption2[EditorOption2["renderControlCharacters"] = 92] = "renderControlCharacters";
+    EditorOption2[EditorOption2["renderFinalNewline"] = 93] = "renderFinalNewline";
+    EditorOption2[EditorOption2["renderLineHighlight"] = 94] = "renderLineHighlight";
+    EditorOption2[EditorOption2["renderLineHighlightOnlyWhenFocus"] = 95] = "renderLineHighlightOnlyWhenFocus";
+    EditorOption2[EditorOption2["renderValidationDecorations"] = 96] = "renderValidationDecorations";
+    EditorOption2[EditorOption2["renderWhitespace"] = 97] = "renderWhitespace";
+    EditorOption2[EditorOption2["revealHorizontalRightPadding"] = 98] = "revealHorizontalRightPadding";
+    EditorOption2[EditorOption2["roundedSelection"] = 99] = "roundedSelection";
+    EditorOption2[EditorOption2["rulers"] = 100] = "rulers";
+    EditorOption2[EditorOption2["scrollbar"] = 101] = "scrollbar";
+    EditorOption2[EditorOption2["scrollBeyondLastColumn"] = 102] = "scrollBeyondLastColumn";
+    EditorOption2[EditorOption2["scrollBeyondLastLine"] = 103] = "scrollBeyondLastLine";
+    EditorOption2[EditorOption2["scrollPredominantAxis"] = 104] = "scrollPredominantAxis";
+    EditorOption2[EditorOption2["selectionClipboard"] = 105] = "selectionClipboard";
+    EditorOption2[EditorOption2["selectionHighlight"] = 106] = "selectionHighlight";
+    EditorOption2[EditorOption2["selectOnLineNumbers"] = 107] = "selectOnLineNumbers";
+    EditorOption2[EditorOption2["showFoldingControls"] = 108] = "showFoldingControls";
+    EditorOption2[EditorOption2["showUnused"] = 109] = "showUnused";
+    EditorOption2[EditorOption2["snippetSuggestions"] = 110] = "snippetSuggestions";
+    EditorOption2[EditorOption2["smartSelect"] = 111] = "smartSelect";
+    EditorOption2[EditorOption2["smoothScrolling"] = 112] = "smoothScrolling";
+    EditorOption2[EditorOption2["stickyScroll"] = 113] = "stickyScroll";
+    EditorOption2[EditorOption2["stickyTabStops"] = 114] = "stickyTabStops";
+    EditorOption2[EditorOption2["stopRenderingLineAfter"] = 115] = "stopRenderingLineAfter";
+    EditorOption2[EditorOption2["suggest"] = 116] = "suggest";
+    EditorOption2[EditorOption2["suggestFontSize"] = 117] = "suggestFontSize";
+    EditorOption2[EditorOption2["suggestLineHeight"] = 118] = "suggestLineHeight";
+    EditorOption2[EditorOption2["suggestOnTriggerCharacters"] = 119] = "suggestOnTriggerCharacters";
+    EditorOption2[EditorOption2["suggestSelection"] = 120] = "suggestSelection";
+    EditorOption2[EditorOption2["tabCompletion"] = 121] = "tabCompletion";
+    EditorOption2[EditorOption2["tabIndex"] = 122] = "tabIndex";
+    EditorOption2[EditorOption2["unicodeHighlighting"] = 123] = "unicodeHighlighting";
+    EditorOption2[EditorOption2["unusualLineTerminators"] = 124] = "unusualLineTerminators";
+    EditorOption2[EditorOption2["useShadowDOM"] = 125] = "useShadowDOM";
+    EditorOption2[EditorOption2["useTabStops"] = 126] = "useTabStops";
+    EditorOption2[EditorOption2["wordBreak"] = 127] = "wordBreak";
+    EditorOption2[EditorOption2["wordSeparators"] = 128] = "wordSeparators";
+    EditorOption2[EditorOption2["wordWrap"] = 129] = "wordWrap";
+    EditorOption2[EditorOption2["wordWrapBreakAfterCharacters"] = 130] = "wordWrapBreakAfterCharacters";
+    EditorOption2[EditorOption2["wordWrapBreakBeforeCharacters"] = 131] = "wordWrapBreakBeforeCharacters";
+    EditorOption2[EditorOption2["wordWrapColumn"] = 132] = "wordWrapColumn";
+    EditorOption2[EditorOption2["wordWrapOverride1"] = 133] = "wordWrapOverride1";
+    EditorOption2[EditorOption2["wordWrapOverride2"] = 134] = "wordWrapOverride2";
+    EditorOption2[EditorOption2["wrappingIndent"] = 135] = "wrappingIndent";
+    EditorOption2[EditorOption2["wrappingStrategy"] = 136] = "wrappingStrategy";
+    EditorOption2[EditorOption2["showDeprecated"] = 137] = "showDeprecated";
+    EditorOption2[EditorOption2["inlayHints"] = 138] = "inlayHints";
+    EditorOption2[EditorOption2["editorClassName"] = 139] = "editorClassName";
+    EditorOption2[EditorOption2["pixelRatio"] = 140] = "pixelRatio";
+    EditorOption2[EditorOption2["tabFocusMode"] = 141] = "tabFocusMode";
+    EditorOption2[EditorOption2["layoutInfo"] = 142] = "layoutInfo";
+    EditorOption2[EditorOption2["wrappingInfo"] = 143] = "wrappingInfo";
+    EditorOption2[EditorOption2["defaultColorDecorators"] = 144] = "defaultColorDecorators";
+    EditorOption2[EditorOption2["colorDecoratorsActivatedOn"] = 145] = "colorDecoratorsActivatedOn";
   })(EditorOption || (EditorOption = {}));
   var EndOfLinePreference;
   (function(EndOfLinePreference2) {
@@ -7710,6 +7897,11 @@
     EndOfLineSequence2[EndOfLineSequence2["LF"] = 0] = "LF";
     EndOfLineSequence2[EndOfLineSequence2["CRLF"] = 1] = "CRLF";
   })(EndOfLineSequence || (EndOfLineSequence = {}));
+  var GlyphMarginLane;
+  (function(GlyphMarginLane3) {
+    GlyphMarginLane3[GlyphMarginLane3["Left"] = 1] = "Left";
+    GlyphMarginLane3[GlyphMarginLane3["Right"] = 2] = "Right";
+  })(GlyphMarginLane || (GlyphMarginLane = {}));
   var IndentAction;
   (function(IndentAction2) {
     IndentAction2[IndentAction2["None"] = 0] = "None";
@@ -7815,56 +8007,61 @@
     KeyCode2[KeyCode2["F17"] = 75] = "F17";
     KeyCode2[KeyCode2["F18"] = 76] = "F18";
     KeyCode2[KeyCode2["F19"] = 77] = "F19";
-    KeyCode2[KeyCode2["NumLock"] = 78] = "NumLock";
-    KeyCode2[KeyCode2["ScrollLock"] = 79] = "ScrollLock";
-    KeyCode2[KeyCode2["Semicolon"] = 80] = "Semicolon";
-    KeyCode2[KeyCode2["Equal"] = 81] = "Equal";
-    KeyCode2[KeyCode2["Comma"] = 82] = "Comma";
-    KeyCode2[KeyCode2["Minus"] = 83] = "Minus";
-    KeyCode2[KeyCode2["Period"] = 84] = "Period";
-    KeyCode2[KeyCode2["Slash"] = 85] = "Slash";
-    KeyCode2[KeyCode2["Backquote"] = 86] = "Backquote";
-    KeyCode2[KeyCode2["BracketLeft"] = 87] = "BracketLeft";
-    KeyCode2[KeyCode2["Backslash"] = 88] = "Backslash";
-    KeyCode2[KeyCode2["BracketRight"] = 89] = "BracketRight";
-    KeyCode2[KeyCode2["Quote"] = 90] = "Quote";
-    KeyCode2[KeyCode2["OEM_8"] = 91] = "OEM_8";
-    KeyCode2[KeyCode2["IntlBackslash"] = 92] = "IntlBackslash";
-    KeyCode2[KeyCode2["Numpad0"] = 93] = "Numpad0";
-    KeyCode2[KeyCode2["Numpad1"] = 94] = "Numpad1";
-    KeyCode2[KeyCode2["Numpad2"] = 95] = "Numpad2";
-    KeyCode2[KeyCode2["Numpad3"] = 96] = "Numpad3";
-    KeyCode2[KeyCode2["Numpad4"] = 97] = "Numpad4";
-    KeyCode2[KeyCode2["Numpad5"] = 98] = "Numpad5";
-    KeyCode2[KeyCode2["Numpad6"] = 99] = "Numpad6";
-    KeyCode2[KeyCode2["Numpad7"] = 100] = "Numpad7";
-    KeyCode2[KeyCode2["Numpad8"] = 101] = "Numpad8";
-    KeyCode2[KeyCode2["Numpad9"] = 102] = "Numpad9";
-    KeyCode2[KeyCode2["NumpadMultiply"] = 103] = "NumpadMultiply";
-    KeyCode2[KeyCode2["NumpadAdd"] = 104] = "NumpadAdd";
-    KeyCode2[KeyCode2["NUMPAD_SEPARATOR"] = 105] = "NUMPAD_SEPARATOR";
-    KeyCode2[KeyCode2["NumpadSubtract"] = 106] = "NumpadSubtract";
-    KeyCode2[KeyCode2["NumpadDecimal"] = 107] = "NumpadDecimal";
-    KeyCode2[KeyCode2["NumpadDivide"] = 108] = "NumpadDivide";
-    KeyCode2[KeyCode2["KEY_IN_COMPOSITION"] = 109] = "KEY_IN_COMPOSITION";
-    KeyCode2[KeyCode2["ABNT_C1"] = 110] = "ABNT_C1";
-    KeyCode2[KeyCode2["ABNT_C2"] = 111] = "ABNT_C2";
-    KeyCode2[KeyCode2["AudioVolumeMute"] = 112] = "AudioVolumeMute";
-    KeyCode2[KeyCode2["AudioVolumeUp"] = 113] = "AudioVolumeUp";
-    KeyCode2[KeyCode2["AudioVolumeDown"] = 114] = "AudioVolumeDown";
-    KeyCode2[KeyCode2["BrowserSearch"] = 115] = "BrowserSearch";
-    KeyCode2[KeyCode2["BrowserHome"] = 116] = "BrowserHome";
-    KeyCode2[KeyCode2["BrowserBack"] = 117] = "BrowserBack";
-    KeyCode2[KeyCode2["BrowserForward"] = 118] = "BrowserForward";
-    KeyCode2[KeyCode2["MediaTrackNext"] = 119] = "MediaTrackNext";
-    KeyCode2[KeyCode2["MediaTrackPrevious"] = 120] = "MediaTrackPrevious";
-    KeyCode2[KeyCode2["MediaStop"] = 121] = "MediaStop";
-    KeyCode2[KeyCode2["MediaPlayPause"] = 122] = "MediaPlayPause";
-    KeyCode2[KeyCode2["LaunchMediaPlayer"] = 123] = "LaunchMediaPlayer";
-    KeyCode2[KeyCode2["LaunchMail"] = 124] = "LaunchMail";
-    KeyCode2[KeyCode2["LaunchApp2"] = 125] = "LaunchApp2";
-    KeyCode2[KeyCode2["Clear"] = 126] = "Clear";
-    KeyCode2[KeyCode2["MAX_VALUE"] = 127] = "MAX_VALUE";
+    KeyCode2[KeyCode2["F20"] = 78] = "F20";
+    KeyCode2[KeyCode2["F21"] = 79] = "F21";
+    KeyCode2[KeyCode2["F22"] = 80] = "F22";
+    KeyCode2[KeyCode2["F23"] = 81] = "F23";
+    KeyCode2[KeyCode2["F24"] = 82] = "F24";
+    KeyCode2[KeyCode2["NumLock"] = 83] = "NumLock";
+    KeyCode2[KeyCode2["ScrollLock"] = 84] = "ScrollLock";
+    KeyCode2[KeyCode2["Semicolon"] = 85] = "Semicolon";
+    KeyCode2[KeyCode2["Equal"] = 86] = "Equal";
+    KeyCode2[KeyCode2["Comma"] = 87] = "Comma";
+    KeyCode2[KeyCode2["Minus"] = 88] = "Minus";
+    KeyCode2[KeyCode2["Period"] = 89] = "Period";
+    KeyCode2[KeyCode2["Slash"] = 90] = "Slash";
+    KeyCode2[KeyCode2["Backquote"] = 91] = "Backquote";
+    KeyCode2[KeyCode2["BracketLeft"] = 92] = "BracketLeft";
+    KeyCode2[KeyCode2["Backslash"] = 93] = "Backslash";
+    KeyCode2[KeyCode2["BracketRight"] = 94] = "BracketRight";
+    KeyCode2[KeyCode2["Quote"] = 95] = "Quote";
+    KeyCode2[KeyCode2["OEM_8"] = 96] = "OEM_8";
+    KeyCode2[KeyCode2["IntlBackslash"] = 97] = "IntlBackslash";
+    KeyCode2[KeyCode2["Numpad0"] = 98] = "Numpad0";
+    KeyCode2[KeyCode2["Numpad1"] = 99] = "Numpad1";
+    KeyCode2[KeyCode2["Numpad2"] = 100] = "Numpad2";
+    KeyCode2[KeyCode2["Numpad3"] = 101] = "Numpad3";
+    KeyCode2[KeyCode2["Numpad4"] = 102] = "Numpad4";
+    KeyCode2[KeyCode2["Numpad5"] = 103] = "Numpad5";
+    KeyCode2[KeyCode2["Numpad6"] = 104] = "Numpad6";
+    KeyCode2[KeyCode2["Numpad7"] = 105] = "Numpad7";
+    KeyCode2[KeyCode2["Numpad8"] = 106] = "Numpad8";
+    KeyCode2[KeyCode2["Numpad9"] = 107] = "Numpad9";
+    KeyCode2[KeyCode2["NumpadMultiply"] = 108] = "NumpadMultiply";
+    KeyCode2[KeyCode2["NumpadAdd"] = 109] = "NumpadAdd";
+    KeyCode2[KeyCode2["NUMPAD_SEPARATOR"] = 110] = "NUMPAD_SEPARATOR";
+    KeyCode2[KeyCode2["NumpadSubtract"] = 111] = "NumpadSubtract";
+    KeyCode2[KeyCode2["NumpadDecimal"] = 112] = "NumpadDecimal";
+    KeyCode2[KeyCode2["NumpadDivide"] = 113] = "NumpadDivide";
+    KeyCode2[KeyCode2["KEY_IN_COMPOSITION"] = 114] = "KEY_IN_COMPOSITION";
+    KeyCode2[KeyCode2["ABNT_C1"] = 115] = "ABNT_C1";
+    KeyCode2[KeyCode2["ABNT_C2"] = 116] = "ABNT_C2";
+    KeyCode2[KeyCode2["AudioVolumeMute"] = 117] = "AudioVolumeMute";
+    KeyCode2[KeyCode2["AudioVolumeUp"] = 118] = "AudioVolumeUp";
+    KeyCode2[KeyCode2["AudioVolumeDown"] = 119] = "AudioVolumeDown";
+    KeyCode2[KeyCode2["BrowserSearch"] = 120] = "BrowserSearch";
+    KeyCode2[KeyCode2["BrowserHome"] = 121] = "BrowserHome";
+    KeyCode2[KeyCode2["BrowserBack"] = 122] = "BrowserBack";
+    KeyCode2[KeyCode2["BrowserForward"] = 123] = "BrowserForward";
+    KeyCode2[KeyCode2["MediaTrackNext"] = 124] = "MediaTrackNext";
+    KeyCode2[KeyCode2["MediaTrackPrevious"] = 125] = "MediaTrackPrevious";
+    KeyCode2[KeyCode2["MediaStop"] = 126] = "MediaStop";
+    KeyCode2[KeyCode2["MediaPlayPause"] = 127] = "MediaPlayPause";
+    KeyCode2[KeyCode2["LaunchMediaPlayer"] = 128] = "LaunchMediaPlayer";
+    KeyCode2[KeyCode2["LaunchMail"] = 129] = "LaunchMail";
+    KeyCode2[KeyCode2["LaunchApp2"] = 130] = "LaunchApp2";
+    KeyCode2[KeyCode2["Clear"] = 131] = "Clear";
+    KeyCode2[KeyCode2["MAX_VALUE"] = 132] = "MAX_VALUE";
   })(KeyCode || (KeyCode = {}));
   var MarkerSeverity;
   (function(MarkerSeverity2) {
@@ -8023,7 +8220,7 @@
     WrappingIndent2[WrappingIndent2["DeepIndent"] = 3] = "DeepIndent";
   })(WrappingIndent || (WrappingIndent = {}));
 
-  // node_modules/monaco-editor/esm/vs/editor/common/services/editorBaseApi.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/services/editorBaseApi.js
   var KeyMod = class {
     static chord(firstPart, secondPart) {
       return KeyChord(firstPart, secondPart);
@@ -8052,7 +8249,7 @@
     };
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/common/core/wordCharacterClassifier.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/core/wordCharacterClassifier.js
   var WordCharacterClassifier = class extends CharacterClassifier {
     constructor(wordSeparators) {
       super(
@@ -8089,7 +8286,7 @@
   }
   var getMapForWordSeparators = once2((input) => new WordCharacterClassifier(input));
 
-  // node_modules/monaco-editor/esm/vs/editor/common/model.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/model.js
   var OverviewRulerLane2;
   (function(OverviewRulerLane3) {
     OverviewRulerLane3[OverviewRulerLane3["Left"] = 1] = "Left";
@@ -8097,6 +8294,11 @@
     OverviewRulerLane3[OverviewRulerLane3["Right"] = 4] = "Right";
     OverviewRulerLane3[OverviewRulerLane3["Full"] = 7] = "Full";
   })(OverviewRulerLane2 || (OverviewRulerLane2 = {}));
+  var GlyphMarginLane2;
+  (function(GlyphMarginLane3) {
+    GlyphMarginLane3[GlyphMarginLane3["Left"] = 1] = "Left";
+    GlyphMarginLane3[GlyphMarginLane3["Right"] = 2] = "Right";
+  })(GlyphMarginLane2 || (GlyphMarginLane2 = {}));
   var MinimapPosition2;
   (function(MinimapPosition3) {
     MinimapPosition3[MinimapPosition3["Inline"] = 1] = "Inline";
@@ -8110,7 +8312,7 @@
     InjectedTextCursorStops3[InjectedTextCursorStops3["None"] = 3] = "None";
   })(InjectedTextCursorStops2 || (InjectedTextCursorStops2 = {}));
 
-  // node_modules/monaco-editor/esm/vs/editor/common/model/textModelSearch.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/model/textModelSearch.js
   function leftIsWordBounday(wordSeparators, text, textLength, matchStartIndex, matchLength) {
     if (matchStartIndex === 0) {
       return true;
@@ -8198,7 +8400,7 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/base/common/assert.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/assert.js
   function assertNever(value, message = "Unreachable") {
     throw new Error(message);
   }
@@ -8222,7 +8424,7 @@
     return true;
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/common/services/unicodeTextModelHighlighter.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/services/unicodeTextModelHighlighter.js
   var UnicodeTextModelHighlighter = class {
     static computeUnicodeHighlights(model, options, range) {
       const startLine = range ? range.startLineNumber : 1;
@@ -8399,30 +8601,112 @@
     return character === " " || character === "\n" || character === "	";
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/common/diff/linesDiffComputer.js
-  var LineRangeMapping = class {
-    constructor(originalRange, modifiedRange, innerChanges) {
-      this.originalRange = originalRange;
-      this.modifiedRange = modifiedRange;
-      this.innerChanges = innerChanges;
-    }
-    toString() {
-      return `{${this.originalRange.toString()}->${this.modifiedRange.toString()}}`;
-    }
-  };
-  var RangeMapping = class {
-    constructor(originalRange, modifiedRange) {
-      this.originalRange = originalRange;
-      this.modifiedRange = modifiedRange;
-    }
-    toString() {
-      return `{${this.originalRange.toString()}->${this.modifiedRange.toString()}}`;
-    }
-  };
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/core/lineRange.js
   var LineRange = class _LineRange {
+    static fromRange(range) {
+      return new _LineRange(range.startLineNumber, range.endLineNumber);
+    }
+    static subtract(a, b) {
+      if (!b) {
+        return [a];
+      }
+      if (a.startLineNumber < b.startLineNumber && b.endLineNumberExclusive < a.endLineNumberExclusive) {
+        return [
+          new _LineRange(a.startLineNumber, b.startLineNumber),
+          new _LineRange(b.endLineNumberExclusive, a.endLineNumberExclusive)
+        ];
+      } else if (b.startLineNumber <= a.startLineNumber && a.endLineNumberExclusive <= b.endLineNumberExclusive) {
+        return [];
+      } else if (b.endLineNumberExclusive < a.endLineNumberExclusive) {
+        return [new _LineRange(Math.max(b.endLineNumberExclusive, a.startLineNumber), a.endLineNumberExclusive)];
+      } else {
+        return [new _LineRange(a.startLineNumber, Math.min(b.startLineNumber, a.endLineNumberExclusive))];
+      }
+    }
+    /**
+     * @param lineRanges An array of sorted line ranges.
+     */
+    static joinMany(lineRanges) {
+      if (lineRanges.length === 0) {
+        return [];
+      }
+      let result = lineRanges[0];
+      for (let i = 1; i < lineRanges.length; i++) {
+        result = this.join(result, lineRanges[i]);
+      }
+      return result;
+    }
+    /**
+     * @param lineRanges1 Must be sorted.
+     * @param lineRanges2 Must be sorted.
+     */
+    static join(lineRanges1, lineRanges2) {
+      if (lineRanges1.length === 0) {
+        return lineRanges2;
+      }
+      if (lineRanges2.length === 0) {
+        return lineRanges1;
+      }
+      const result = [];
+      let i1 = 0;
+      let i2 = 0;
+      let current = null;
+      while (i1 < lineRanges1.length || i2 < lineRanges2.length) {
+        let next = null;
+        if (i1 < lineRanges1.length && i2 < lineRanges2.length) {
+          const lineRange1 = lineRanges1[i1];
+          const lineRange2 = lineRanges2[i2];
+          if (lineRange1.startLineNumber < lineRange2.startLineNumber) {
+            next = lineRange1;
+            i1++;
+          } else {
+            next = lineRange2;
+            i2++;
+          }
+        } else if (i1 < lineRanges1.length) {
+          next = lineRanges1[i1];
+          i1++;
+        } else {
+          next = lineRanges2[i2];
+          i2++;
+        }
+        if (current === null) {
+          current = next;
+        } else {
+          if (current.endLineNumberExclusive >= next.startLineNumber) {
+            current = new _LineRange(current.startLineNumber, Math.max(current.endLineNumberExclusive, next.endLineNumberExclusive));
+          } else {
+            result.push(current);
+            current = next;
+          }
+        }
+      }
+      if (current !== null) {
+        result.push(current);
+      }
+      return result;
+    }
+    static ofLength(startLineNumber, length) {
+      return new _LineRange(startLineNumber, startLineNumber + length);
+    }
+    /**
+     * @internal
+     */
+    static deserialize(lineRange) {
+      return new _LineRange(lineRange[0], lineRange[1]);
+    }
     constructor(startLineNumber, endLineNumberExclusive) {
+      if (startLineNumber > endLineNumberExclusive) {
+        throw new BugIndicatingError(`startLineNumber ${startLineNumber} cannot be after endLineNumberExclusive ${endLineNumberExclusive}`);
+      }
       this.startLineNumber = startLineNumber;
       this.endLineNumberExclusive = endLineNumberExclusive;
+    }
+    /**
+     * Indicates if this line range contains the given line number.
+     */
+    contains(lineNumber) {
+      return this.startLineNumber <= lineNumber && lineNumber < this.endLineNumberExclusive;
     }
     /**
      * Indicates if this line range is empty.
@@ -8451,9 +8735,137 @@
     toString() {
       return `[${this.startLineNumber},${this.endLineNumberExclusive})`;
     }
+    /**
+     * The resulting range is empty if the ranges do not intersect, but touch.
+     * If the ranges don't even touch, the result is undefined.
+     */
+    intersect(other) {
+      const startLineNumber = Math.max(this.startLineNumber, other.startLineNumber);
+      const endLineNumberExclusive = Math.min(this.endLineNumberExclusive, other.endLineNumberExclusive);
+      if (startLineNumber <= endLineNumberExclusive) {
+        return new _LineRange(startLineNumber, endLineNumberExclusive);
+      }
+      return void 0;
+    }
+    intersectsStrict(other) {
+      return this.startLineNumber < other.endLineNumberExclusive && other.startLineNumber < this.endLineNumberExclusive;
+    }
+    overlapOrTouch(other) {
+      return this.startLineNumber <= other.endLineNumberExclusive && other.startLineNumber <= this.endLineNumberExclusive;
+    }
+    equals(b) {
+      return this.startLineNumber === b.startLineNumber && this.endLineNumberExclusive === b.endLineNumberExclusive;
+    }
+    toInclusiveRange() {
+      if (this.isEmpty) {
+        return null;
+      }
+      return new Range(this.startLineNumber, 1, this.endLineNumberExclusive - 1, Number.MAX_SAFE_INTEGER);
+    }
+    toExclusiveRange() {
+      return new Range(this.startLineNumber, 1, this.endLineNumberExclusive, 1);
+    }
+    mapToLineArray(f) {
+      const result = [];
+      for (let lineNumber = this.startLineNumber; lineNumber < this.endLineNumberExclusive; lineNumber++) {
+        result.push(f(lineNumber));
+      }
+      return result;
+    }
+    forEach(f) {
+      for (let lineNumber = this.startLineNumber; lineNumber < this.endLineNumberExclusive; lineNumber++) {
+        f(lineNumber);
+      }
+    }
+    /**
+     * @internal
+     */
+    serialize() {
+      return [this.startLineNumber, this.endLineNumberExclusive];
+    }
+    includes(lineNumber) {
+      return this.startLineNumber <= lineNumber && lineNumber < this.endLineNumberExclusive;
+    }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/diff/smartLinesDiffComputer.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/diff/linesDiffComputer.js
+  var LinesDiff = class {
+    constructor(changes, moves, hitTimeout) {
+      this.changes = changes;
+      this.moves = moves;
+      this.hitTimeout = hitTimeout;
+    }
+  };
+  var LineRangeMapping = class _LineRangeMapping {
+    static inverse(mapping, originalLineCount, modifiedLineCount) {
+      const result = [];
+      let lastOriginalEndLineNumber = 1;
+      let lastModifiedEndLineNumber = 1;
+      for (const m of mapping) {
+        const r2 = new _LineRangeMapping(new LineRange(lastOriginalEndLineNumber, m.originalRange.startLineNumber), new LineRange(lastModifiedEndLineNumber, m.modifiedRange.startLineNumber), void 0);
+        if (!r2.modifiedRange.isEmpty) {
+          result.push(r2);
+        }
+        lastOriginalEndLineNumber = m.originalRange.endLineNumberExclusive;
+        lastModifiedEndLineNumber = m.modifiedRange.endLineNumberExclusive;
+      }
+      const r = new _LineRangeMapping(new LineRange(lastOriginalEndLineNumber, originalLineCount + 1), new LineRange(lastModifiedEndLineNumber, modifiedLineCount + 1), void 0);
+      if (!r.modifiedRange.isEmpty) {
+        result.push(r);
+      }
+      return result;
+    }
+    constructor(originalRange, modifiedRange, innerChanges) {
+      this.originalRange = originalRange;
+      this.modifiedRange = modifiedRange;
+      this.innerChanges = innerChanges;
+    }
+    toString() {
+      return `{${this.originalRange.toString()}->${this.modifiedRange.toString()}}`;
+    }
+    get changedLineCount() {
+      return Math.max(this.originalRange.length, this.modifiedRange.length);
+    }
+    flip() {
+      var _a4;
+      return new _LineRangeMapping(this.modifiedRange, this.originalRange, (_a4 = this.innerChanges) === null || _a4 === void 0 ? void 0 : _a4.map((c) => c.flip()));
+    }
+  };
+  var RangeMapping = class _RangeMapping {
+    constructor(originalRange, modifiedRange) {
+      this.originalRange = originalRange;
+      this.modifiedRange = modifiedRange;
+    }
+    toString() {
+      return `{${this.originalRange.toString()}->${this.modifiedRange.toString()}}`;
+    }
+    flip() {
+      return new _RangeMapping(this.modifiedRange, this.originalRange);
+    }
+  };
+  var SimpleLineRangeMapping = class _SimpleLineRangeMapping {
+    constructor(original, modified) {
+      this.original = original;
+      this.modified = modified;
+    }
+    toString() {
+      return `{${this.original.toString()}->${this.modified.toString()}}`;
+    }
+    flip() {
+      return new _SimpleLineRangeMapping(this.modified, this.original);
+    }
+  };
+  var MovedText = class _MovedText {
+    constructor(lineRangeMapping, changes) {
+      this.lineRangeMapping = lineRangeMapping;
+      this.changes = changes;
+    }
+    flip() {
+      return new _MovedText(this.lineRangeMapping.flip(), this.changes.map((c) => c.flip()));
+    }
+  };
+
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/diff/smartLinesDiffComputer.js
   var MINIMUM_MATCHING_CHARACTER_LENGTH = 3;
   var SmartLinesDiffComputer = class {
     computeDiff(originalLines, modifiedLines, options) {
@@ -8495,10 +8907,7 @@
         return checkAdjacentItems(changes, (m1, m2) => m2.originalRange.startLineNumber - m1.originalRange.endLineNumberExclusive === m2.modifiedRange.startLineNumber - m1.modifiedRange.endLineNumberExclusive && // There has to be an unchanged line in between (otherwise both diffs should have been joined)
         m1.originalRange.endLineNumberExclusive < m2.originalRange.startLineNumber && m1.modifiedRange.endLineNumberExclusive < m2.modifiedRange.startLineNumber);
       });
-      return {
-        quitEarly: result.quitEarly,
-        changes
-      };
+      return new LinesDiff(changes, [], result.quitEarly);
     }
   };
   function computeDiff(originalSequence, modifiedSequence, continueProcessingPredicate, pretty) {
@@ -8876,23 +9285,37 @@
     };
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/common/diff/algorithms/diffAlgorithm.js
-  var SequenceDiff = class _SequenceDiff {
-    constructor(seq1Range, seq2Range) {
-      this.seq1Range = seq1Range;
-      this.seq2Range = seq2Range;
-    }
-    reverse() {
-      return new _SequenceDiff(this.seq2Range, this.seq1Range);
-    }
-    toString() {
-      return `${this.seq1Range} <-> ${this.seq2Range}`;
-    }
-  };
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/core/offsetRange.js
   var OffsetRange = class _OffsetRange {
+    static addRange(range, sortedRanges) {
+      let i = 0;
+      while (i < sortedRanges.length && sortedRanges[i].endExclusive < range.start) {
+        i++;
+      }
+      let j = i;
+      while (j < sortedRanges.length && sortedRanges[j].start <= range.endExclusive) {
+        j++;
+      }
+      if (i === j) {
+        sortedRanges.splice(i, 0, range);
+      } else {
+        const start = Math.min(range.start, sortedRanges[i].start);
+        const end = Math.max(range.endExclusive, sortedRanges[j - 1].endExclusive);
+        sortedRanges.splice(i, j - i, new _OffsetRange(start, end));
+      }
+    }
+    static tryCreate(start, endExclusive) {
+      if (start > endExclusive) {
+        return void 0;
+      }
+      return new _OffsetRange(start, endExclusive);
+    }
     constructor(start, endExclusive) {
       this.start = start;
       this.endExclusive = endExclusive;
+      if (start > endExclusive) {
+        throw new BugIndicatingError(`Invalid range: ${this.toString()}`);
+      }
     }
     get isEmpty() {
       return this.start === this.endExclusive;
@@ -8906,12 +9329,99 @@
     toString() {
       return `[${this.start}, ${this.endExclusive})`;
     }
+    equals(other) {
+      return this.start === other.start && this.endExclusive === other.endExclusive;
+    }
+    containsRange(other) {
+      return this.start <= other.start && other.endExclusive <= this.endExclusive;
+    }
+    contains(offset) {
+      return this.start <= offset && offset < this.endExclusive;
+    }
+    /**
+     * for all numbers n: range1.contains(n) or range2.contains(n) => range1.join(range2).contains(n)
+     * The joined range is the smallest range that contains both ranges.
+     */
     join(other) {
       return new _OffsetRange(Math.min(this.start, other.start), Math.max(this.endExclusive, other.endExclusive));
     }
+    /**
+     * for all numbers n: range1.contains(n) and range2.contains(n) <=> range1.intersect(range2).contains(n)
+     *
+     * The resulting range is empty if the ranges do not intersect, but touch.
+     * If the ranges don't even touch, the result is undefined.
+     */
+    intersect(other) {
+      const start = Math.max(this.start, other.start);
+      const end = Math.min(this.endExclusive, other.endExclusive);
+      if (start <= end) {
+        return new _OffsetRange(start, end);
+      }
+      return void 0;
+    }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/diff/algorithms/utils.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/diff/algorithms/diffAlgorithm.js
+  var DiffAlgorithmResult = class _DiffAlgorithmResult {
+    static trivial(seq1, seq2) {
+      return new _DiffAlgorithmResult([new SequenceDiff(new OffsetRange(0, seq1.length), new OffsetRange(0, seq2.length))], false);
+    }
+    static trivialTimedOut(seq1, seq2) {
+      return new _DiffAlgorithmResult([new SequenceDiff(new OffsetRange(0, seq1.length), new OffsetRange(0, seq2.length))], true);
+    }
+    constructor(diffs, hitTimeout) {
+      this.diffs = diffs;
+      this.hitTimeout = hitTimeout;
+    }
+  };
+  var SequenceDiff = class _SequenceDiff {
+    constructor(seq1Range, seq2Range) {
+      this.seq1Range = seq1Range;
+      this.seq2Range = seq2Range;
+    }
+    reverse() {
+      return new _SequenceDiff(this.seq2Range, this.seq1Range);
+    }
+    toString() {
+      return `${this.seq1Range} <-> ${this.seq2Range}`;
+    }
+    join(other) {
+      return new _SequenceDiff(this.seq1Range.join(other.seq1Range), this.seq2Range.join(other.seq2Range));
+    }
+    delta(offset) {
+      if (offset === 0) {
+        return this;
+      }
+      return new _SequenceDiff(this.seq1Range.delta(offset), this.seq2Range.delta(offset));
+    }
+  };
+  var InfiniteTimeout = class {
+    isValid() {
+      return true;
+    }
+  };
+  InfiniteTimeout.instance = new InfiniteTimeout();
+  var DateTimeout = class {
+    constructor(timeout) {
+      this.timeout = timeout;
+      this.startTime = Date.now();
+      this.valid = true;
+      if (timeout <= 0) {
+        throw new BugIndicatingError("timeout must be positive");
+      }
+    }
+    // Recommendation: Set a log-point `{this.disable()}` in the body
+    isValid() {
+      const valid = Date.now() - this.startTime < this.timeout;
+      if (!valid && this.valid) {
+        this.valid = false;
+        debugger;
+      }
+      return this.valid;
+    }
+  };
+
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/diff/algorithms/utils.js
   var Array2D = class {
     constructor(width, height) {
       this.width = width;
@@ -8927,14 +9437,20 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/diff/algorithms/dynamicProgrammingDiffing.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/diff/algorithms/dynamicProgrammingDiffing.js
   var DynamicProgrammingDiffing = class {
-    compute(sequence1, sequence2, equalityScore) {
+    compute(sequence1, sequence2, timeout = InfiniteTimeout.instance, equalityScore) {
+      if (sequence1.length === 0 || sequence2.length === 0) {
+        return DiffAlgorithmResult.trivial(sequence1, sequence2);
+      }
       const lcsLengths = new Array2D(sequence1.length, sequence2.length);
       const directions = new Array2D(sequence1.length, sequence2.length);
       const lengths = new Array2D(sequence1.length, sequence2.length);
       for (let s12 = 0; s12 < sequence1.length; s12++) {
         for (let s22 = 0; s22 < sequence2.length; s22++) {
+          if (!timeout.isValid()) {
+            return DiffAlgorithmResult.trivialTimedOut(sequence1, sequence2);
+          }
           const horizontalLen = s12 === 0 ? 0 : lcsLengths.get(s12 - 1, s22);
           const verticalLen = s22 === 0 ? 0 : lcsLengths.get(s12, s22 - 1);
           let extendedSeqScore;
@@ -8993,11 +9509,11 @@
       }
       reportDecreasingAligningPositions(-1, -1);
       result.reverse();
-      return result;
+      return new DiffAlgorithmResult(result, false);
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/diff/algorithms/joinSequenceDiffs.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/diff/algorithms/joinSequenceDiffs.js
   function optimizeSequenceDiffs(sequence1, sequence2, sequenceDiffs) {
     let result = sequenceDiffs;
     result = joinSequenceDiffs(sequence1, sequence2, result);
@@ -9020,59 +9536,140 @@
     }
     return result;
   }
-  function joinSequenceDiffs(sequence1, sequence2, sequenceDiffs) {
-    const result = [];
-    if (sequenceDiffs.length > 0) {
-      result.push(sequenceDiffs[0]);
+  function removeRandomMatches(sequence1, sequence2, sequenceDiffs) {
+    let diffs = sequenceDiffs;
+    if (diffs.length === 0) {
+      return diffs;
     }
+    let counter = 0;
+    let shouldRepeat;
+    do {
+      shouldRepeat = false;
+      const result = [
+        diffs[0]
+      ];
+      for (let i = 1; i < diffs.length; i++) {
+        let shouldJoinDiffs = function(before, after) {
+          const unchangedRange = new OffsetRange(lastResult.seq1Range.endExclusive, cur.seq1Range.start);
+          const unchangedLineCount = sequence1.countLinesIn(unchangedRange);
+          if (unchangedLineCount > 5 || unchangedRange.length > 500) {
+            return false;
+          }
+          const unchangedText = sequence1.getText(unchangedRange).trim();
+          if (unchangedText.length > 20 || unchangedText.split(/\r\n|\r|\n/).length > 1) {
+            return false;
+          }
+          const beforeLineCount1 = sequence1.countLinesIn(before.seq1Range);
+          const beforeSeq1Length = before.seq1Range.length;
+          const beforeLineCount2 = sequence2.countLinesIn(before.seq2Range);
+          const beforeSeq2Length = before.seq2Range.length;
+          const afterLineCount1 = sequence1.countLinesIn(after.seq1Range);
+          const afterSeq1Length = after.seq1Range.length;
+          const afterLineCount2 = sequence2.countLinesIn(after.seq2Range);
+          const afterSeq2Length = after.seq2Range.length;
+          const max = 2 * 40 + 50;
+          function cap(v) {
+            return Math.min(v, max);
+          }
+          if (Math.pow(Math.pow(cap(beforeLineCount1 * 40 + beforeSeq1Length), 1.5) + Math.pow(cap(beforeLineCount2 * 40 + beforeSeq2Length), 1.5), 1.5) + Math.pow(Math.pow(cap(afterLineCount1 * 40 + afterSeq1Length), 1.5) + Math.pow(cap(afterLineCount2 * 40 + afterSeq2Length), 1.5), 1.5) > Math.pow(Math.pow(max, 1.5), 1.5) * 1.3) {
+            return true;
+          }
+          return false;
+        };
+        const cur = diffs[i];
+        const lastResult = result[result.length - 1];
+        const shouldJoin = shouldJoinDiffs(lastResult, cur);
+        if (shouldJoin) {
+          shouldRepeat = true;
+          result[result.length - 1] = result[result.length - 1].join(cur);
+        } else {
+          result.push(cur);
+        }
+      }
+      diffs = result;
+    } while (counter++ < 10 && shouldRepeat);
+    return diffs;
+  }
+  function joinSequenceDiffs(sequence1, sequence2, sequenceDiffs) {
+    if (sequenceDiffs.length === 0) {
+      return sequenceDiffs;
+    }
+    const result = [];
+    result.push(sequenceDiffs[0]);
     for (let i = 1; i < sequenceDiffs.length; i++) {
-      const lastResult = result[result.length - 1];
-      const cur = sequenceDiffs[i];
-      if (cur.seq1Range.isEmpty) {
-        let all = true;
-        const length = cur.seq1Range.start - lastResult.seq1Range.endExclusive;
-        for (let i2 = 1; i2 <= length; i2++) {
-          if (sequence2.getElement(cur.seq2Range.start - i2) !== sequence2.getElement(cur.seq2Range.endExclusive - i2)) {
-            all = false;
+      const prevResult = result[result.length - 1];
+      let cur = sequenceDiffs[i];
+      if (cur.seq1Range.isEmpty || cur.seq2Range.isEmpty) {
+        const length = cur.seq1Range.start - prevResult.seq1Range.endExclusive;
+        let d;
+        for (d = 1; d <= length; d++) {
+          if (sequence1.getElement(cur.seq1Range.start - d) !== sequence1.getElement(cur.seq1Range.endExclusive - d) || sequence2.getElement(cur.seq2Range.start - d) !== sequence2.getElement(cur.seq2Range.endExclusive - d)) {
             break;
           }
         }
-        if (all) {
-          result[result.length - 1] = new SequenceDiff(lastResult.seq1Range, new OffsetRange(lastResult.seq2Range.start, cur.seq2Range.endExclusive - length));
+        d--;
+        if (d === length) {
+          result[result.length - 1] = new SequenceDiff(new OffsetRange(prevResult.seq1Range.start, cur.seq1Range.endExclusive - length), new OffsetRange(prevResult.seq2Range.start, cur.seq2Range.endExclusive - length));
           continue;
         }
+        cur = cur.delta(-d);
       }
       result.push(cur);
     }
-    return result;
+    const result2 = [];
+    for (let i = 0; i < result.length - 1; i++) {
+      const nextResult = result[i + 1];
+      let cur = result[i];
+      if (cur.seq1Range.isEmpty || cur.seq2Range.isEmpty) {
+        const length = nextResult.seq1Range.start - cur.seq1Range.endExclusive;
+        let d;
+        for (d = 0; d < length; d++) {
+          if (sequence1.getElement(cur.seq1Range.start + d) !== sequence1.getElement(cur.seq1Range.endExclusive + d) || sequence2.getElement(cur.seq2Range.start + d) !== sequence2.getElement(cur.seq2Range.endExclusive + d)) {
+            break;
+          }
+        }
+        if (d === length) {
+          result[i + 1] = new SequenceDiff(new OffsetRange(cur.seq1Range.start + length, nextResult.seq1Range.endExclusive), new OffsetRange(cur.seq2Range.start + length, nextResult.seq2Range.endExclusive));
+          continue;
+        }
+        if (d > 0) {
+          cur = cur.delta(d);
+        }
+      }
+      result2.push(cur);
+    }
+    if (result.length > 0) {
+      result2.push(result[result.length - 1]);
+    }
+    return result2;
   }
   function shiftSequenceDiffs(sequence1, sequence2, sequenceDiffs) {
     if (!sequence1.getBoundaryScore || !sequence2.getBoundaryScore) {
       return sequenceDiffs;
     }
     for (let i = 0; i < sequenceDiffs.length; i++) {
+      const prevDiff = i > 0 ? sequenceDiffs[i - 1] : void 0;
       const diff = sequenceDiffs[i];
+      const nextDiff = i + 1 < sequenceDiffs.length ? sequenceDiffs[i + 1] : void 0;
+      const seq1ValidRange = new OffsetRange(prevDiff ? prevDiff.seq1Range.start + 1 : 0, nextDiff ? nextDiff.seq1Range.endExclusive - 1 : sequence1.length);
+      const seq2ValidRange = new OffsetRange(prevDiff ? prevDiff.seq2Range.start + 1 : 0, nextDiff ? nextDiff.seq2Range.endExclusive - 1 : sequence2.length);
       if (diff.seq1Range.isEmpty) {
-        const seq2PrevEndExclusive = i > 0 ? sequenceDiffs[i - 1].seq2Range.endExclusive : -1;
-        const seq2NextStart = i + 1 < sequenceDiffs.length ? sequenceDiffs[i + 1].seq2Range.start : sequence2.length;
-        sequenceDiffs[i] = shiftDiffToBetterPosition(diff, sequence1, sequence2, seq2NextStart, seq2PrevEndExclusive);
+        sequenceDiffs[i] = shiftDiffToBetterPosition(diff, sequence1, sequence2, seq1ValidRange, seq2ValidRange);
       } else if (diff.seq2Range.isEmpty) {
-        const seq1PrevEndExclusive = i > 0 ? sequenceDiffs[i - 1].seq1Range.endExclusive : -1;
-        const seq1NextStart = i + 1 < sequenceDiffs.length ? sequenceDiffs[i + 1].seq1Range.start : sequence1.length;
-        sequenceDiffs[i] = shiftDiffToBetterPosition(diff.reverse(), sequence2, sequence1, seq1NextStart, seq1PrevEndExclusive).reverse();
+        sequenceDiffs[i] = shiftDiffToBetterPosition(diff.reverse(), sequence2, sequence1, seq2ValidRange, seq1ValidRange).reverse();
       }
     }
     return sequenceDiffs;
   }
-  function shiftDiffToBetterPosition(diff, sequence1, sequence2, seq2NextStart, seq2PrevEndExclusive) {
-    const maxShiftLimit = 20;
+  function shiftDiffToBetterPosition(diff, sequence1, sequence2, seq1ValidRange, seq2ValidRange) {
+    const maxShiftLimit = 100;
     let deltaBefore = 1;
-    while (diff.seq2Range.start - deltaBefore > seq2PrevEndExclusive && sequence2.getElement(diff.seq2Range.start - deltaBefore) === sequence2.getElement(diff.seq2Range.endExclusive - deltaBefore) && deltaBefore < maxShiftLimit) {
+    while (diff.seq1Range.start - deltaBefore >= seq1ValidRange.start && diff.seq2Range.start - deltaBefore >= seq2ValidRange.start && sequence2.getElement(diff.seq2Range.start - deltaBefore) === sequence2.getElement(diff.seq2Range.endExclusive - deltaBefore) && deltaBefore < maxShiftLimit) {
       deltaBefore++;
     }
     deltaBefore--;
     let deltaAfter = 0;
-    while (diff.seq2Range.start + deltaAfter < seq2NextStart && sequence2.getElement(diff.seq2Range.start + deltaAfter) === sequence2.getElement(diff.seq2Range.endExclusive + deltaAfter) && deltaAfter < maxShiftLimit) {
+    while (diff.seq1Range.start + deltaAfter < seq1ValidRange.endExclusive && diff.seq2Range.endExclusive + deltaAfter < seq2ValidRange.endExclusive && sequence2.getElement(diff.seq2Range.start + deltaAfter) === sequence2.getElement(diff.seq2Range.endExclusive + deltaAfter) && deltaAfter < maxShiftLimit) {
       deltaAfter++;
     }
     if (deltaBefore === 0 && deltaAfter === 0) {
@@ -9090,19 +9687,14 @@
         bestDelta = delta;
       }
     }
-    if (bestDelta !== 0) {
-      return new SequenceDiff(diff.seq1Range.delta(bestDelta), diff.seq2Range.delta(bestDelta));
-    }
-    return diff;
+    return diff.delta(bestDelta);
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/common/diff/algorithms/myersDiffAlgorithm.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/diff/algorithms/myersDiffAlgorithm.js
   var MyersDiffAlgorithm = class {
-    compute(seq1, seq2) {
-      if (seq1.length === 0) {
-        return [new SequenceDiff(new OffsetRange(0, 0), new OffsetRange(0, seq2.length))];
-      } else if (seq2.length === 0) {
-        return [new SequenceDiff(new OffsetRange(0, seq1.length), new OffsetRange(0, 0))];
+    compute(seq1, seq2, timeout = InfiniteTimeout.instance) {
+      if (seq1.length === 0 || seq2.length === 0) {
+        return DiffAlgorithmResult.trivial(seq1, seq2);
       }
       function getXAfterSnake(x, y) {
         while (x < seq1.length && y < seq2.length && seq1.getElement(x) === seq2.getElement(y)) {
@@ -9120,11 +9712,19 @@
       loop:
         while (true) {
           d++;
-          for (k = -d; k <= d; k += 2) {
-            const maxXofDLineTop = k === d ? -1 : V.get(k + 1);
-            const maxXofDLineLeft = k === -d ? -1 : V.get(k - 1) + 1;
+          if (!timeout.isValid()) {
+            return DiffAlgorithmResult.trivialTimedOut(seq1, seq2);
+          }
+          const lowerBound = -Math.min(d, seq2.length + d % 2);
+          const upperBound = Math.min(d, seq1.length + d % 2);
+          for (k = lowerBound; k <= upperBound; k += 2) {
+            const maxXofDLineTop = k === upperBound ? -1 : V.get(k + 1);
+            const maxXofDLineLeft = k === lowerBound ? -1 : V.get(k - 1) + 1;
             const x = Math.min(Math.max(maxXofDLineTop, maxXofDLineLeft), seq1.length);
             const y = x - k;
+            if (x > seq1.length || y > seq2.length) {
+              continue;
+            }
             const newMaxX = getXAfterSnake(x, y);
             V.set(k, newMaxX);
             const lastPath = x === maxXofDLineTop ? paths.get(k + 1) : paths.get(k - 1);
@@ -9152,7 +9752,7 @@
         path = path.prev;
       }
       result.reverse();
-      return result;
+      return new DiffAlgorithmResult(result, false);
     }
   };
   var SnakePath = class {
@@ -9218,13 +9818,26 @@
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/diff/standardLinesDiffComputer.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/diff/standardLinesDiffComputer.js
   var StandardLinesDiffComputer = class {
     constructor() {
       this.dynamicProgrammingDiffing = new DynamicProgrammingDiffing();
       this.myersDiffingAlgorithm = new MyersDiffAlgorithm();
     }
     computeDiff(originalLines, modifiedLines, options) {
+      if (originalLines.length === 1 && originalLines[0].length === 0 || modifiedLines.length === 1 && modifiedLines[0].length === 0) {
+        return {
+          changes: [
+            new LineRangeMapping(new LineRange(1, originalLines.length + 1), new LineRange(1, modifiedLines.length + 1), [
+              new RangeMapping(new Range(1, 1, originalLines.length, originalLines[0].length + 1), new Range(1, 1, modifiedLines.length, modifiedLines[0].length + 1))
+            ])
+          ],
+          hitTimeout: false,
+          moves: []
+        };
+      }
+      const timeout = options.maxComputationTimeMs === 0 ? InfiniteTimeout.instance : new DateTimeout(options.maxComputationTimeMs);
+      const considerWhitespaceChanges = !options.ignoreTrimWhitespace;
       const perfectHashes = /* @__PURE__ */ new Map();
       function getOrCreateHash(text) {
         let hash = perfectHashes.get(text);
@@ -9238,22 +9851,30 @@
       const tgtDocLines = modifiedLines.map((l) => getOrCreateHash(l.trim()));
       const sequence1 = new LineSequence2(srcDocLines, originalLines);
       const sequence2 = new LineSequence2(tgtDocLines, modifiedLines);
-      let lineAlignments = (() => {
+      const lineAlignmentResult = (() => {
         if (sequence1.length + sequence2.length < 1500) {
-          return this.dynamicProgrammingDiffing.compute(sequence1, sequence2, (offset1, offset2) => originalLines[offset1] === modifiedLines[offset2] ? modifiedLines[offset2].length === 0 ? 0.1 : 1 + Math.log(1 + modifiedLines[offset2].length) : 0.99);
+          return this.dynamicProgrammingDiffing.compute(sequence1, sequence2, timeout, (offset1, offset2) => originalLines[offset1] === modifiedLines[offset2] ? modifiedLines[offset2].length === 0 ? 0.1 : 1 + Math.log(1 + modifiedLines[offset2].length) : 0.99);
         }
         return this.myersDiffingAlgorithm.compute(sequence1, sequence2);
       })();
+      let lineAlignments = lineAlignmentResult.diffs;
+      let hitTimeout = lineAlignmentResult.hitTimeout;
       lineAlignments = optimizeSequenceDiffs(sequence1, sequence2, lineAlignments);
       const alignments = [];
       const scanForWhitespaceChanges = (equalLinesCount) => {
+        if (!considerWhitespaceChanges) {
+          return;
+        }
         for (let i = 0; i < equalLinesCount; i++) {
           const seq1Offset = seq1LastStart + i;
           const seq2Offset = seq2LastStart + i;
           if (originalLines[seq1Offset] !== modifiedLines[seq2Offset]) {
-            const characterDiffs = this.refineDiff(originalLines, modifiedLines, new SequenceDiff(new OffsetRange(seq1Offset, seq1Offset + 1), new OffsetRange(seq2Offset, seq2Offset + 1)));
-            for (const a of characterDiffs) {
+            const characterDiffs = this.refineDiff(originalLines, modifiedLines, new SequenceDiff(new OffsetRange(seq1Offset, seq1Offset + 1), new OffsetRange(seq2Offset, seq2Offset + 1)), timeout, considerWhitespaceChanges);
+            for (const a of characterDiffs.mappings) {
               alignments.push(a);
+            }
+            if (characterDiffs.hitTimeout) {
+              hitTimeout = true;
             }
           }
         }
@@ -9266,40 +9887,198 @@
         scanForWhitespaceChanges(equalLinesCount);
         seq1LastStart = diff.seq1Range.endExclusive;
         seq2LastStart = diff.seq2Range.endExclusive;
-        const characterDiffs = this.refineDiff(originalLines, modifiedLines, diff);
-        for (const a of characterDiffs) {
+        const characterDiffs = this.refineDiff(originalLines, modifiedLines, diff, timeout, considerWhitespaceChanges);
+        if (characterDiffs.hitTimeout) {
+          hitTimeout = true;
+        }
+        for (const a of characterDiffs.mappings) {
           alignments.push(a);
         }
       }
       scanForWhitespaceChanges(originalLines.length - seq1LastStart);
-      const changes = lineRangeMappingFromRangeMappings(alignments);
+      const changes = lineRangeMappingFromRangeMappings(alignments, originalLines, modifiedLines);
+      const moves = [];
+      if (options.computeMoves) {
+        const deletions = changes.filter((c) => c.modifiedRange.isEmpty && c.originalRange.length >= 3).map((d) => new LineRangeFragment(d.originalRange, originalLines));
+        const insertions = new Set(changes.filter((c) => c.originalRange.isEmpty && c.modifiedRange.length >= 3).map((d) => new LineRangeFragment(d.modifiedRange, modifiedLines)));
+        for (const deletion of deletions) {
+          let highestSimilarity = -1;
+          let best;
+          for (const insertion of insertions) {
+            const similarity = deletion.computeSimilarity(insertion);
+            if (similarity > highestSimilarity) {
+              highestSimilarity = similarity;
+              best = insertion;
+            }
+          }
+          if (highestSimilarity > 0.9 && best) {
+            const moveChanges = this.refineDiff(originalLines, modifiedLines, new SequenceDiff(new OffsetRange(deletion.range.startLineNumber - 1, deletion.range.endLineNumberExclusive - 1), new OffsetRange(best.range.startLineNumber - 1, best.range.endLineNumberExclusive - 1)), timeout, considerWhitespaceChanges);
+            const mappings = lineRangeMappingFromRangeMappings(moveChanges.mappings, originalLines, modifiedLines, true);
+            insertions.delete(best);
+            moves.push(new MovedText(new SimpleLineRangeMapping(deletion.range, best.range), mappings));
+          }
+        }
+      }
+      assertFn(() => {
+        function validatePosition(pos, lines) {
+          if (pos.lineNumber < 1 || pos.lineNumber > lines.length) {
+            return false;
+          }
+          const line = lines[pos.lineNumber - 1];
+          if (pos.column < 1 || pos.column > line.length + 1) {
+            return false;
+          }
+          return true;
+        }
+        function validateRange(range, lines) {
+          if (range.startLineNumber < 1 || range.startLineNumber > lines.length + 1) {
+            return false;
+          }
+          if (range.endLineNumberExclusive < 1 || range.endLineNumberExclusive > lines.length + 1) {
+            return false;
+          }
+          return true;
+        }
+        for (const c of changes) {
+          if (!c.innerChanges) {
+            return false;
+          }
+          for (const ic of c.innerChanges) {
+            const valid = validatePosition(ic.modifiedRange.getStartPosition(), modifiedLines) && validatePosition(ic.modifiedRange.getEndPosition(), modifiedLines) && validatePosition(ic.originalRange.getStartPosition(), originalLines) && validatePosition(ic.originalRange.getEndPosition(), originalLines);
+            if (!valid) {
+              return false;
+            }
+          }
+          if (!validateRange(c.modifiedRange, modifiedLines) || !validateRange(c.originalRange, originalLines)) {
+            return false;
+          }
+        }
+        return true;
+      });
+      return new LinesDiff(changes, moves, hitTimeout);
+    }
+    refineDiff(originalLines, modifiedLines, diff, timeout, considerWhitespaceChanges) {
+      const slice1 = new LinesSliceCharSequence(originalLines, diff.seq1Range, considerWhitespaceChanges);
+      const slice2 = new LinesSliceCharSequence(modifiedLines, diff.seq2Range, considerWhitespaceChanges);
+      const diffResult = slice1.length + slice2.length < 500 ? this.dynamicProgrammingDiffing.compute(slice1, slice2, timeout) : this.myersDiffingAlgorithm.compute(slice1, slice2, timeout);
+      let diffs = diffResult.diffs;
+      diffs = optimizeSequenceDiffs(slice1, slice2, diffs);
+      diffs = coverFullWords(slice1, slice2, diffs);
+      diffs = smoothenSequenceDiffs(slice1, slice2, diffs);
+      diffs = removeRandomMatches(slice1, slice2, diffs);
+      const result = diffs.map((d) => new RangeMapping(slice1.translateRange(d.seq1Range), slice2.translateRange(d.seq2Range)));
       return {
-        quitEarly: false,
-        changes
+        mappings: result,
+        hitTimeout: diffResult.hitTimeout
       };
     }
-    refineDiff(originalLines, modifiedLines, diff) {
-      const sourceSlice = new Slice(originalLines, diff.seq1Range);
-      const targetSlice = new Slice(modifiedLines, diff.seq2Range);
-      const originalDiffs = sourceSlice.length + targetSlice.length < 500 ? this.dynamicProgrammingDiffing.compute(sourceSlice, targetSlice) : this.myersDiffingAlgorithm.compute(sourceSlice, targetSlice);
-      let diffs = optimizeSequenceDiffs(sourceSlice, targetSlice, originalDiffs);
-      diffs = smoothenSequenceDiffs(sourceSlice, targetSlice, diffs);
-      const result = diffs.map((d) => new RangeMapping(sourceSlice.translateRange(d.seq1Range).delta(diff.seq1Range.start), targetSlice.translateRange(d.seq2Range).delta(diff.seq2Range.start)));
-      return result;
-    }
   };
-  function lineRangeMappingFromRangeMappings(alignments) {
+  function coverFullWords(sequence1, sequence2, sequenceDiffs) {
+    const additional = [];
+    let lastModifiedWord = void 0;
+    function maybePushWordToAdditional() {
+      if (!lastModifiedWord) {
+        return;
+      }
+      const originalLength1 = lastModifiedWord.s1Range.length - lastModifiedWord.deleted;
+      const originalLength2 = lastModifiedWord.s2Range.length - lastModifiedWord.added;
+      if (originalLength1 !== originalLength2) {
+      }
+      if (Math.max(lastModifiedWord.deleted, lastModifiedWord.added) + (lastModifiedWord.count - 1) > originalLength1) {
+        additional.push(new SequenceDiff(lastModifiedWord.s1Range, lastModifiedWord.s2Range));
+      }
+      lastModifiedWord = void 0;
+    }
+    for (const s of sequenceDiffs) {
+      let processWord = function(s1Range, s2Range) {
+        var _a4, _b, _c, _d;
+        if (!lastModifiedWord || !lastModifiedWord.s1Range.containsRange(s1Range) || !lastModifiedWord.s2Range.containsRange(s2Range)) {
+          if (lastModifiedWord && !(lastModifiedWord.s1Range.endExclusive < s1Range.start && lastModifiedWord.s2Range.endExclusive < s2Range.start)) {
+            const s1Added = OffsetRange.tryCreate(lastModifiedWord.s1Range.endExclusive, s1Range.start);
+            const s2Added = OffsetRange.tryCreate(lastModifiedWord.s2Range.endExclusive, s2Range.start);
+            lastModifiedWord.deleted += (_a4 = s1Added === null || s1Added === void 0 ? void 0 : s1Added.length) !== null && _a4 !== void 0 ? _a4 : 0;
+            lastModifiedWord.added += (_b = s2Added === null || s2Added === void 0 ? void 0 : s2Added.length) !== null && _b !== void 0 ? _b : 0;
+            lastModifiedWord.s1Range = lastModifiedWord.s1Range.join(s1Range);
+            lastModifiedWord.s2Range = lastModifiedWord.s2Range.join(s2Range);
+          } else {
+            maybePushWordToAdditional();
+            lastModifiedWord = { added: 0, deleted: 0, count: 0, s1Range, s2Range };
+          }
+        }
+        const changedS1 = s1Range.intersect(s.seq1Range);
+        const changedS2 = s2Range.intersect(s.seq2Range);
+        lastModifiedWord.count++;
+        lastModifiedWord.deleted += (_c = changedS1 === null || changedS1 === void 0 ? void 0 : changedS1.length) !== null && _c !== void 0 ? _c : 0;
+        lastModifiedWord.added += (_d = changedS2 === null || changedS2 === void 0 ? void 0 : changedS2.length) !== null && _d !== void 0 ? _d : 0;
+      };
+      const w1Before = sequence1.findWordContaining(s.seq1Range.start - 1);
+      const w2Before = sequence2.findWordContaining(s.seq2Range.start - 1);
+      const w1After = sequence1.findWordContaining(s.seq1Range.endExclusive);
+      const w2After = sequence2.findWordContaining(s.seq2Range.endExclusive);
+      if (w1Before && w1After && w2Before && w2After && w1Before.equals(w1After) && w2Before.equals(w2After)) {
+        processWord(w1Before, w2Before);
+      } else {
+        if (w1Before && w2Before) {
+          processWord(w1Before, w2Before);
+        }
+        if (w1After && w2After) {
+          processWord(w1After, w2After);
+        }
+      }
+    }
+    maybePushWordToAdditional();
+    const merged = mergeSequenceDiffs(sequenceDiffs, additional);
+    return merged;
+  }
+  function mergeSequenceDiffs(sequenceDiffs1, sequenceDiffs2) {
+    const result = [];
+    while (sequenceDiffs1.length > 0 || sequenceDiffs2.length > 0) {
+      const sd1 = sequenceDiffs1[0];
+      const sd2 = sequenceDiffs2[0];
+      let next;
+      if (sd1 && (!sd2 || sd1.seq1Range.start < sd2.seq1Range.start)) {
+        next = sequenceDiffs1.shift();
+      } else {
+        next = sequenceDiffs2.shift();
+      }
+      if (result.length > 0 && result[result.length - 1].seq1Range.endExclusive >= next.seq1Range.start) {
+        result[result.length - 1] = result[result.length - 1].join(next);
+      } else {
+        result.push(next);
+      }
+    }
+    return result;
+  }
+  function lineRangeMappingFromRangeMappings(alignments, originalLines, modifiedLines, dontAssertStartLine = false) {
     const changes = [];
-    for (const g of group(alignments, (a1, a2) => a2.originalRange.startLineNumber - (a1.originalRange.endLineNumber - (a1.originalRange.endColumn > 1 ? 0 : 1)) <= 1 || a2.modifiedRange.startLineNumber - (a1.modifiedRange.endLineNumber - (a1.modifiedRange.endColumn > 1 ? 0 : 1)) <= 1)) {
+    for (const g of group(alignments.map((a) => getLineRangeMapping(a, originalLines, modifiedLines)), (a1, a2) => a1.originalRange.overlapOrTouch(a2.originalRange) || a1.modifiedRange.overlapOrTouch(a2.modifiedRange))) {
       const first = g[0];
       const last = g[g.length - 1];
-      changes.push(new LineRangeMapping(new LineRange(first.originalRange.startLineNumber, last.originalRange.endLineNumber + (last.originalRange.endColumn > 1 || last.modifiedRange.endColumn > 1 ? 1 : 0)), new LineRange(first.modifiedRange.startLineNumber, last.modifiedRange.endLineNumber + (last.originalRange.endColumn > 1 || last.modifiedRange.endColumn > 1 ? 1 : 0)), g));
+      changes.push(new LineRangeMapping(first.originalRange.join(last.originalRange), first.modifiedRange.join(last.modifiedRange), g.map((a) => a.innerChanges[0])));
     }
     assertFn(() => {
+      if (!dontAssertStartLine) {
+        if (changes.length > 0 && changes[0].originalRange.startLineNumber !== changes[0].modifiedRange.startLineNumber) {
+          return false;
+        }
+      }
       return checkAdjacentItems(changes, (m1, m2) => m2.originalRange.startLineNumber - m1.originalRange.endLineNumberExclusive === m2.modifiedRange.startLineNumber - m1.modifiedRange.endLineNumberExclusive && // There has to be an unchanged line in between (otherwise both diffs should have been joined)
       m1.originalRange.endLineNumberExclusive < m2.originalRange.startLineNumber && m1.modifiedRange.endLineNumberExclusive < m2.modifiedRange.startLineNumber);
     });
     return changes;
+  }
+  function getLineRangeMapping(rangeMapping, originalLines, modifiedLines) {
+    let lineStartDelta = 0;
+    let lineEndDelta = 0;
+    if (rangeMapping.modifiedRange.endColumn === 1 && rangeMapping.originalRange.endColumn === 1 && rangeMapping.originalRange.startLineNumber + lineStartDelta <= rangeMapping.originalRange.endLineNumber && rangeMapping.modifiedRange.startLineNumber + lineStartDelta <= rangeMapping.modifiedRange.endLineNumber) {
+      lineEndDelta = -1;
+    }
+    if (rangeMapping.modifiedRange.startColumn - 1 >= modifiedLines[rangeMapping.modifiedRange.startLineNumber - 1].length && rangeMapping.originalRange.startColumn - 1 >= originalLines[rangeMapping.originalRange.startLineNumber - 1].length && rangeMapping.originalRange.startLineNumber <= rangeMapping.originalRange.endLineNumber + lineEndDelta && rangeMapping.modifiedRange.startLineNumber <= rangeMapping.modifiedRange.endLineNumber + lineEndDelta) {
+      lineStartDelta = 1;
+    }
+    const originalLineRange = new LineRange(rangeMapping.originalRange.startLineNumber + lineStartDelta, rangeMapping.originalRange.endLineNumber + 1 + lineEndDelta);
+    const modifiedLineRange = new LineRange(rangeMapping.modifiedRange.startLineNumber + lineStartDelta, rangeMapping.modifiedRange.endLineNumber + 1 + lineEndDelta);
+    return new LineRangeMapping(originalLineRange, modifiedLineRange, [rangeMapping]);
   }
   function* group(items, shouldBeGrouped) {
     let currentGroup;
@@ -9343,31 +10122,50 @@
     }
     return i;
   }
-  var Slice = class {
-    constructor(lines, lineRange) {
+  var LinesSliceCharSequence = class {
+    constructor(lines, lineRange, considerWhitespaceChanges) {
       this.lines = lines;
+      this.considerWhitespaceChanges = considerWhitespaceChanges;
+      this.elements = [];
+      this.firstCharOffsetByLineMinusOne = [];
+      this.offsetByLine = [];
+      let trimFirstLineFully = false;
+      if (lineRange.start > 0 && lineRange.endExclusive >= lines.length) {
+        lineRange = new OffsetRange(lineRange.start - 1, lineRange.endExclusive);
+        trimFirstLineFully = true;
+      }
       this.lineRange = lineRange;
-      let chars = 0;
-      this.firstCharOnLineOffsets = new Int32Array(lineRange.length);
-      for (let i = lineRange.start; i < lineRange.endExclusive; i++) {
-        const line = lines[i];
-        chars += line.length;
-        this.firstCharOnLineOffsets[i - lineRange.start] = chars + 1;
-        chars++;
-      }
-      this.elements = new Int32Array(chars);
-      let offset = 0;
-      for (let i = lineRange.start; i < lineRange.endExclusive; i++) {
-        const line = lines[i];
+      for (let i = this.lineRange.start; i < this.lineRange.endExclusive; i++) {
+        let line = lines[i];
+        let offset = 0;
+        if (trimFirstLineFully) {
+          offset = line.length;
+          line = "";
+          trimFirstLineFully = false;
+        } else if (!considerWhitespaceChanges) {
+          const trimmedStartLine = line.trimStart();
+          offset = line.length - trimmedStartLine.length;
+          line = trimmedStartLine.trimEnd();
+        }
+        this.offsetByLine.push(offset);
         for (let i2 = 0; i2 < line.length; i2++) {
-          this.elements[offset + i2] = line.charCodeAt(i2);
+          this.elements.push(line.charCodeAt(i2));
         }
-        offset += line.length;
         if (i < lines.length - 1) {
-          this.elements[offset] = "\n".charCodeAt(0);
-          offset += 1;
+          this.elements.push("\n".charCodeAt(0));
+          this.firstCharOffsetByLineMinusOne[i - this.lineRange.start] = this.elements.length;
         }
       }
+      this.offsetByLine.push(0);
+    }
+    toString() {
+      return `Slice: "${this.text}"`;
+    }
+    get text() {
+      return this.getText(new OffsetRange(0, this.length));
+    }
+    getText(range) {
+      return this.elements.slice(range.start, range.endExclusive).map((e) => String.fromCharCode(e)).join("");
     }
     getElement(offset) {
       return this.elements[offset];
@@ -9393,23 +10191,52 @@
       return score2;
     }
     translateOffset(offset) {
+      if (this.lineRange.isEmpty) {
+        return new Position(this.lineRange.start + 1, 1);
+      }
       let i = 0;
-      let j = this.firstCharOnLineOffsets.length;
+      let j = this.firstCharOffsetByLineMinusOne.length;
       while (i < j) {
         const k = Math.floor((i + j) / 2);
-        if (this.firstCharOnLineOffsets[k] > offset) {
+        if (this.firstCharOffsetByLineMinusOne[k] > offset) {
           j = k;
         } else {
           i = k + 1;
         }
       }
-      const offsetOfPrevLineBreak = i === 0 ? 0 : this.firstCharOnLineOffsets[i - 1];
-      return new Position(i + 1, offset - offsetOfPrevLineBreak + 1);
+      const offsetOfFirstCharInLine = i === 0 ? 0 : this.firstCharOffsetByLineMinusOne[i - 1];
+      return new Position(this.lineRange.start + i + 1, offset - offsetOfFirstCharInLine + 1 + this.offsetByLine[i]);
     }
     translateRange(range) {
       return Range.fromPositions(this.translateOffset(range.start), this.translateOffset(range.endExclusive));
     }
+    /**
+     * Finds the word that contains the character at the given offset
+     */
+    findWordContaining(offset) {
+      if (offset < 0 || offset >= this.elements.length) {
+        return void 0;
+      }
+      if (!isWordChar(this.elements[offset])) {
+        return void 0;
+      }
+      let start = offset;
+      while (start > 0 && isWordChar(this.elements[start - 1])) {
+        start--;
+      }
+      let end = offset;
+      while (end < this.elements.length && isWordChar(this.elements[end])) {
+        end++;
+      }
+      return new OffsetRange(start, end);
+    }
+    countLinesIn(range) {
+      return this.translateOffset(range.endExclusive).lineNumber - this.translateOffset(range.start).lineNumber;
+    }
   };
+  function isWordChar(charCode) {
+    return charCode >= 97 && charCode <= 122 || charCode >= 65 && charCode <= 90 || charCode >= 48 && charCode <= 57;
+  }
   var score = {
     [
       0
@@ -9469,14 +10296,618 @@
   function isSpace(charCode) {
     return charCode === 32 || charCode === 9;
   }
-
-  // node_modules/monaco-editor/esm/vs/editor/common/diff/linesDiffComputers.js
-  var linesDiffComputers = {
-    smart: new SmartLinesDiffComputer(),
-    experimental: new StandardLinesDiffComputer()
+  var chrKeys = /* @__PURE__ */ new Map();
+  function getKey(chr) {
+    let key = chrKeys.get(chr);
+    if (key === void 0) {
+      key = chrKeys.size;
+      chrKeys.set(chr, key);
+    }
+    return key;
+  }
+  var LineRangeFragment = class {
+    constructor(range, lines) {
+      this.range = range;
+      this.lines = lines;
+      this.histogram = [];
+      let counter = 0;
+      for (let i = range.startLineNumber - 1; i < range.endLineNumberExclusive - 1; i++) {
+        const line = lines[i];
+        for (let j = 0; j < line.length; j++) {
+          counter++;
+          const chr = line[j];
+          const key2 = getKey(chr);
+          this.histogram[key2] = (this.histogram[key2] || 0) + 1;
+        }
+        counter++;
+        const key = getKey("\n");
+        this.histogram[key] = (this.histogram[key] || 0) + 1;
+      }
+      this.totalCount = counter;
+    }
+    computeSimilarity(other) {
+      var _a4, _b;
+      let sumDifferences = 0;
+      const maxLength = Math.max(this.histogram.length, other.histogram.length);
+      for (let i = 0; i < maxLength; i++) {
+        sumDifferences += Math.abs(((_a4 = this.histogram[i]) !== null && _a4 !== void 0 ? _a4 : 0) - ((_b = other.histogram[i]) !== null && _b !== void 0 ? _b : 0));
+      }
+      return 1 - sumDifferences / (this.totalCount + other.totalCount);
+    }
   };
 
-  // node_modules/monaco-editor/esm/vs/editor/common/services/editorSimpleWorker.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/diff/linesDiffComputers.js
+  var linesDiffComputers = {
+    getLegacy: () => new SmartLinesDiffComputer(),
+    getAdvanced: () => new StandardLinesDiffComputer()
+  };
+
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/base/common/color.js
+  function roundFloat(number, decimalPoints) {
+    const decimal = Math.pow(10, decimalPoints);
+    return Math.round(number * decimal) / decimal;
+  }
+  var RGBA = class {
+    constructor(r, g, b, a = 1) {
+      this._rgbaBrand = void 0;
+      this.r = Math.min(255, Math.max(0, r)) | 0;
+      this.g = Math.min(255, Math.max(0, g)) | 0;
+      this.b = Math.min(255, Math.max(0, b)) | 0;
+      this.a = roundFloat(Math.max(Math.min(1, a), 0), 3);
+    }
+    static equals(a, b) {
+      return a.r === b.r && a.g === b.g && a.b === b.b && a.a === b.a;
+    }
+  };
+  var HSLA = class _HSLA {
+    constructor(h, s, l, a) {
+      this._hslaBrand = void 0;
+      this.h = Math.max(Math.min(360, h), 0) | 0;
+      this.s = roundFloat(Math.max(Math.min(1, s), 0), 3);
+      this.l = roundFloat(Math.max(Math.min(1, l), 0), 3);
+      this.a = roundFloat(Math.max(Math.min(1, a), 0), 3);
+    }
+    static equals(a, b) {
+      return a.h === b.h && a.s === b.s && a.l === b.l && a.a === b.a;
+    }
+    /**
+     * Converts an RGB color value to HSL. Conversion formula
+     * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+     * Assumes r, g, and b are contained in the set [0, 255] and
+     * returns h in the set [0, 360], s, and l in the set [0, 1].
+     */
+    static fromRGBA(rgba) {
+      const r = rgba.r / 255;
+      const g = rgba.g / 255;
+      const b = rgba.b / 255;
+      const a = rgba.a;
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h = 0;
+      let s = 0;
+      const l = (min + max) / 2;
+      const chroma = max - min;
+      if (chroma > 0) {
+        s = Math.min(l <= 0.5 ? chroma / (2 * l) : chroma / (2 - 2 * l), 1);
+        switch (max) {
+          case r:
+            h = (g - b) / chroma + (g < b ? 6 : 0);
+            break;
+          case g:
+            h = (b - r) / chroma + 2;
+            break;
+          case b:
+            h = (r - g) / chroma + 4;
+            break;
+        }
+        h *= 60;
+        h = Math.round(h);
+      }
+      return new _HSLA(h, s, l, a);
+    }
+    static _hue2rgb(p, q, t) {
+      if (t < 0) {
+        t += 1;
+      }
+      if (t > 1) {
+        t -= 1;
+      }
+      if (t < 1 / 6) {
+        return p + (q - p) * 6 * t;
+      }
+      if (t < 1 / 2) {
+        return q;
+      }
+      if (t < 2 / 3) {
+        return p + (q - p) * (2 / 3 - t) * 6;
+      }
+      return p;
+    }
+    /**
+     * Converts an HSL color value to RGB. Conversion formula
+     * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+     * Assumes h in the set [0, 360] s, and l are contained in the set [0, 1] and
+     * returns r, g, and b in the set [0, 255].
+     */
+    static toRGBA(hsla) {
+      const h = hsla.h / 360;
+      const { s, l, a } = hsla;
+      let r, g, b;
+      if (s === 0) {
+        r = g = b = l;
+      } else {
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = _HSLA._hue2rgb(p, q, h + 1 / 3);
+        g = _HSLA._hue2rgb(p, q, h);
+        b = _HSLA._hue2rgb(p, q, h - 1 / 3);
+      }
+      return new RGBA(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255), a);
+    }
+  };
+  var HSVA = class _HSVA {
+    constructor(h, s, v, a) {
+      this._hsvaBrand = void 0;
+      this.h = Math.max(Math.min(360, h), 0) | 0;
+      this.s = roundFloat(Math.max(Math.min(1, s), 0), 3);
+      this.v = roundFloat(Math.max(Math.min(1, v), 0), 3);
+      this.a = roundFloat(Math.max(Math.min(1, a), 0), 3);
+    }
+    static equals(a, b) {
+      return a.h === b.h && a.s === b.s && a.v === b.v && a.a === b.a;
+    }
+    // from http://www.rapidtables.com/convert/color/rgb-to-hsv.htm
+    static fromRGBA(rgba) {
+      const r = rgba.r / 255;
+      const g = rgba.g / 255;
+      const b = rgba.b / 255;
+      const cmax = Math.max(r, g, b);
+      const cmin = Math.min(r, g, b);
+      const delta = cmax - cmin;
+      const s = cmax === 0 ? 0 : delta / cmax;
+      let m;
+      if (delta === 0) {
+        m = 0;
+      } else if (cmax === r) {
+        m = ((g - b) / delta % 6 + 6) % 6;
+      } else if (cmax === g) {
+        m = (b - r) / delta + 2;
+      } else {
+        m = (r - g) / delta + 4;
+      }
+      return new _HSVA(Math.round(m * 60), s, cmax, rgba.a);
+    }
+    // from http://www.rapidtables.com/convert/color/hsv-to-rgb.htm
+    static toRGBA(hsva) {
+      const { h, s, v, a } = hsva;
+      const c = v * s;
+      const x = c * (1 - Math.abs(h / 60 % 2 - 1));
+      const m = v - c;
+      let [r, g, b] = [0, 0, 0];
+      if (h < 60) {
+        r = c;
+        g = x;
+      } else if (h < 120) {
+        r = x;
+        g = c;
+      } else if (h < 180) {
+        g = c;
+        b = x;
+      } else if (h < 240) {
+        g = x;
+        b = c;
+      } else if (h < 300) {
+        r = x;
+        b = c;
+      } else if (h <= 360) {
+        r = c;
+        b = x;
+      }
+      r = Math.round((r + m) * 255);
+      g = Math.round((g + m) * 255);
+      b = Math.round((b + m) * 255);
+      return new RGBA(r, g, b, a);
+    }
+  };
+  var Color = class _Color {
+    static fromHex(hex) {
+      return _Color.Format.CSS.parseHex(hex) || _Color.red;
+    }
+    static equals(a, b) {
+      if (!a && !b) {
+        return true;
+      }
+      if (!a || !b) {
+        return false;
+      }
+      return a.equals(b);
+    }
+    get hsla() {
+      if (this._hsla) {
+        return this._hsla;
+      } else {
+        return HSLA.fromRGBA(this.rgba);
+      }
+    }
+    get hsva() {
+      if (this._hsva) {
+        return this._hsva;
+      }
+      return HSVA.fromRGBA(this.rgba);
+    }
+    constructor(arg) {
+      if (!arg) {
+        throw new Error("Color needs a value");
+      } else if (arg instanceof RGBA) {
+        this.rgba = arg;
+      } else if (arg instanceof HSLA) {
+        this._hsla = arg;
+        this.rgba = HSLA.toRGBA(arg);
+      } else if (arg instanceof HSVA) {
+        this._hsva = arg;
+        this.rgba = HSVA.toRGBA(arg);
+      } else {
+        throw new Error("Invalid color ctor argument");
+      }
+    }
+    equals(other) {
+      return !!other && RGBA.equals(this.rgba, other.rgba) && HSLA.equals(this.hsla, other.hsla) && HSVA.equals(this.hsva, other.hsva);
+    }
+    /**
+     * http://www.w3.org/TR/WCAG20/#relativeluminancedef
+     * Returns the number in the set [0, 1]. O => Darkest Black. 1 => Lightest white.
+     */
+    getRelativeLuminance() {
+      const R = _Color._relativeLuminanceForComponent(this.rgba.r);
+      const G = _Color._relativeLuminanceForComponent(this.rgba.g);
+      const B = _Color._relativeLuminanceForComponent(this.rgba.b);
+      const luminance = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+      return roundFloat(luminance, 4);
+    }
+    static _relativeLuminanceForComponent(color) {
+      const c = color / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    }
+    /**
+     *	http://24ways.org/2010/calculating-color-contrast
+     *  Return 'true' if lighter color otherwise 'false'
+     */
+    isLighter() {
+      const yiq = (this.rgba.r * 299 + this.rgba.g * 587 + this.rgba.b * 114) / 1e3;
+      return yiq >= 128;
+    }
+    isLighterThan(another) {
+      const lum1 = this.getRelativeLuminance();
+      const lum2 = another.getRelativeLuminance();
+      return lum1 > lum2;
+    }
+    isDarkerThan(another) {
+      const lum1 = this.getRelativeLuminance();
+      const lum2 = another.getRelativeLuminance();
+      return lum1 < lum2;
+    }
+    lighten(factor) {
+      return new _Color(new HSLA(this.hsla.h, this.hsla.s, this.hsla.l + this.hsla.l * factor, this.hsla.a));
+    }
+    darken(factor) {
+      return new _Color(new HSLA(this.hsla.h, this.hsla.s, this.hsla.l - this.hsla.l * factor, this.hsla.a));
+    }
+    transparent(factor) {
+      const { r, g, b, a } = this.rgba;
+      return new _Color(new RGBA(r, g, b, a * factor));
+    }
+    isTransparent() {
+      return this.rgba.a === 0;
+    }
+    isOpaque() {
+      return this.rgba.a === 1;
+    }
+    opposite() {
+      return new _Color(new RGBA(255 - this.rgba.r, 255 - this.rgba.g, 255 - this.rgba.b, this.rgba.a));
+    }
+    makeOpaque(opaqueBackground) {
+      if (this.isOpaque() || opaqueBackground.rgba.a !== 1) {
+        return this;
+      }
+      const { r, g, b, a } = this.rgba;
+      return new _Color(new RGBA(opaqueBackground.rgba.r - a * (opaqueBackground.rgba.r - r), opaqueBackground.rgba.g - a * (opaqueBackground.rgba.g - g), opaqueBackground.rgba.b - a * (opaqueBackground.rgba.b - b), 1));
+    }
+    toString() {
+      if (!this._toString) {
+        this._toString = _Color.Format.CSS.format(this);
+      }
+      return this._toString;
+    }
+    static getLighterColor(of, relative2, factor) {
+      if (of.isLighterThan(relative2)) {
+        return of;
+      }
+      factor = factor ? factor : 0.5;
+      const lum1 = of.getRelativeLuminance();
+      const lum2 = relative2.getRelativeLuminance();
+      factor = factor * (lum2 - lum1) / lum2;
+      return of.lighten(factor);
+    }
+    static getDarkerColor(of, relative2, factor) {
+      if (of.isDarkerThan(relative2)) {
+        return of;
+      }
+      factor = factor ? factor : 0.5;
+      const lum1 = of.getRelativeLuminance();
+      const lum2 = relative2.getRelativeLuminance();
+      factor = factor * (lum1 - lum2) / lum1;
+      return of.darken(factor);
+    }
+  };
+  Color.white = new Color(new RGBA(255, 255, 255, 1));
+  Color.black = new Color(new RGBA(0, 0, 0, 1));
+  Color.red = new Color(new RGBA(255, 0, 0, 1));
+  Color.blue = new Color(new RGBA(0, 0, 255, 1));
+  Color.green = new Color(new RGBA(0, 255, 0, 1));
+  Color.cyan = new Color(new RGBA(0, 255, 255, 1));
+  Color.lightgrey = new Color(new RGBA(211, 211, 211, 1));
+  Color.transparent = new Color(new RGBA(0, 0, 0, 0));
+  (function(Color3) {
+    let Format;
+    (function(Format2) {
+      let CSS;
+      (function(CSS2) {
+        function formatRGB(color) {
+          if (color.rgba.a === 1) {
+            return `rgb(${color.rgba.r}, ${color.rgba.g}, ${color.rgba.b})`;
+          }
+          return Color3.Format.CSS.formatRGBA(color);
+        }
+        CSS2.formatRGB = formatRGB;
+        function formatRGBA(color) {
+          return `rgba(${color.rgba.r}, ${color.rgba.g}, ${color.rgba.b}, ${+color.rgba.a.toFixed(2)})`;
+        }
+        CSS2.formatRGBA = formatRGBA;
+        function formatHSL(color) {
+          if (color.hsla.a === 1) {
+            return `hsl(${color.hsla.h}, ${(color.hsla.s * 100).toFixed(2)}%, ${(color.hsla.l * 100).toFixed(2)}%)`;
+          }
+          return Color3.Format.CSS.formatHSLA(color);
+        }
+        CSS2.formatHSL = formatHSL;
+        function formatHSLA(color) {
+          return `hsla(${color.hsla.h}, ${(color.hsla.s * 100).toFixed(2)}%, ${(color.hsla.l * 100).toFixed(2)}%, ${color.hsla.a.toFixed(2)})`;
+        }
+        CSS2.formatHSLA = formatHSLA;
+        function _toTwoDigitHex(n) {
+          const r = n.toString(16);
+          return r.length !== 2 ? "0" + r : r;
+        }
+        function formatHex(color) {
+          return `#${_toTwoDigitHex(color.rgba.r)}${_toTwoDigitHex(color.rgba.g)}${_toTwoDigitHex(color.rgba.b)}`;
+        }
+        CSS2.formatHex = formatHex;
+        function formatHexA(color, compact = false) {
+          if (compact && color.rgba.a === 1) {
+            return Color3.Format.CSS.formatHex(color);
+          }
+          return `#${_toTwoDigitHex(color.rgba.r)}${_toTwoDigitHex(color.rgba.g)}${_toTwoDigitHex(color.rgba.b)}${_toTwoDigitHex(Math.round(color.rgba.a * 255))}`;
+        }
+        CSS2.formatHexA = formatHexA;
+        function format3(color) {
+          if (color.isOpaque()) {
+            return Color3.Format.CSS.formatHex(color);
+          }
+          return Color3.Format.CSS.formatRGBA(color);
+        }
+        CSS2.format = format3;
+        function parseHex(hex) {
+          const length = hex.length;
+          if (length === 0) {
+            return null;
+          }
+          if (hex.charCodeAt(0) !== 35) {
+            return null;
+          }
+          if (length === 7) {
+            const r = 16 * _parseHexDigit(hex.charCodeAt(1)) + _parseHexDigit(hex.charCodeAt(2));
+            const g = 16 * _parseHexDigit(hex.charCodeAt(3)) + _parseHexDigit(hex.charCodeAt(4));
+            const b = 16 * _parseHexDigit(hex.charCodeAt(5)) + _parseHexDigit(hex.charCodeAt(6));
+            return new Color3(new RGBA(r, g, b, 1));
+          }
+          if (length === 9) {
+            const r = 16 * _parseHexDigit(hex.charCodeAt(1)) + _parseHexDigit(hex.charCodeAt(2));
+            const g = 16 * _parseHexDigit(hex.charCodeAt(3)) + _parseHexDigit(hex.charCodeAt(4));
+            const b = 16 * _parseHexDigit(hex.charCodeAt(5)) + _parseHexDigit(hex.charCodeAt(6));
+            const a = 16 * _parseHexDigit(hex.charCodeAt(7)) + _parseHexDigit(hex.charCodeAt(8));
+            return new Color3(new RGBA(r, g, b, a / 255));
+          }
+          if (length === 4) {
+            const r = _parseHexDigit(hex.charCodeAt(1));
+            const g = _parseHexDigit(hex.charCodeAt(2));
+            const b = _parseHexDigit(hex.charCodeAt(3));
+            return new Color3(new RGBA(16 * r + r, 16 * g + g, 16 * b + b));
+          }
+          if (length === 5) {
+            const r = _parseHexDigit(hex.charCodeAt(1));
+            const g = _parseHexDigit(hex.charCodeAt(2));
+            const b = _parseHexDigit(hex.charCodeAt(3));
+            const a = _parseHexDigit(hex.charCodeAt(4));
+            return new Color3(new RGBA(16 * r + r, 16 * g + g, 16 * b + b, (16 * a + a) / 255));
+          }
+          return null;
+        }
+        CSS2.parseHex = parseHex;
+        function _parseHexDigit(charCode) {
+          switch (charCode) {
+            case 48:
+              return 0;
+            case 49:
+              return 1;
+            case 50:
+              return 2;
+            case 51:
+              return 3;
+            case 52:
+              return 4;
+            case 53:
+              return 5;
+            case 54:
+              return 6;
+            case 55:
+              return 7;
+            case 56:
+              return 8;
+            case 57:
+              return 9;
+            case 97:
+              return 10;
+            case 65:
+              return 10;
+            case 98:
+              return 11;
+            case 66:
+              return 11;
+            case 99:
+              return 12;
+            case 67:
+              return 12;
+            case 100:
+              return 13;
+            case 68:
+              return 13;
+            case 101:
+              return 14;
+            case 69:
+              return 14;
+            case 102:
+              return 15;
+            case 70:
+              return 15;
+          }
+          return 0;
+        }
+      })(CSS = Format2.CSS || (Format2.CSS = {}));
+    })(Format = Color3.Format || (Color3.Format = {}));
+  })(Color || (Color = {}));
+
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/languages/defaultDocumentColorsComputer.js
+  function _parseCaptureGroups(captureGroups) {
+    const values = [];
+    for (const captureGroup of captureGroups) {
+      const parsedNumber = Number(captureGroup);
+      if (parsedNumber || parsedNumber === 0 && captureGroup.replace(/\s/g, "") !== "") {
+        values.push(parsedNumber);
+      }
+    }
+    return values;
+  }
+  function _toIColor(r, g, b, a) {
+    return {
+      red: r / 255,
+      blue: b / 255,
+      green: g / 255,
+      alpha: a
+    };
+  }
+  function _findRange(model, match) {
+    const index = match.index;
+    const length = match[0].length;
+    if (!index) {
+      return;
+    }
+    const startPosition = model.positionAt(index);
+    const range = {
+      startLineNumber: startPosition.lineNumber,
+      startColumn: startPosition.column,
+      endLineNumber: startPosition.lineNumber,
+      endColumn: startPosition.column + length
+    };
+    return range;
+  }
+  function _findHexColorInformation(range, hexValue) {
+    if (!range) {
+      return;
+    }
+    const parsedHexColor = Color.Format.CSS.parseHex(hexValue);
+    if (!parsedHexColor) {
+      return;
+    }
+    return {
+      range,
+      color: _toIColor(parsedHexColor.rgba.r, parsedHexColor.rgba.g, parsedHexColor.rgba.b, parsedHexColor.rgba.a)
+    };
+  }
+  function _findRGBColorInformation(range, matches, isAlpha) {
+    if (!range || matches.length !== 1) {
+      return;
+    }
+    const match = matches[0];
+    const captureGroups = match.values();
+    const parsedRegex = _parseCaptureGroups(captureGroups);
+    return {
+      range,
+      color: _toIColor(parsedRegex[0], parsedRegex[1], parsedRegex[2], isAlpha ? parsedRegex[3] : 1)
+    };
+  }
+  function _findHSLColorInformation(range, matches, isAlpha) {
+    if (!range || matches.length !== 1) {
+      return;
+    }
+    const match = matches[0];
+    const captureGroups = match.values();
+    const parsedRegex = _parseCaptureGroups(captureGroups);
+    const colorEquivalent = new Color(new HSLA(parsedRegex[0], parsedRegex[1] / 100, parsedRegex[2] / 100, isAlpha ? parsedRegex[3] : 1));
+    return {
+      range,
+      color: _toIColor(colorEquivalent.rgba.r, colorEquivalent.rgba.g, colorEquivalent.rgba.b, colorEquivalent.rgba.a)
+    };
+  }
+  function _findMatches(model, regex) {
+    if (typeof model === "string") {
+      return [...model.matchAll(regex)];
+    } else {
+      return model.findMatches(regex);
+    }
+  }
+  function computeColors(model) {
+    const result = [];
+    const initialValidationRegex = /\b(rgb|rgba|hsl|hsla)(\([0-9\s,.\%]*\))|(#)([A-Fa-f0-9]{3})\b|(#)([A-Fa-f0-9]{4})\b|(#)([A-Fa-f0-9]{6})\b|(#)([A-Fa-f0-9]{8})\b/gm;
+    const initialValidationMatches = _findMatches(model, initialValidationRegex);
+    if (initialValidationMatches.length > 0) {
+      for (const initialMatch of initialValidationMatches) {
+        const initialCaptureGroups = initialMatch.filter((captureGroup) => captureGroup !== void 0);
+        const colorScheme = initialCaptureGroups[1];
+        const colorParameters = initialCaptureGroups[2];
+        if (!colorParameters) {
+          continue;
+        }
+        let colorInformation;
+        if (colorScheme === "rgb") {
+          const regexParameters = /^\(\s*(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\s*,\s*(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\s*,\s*(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\s*\)$/gm;
+          colorInformation = _findRGBColorInformation(_findRange(model, initialMatch), _findMatches(colorParameters, regexParameters), false);
+        } else if (colorScheme === "rgba") {
+          const regexParameters = /^\(\s*(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\s*,\s*(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\s*,\s*(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\s*,\s*(0[.][0-9]+|[.][0-9]+|[01][.]|[01])\s*\)$/gm;
+          colorInformation = _findRGBColorInformation(_findRange(model, initialMatch), _findMatches(colorParameters, regexParameters), true);
+        } else if (colorScheme === "hsl") {
+          const regexParameters = /^\(\s*(36[0]|3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9])\s*,\s*(100|\d{1,2}[.]\d*|\d{1,2})%\s*,\s*(100|\d{1,2}[.]\d*|\d{1,2})%\s*\)$/gm;
+          colorInformation = _findHSLColorInformation(_findRange(model, initialMatch), _findMatches(colorParameters, regexParameters), false);
+        } else if (colorScheme === "hsla") {
+          const regexParameters = /^\(\s*(36[0]|3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9])\s*,\s*(100|\d{1,2}[.]\d*|\d{1,2})%\s*,\s*(100|\d{1,2}[.]\d*|\d{1,2})%\s*,\s*(0[.][0-9]+|[.][0-9]+|[01][.]|[01])\s*\)$/gm;
+          colorInformation = _findHSLColorInformation(_findRange(model, initialMatch), _findMatches(colorParameters, regexParameters), true);
+        } else if (colorScheme === "#") {
+          colorInformation = _findHexColorInformation(_findRange(model, initialMatch), colorScheme + colorParameters);
+        }
+        if (colorInformation) {
+          result.push(colorInformation);
+        }
+      }
+    }
+    return result;
+  }
+  function computeDefaultDocumentColors(model) {
+    if (!model || typeof model.getValue !== "function" || typeof model.positionAt !== "function") {
+      return [];
+    }
+    return computeColors(model);
+  }
+
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/common/services/editorSimpleWorker.js
   var __awaiter2 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve2) {
@@ -9513,6 +10944,21 @@
     }
     getValue() {
       return this.getText();
+    }
+    findMatches(regex) {
+      const matches = [];
+      for (let i = 0; i < this._lines.length; i++) {
+        const line = this._lines[i];
+        const offsetToAdd = this.offsetAt(new Position(i + 1, 1));
+        const iteratorOverMatches = line.matchAll(regex);
+        for (const match of iteratorOverMatches) {
+          if (match.index || match.index === 0) {
+            match.index = match.index + offsetToAdd;
+          }
+          matches.push(match);
+        }
+      }
+      return matches;
     }
     getLinesContent() {
       return this._lines.slice(0);
@@ -9714,15 +11160,13 @@
       });
     }
     static computeDiff(originalTextModel, modifiedTextModel, options, algorithm) {
-      const diffAlgorithm = algorithm === "experimental" ? linesDiffComputers.experimental : linesDiffComputers.smart;
+      const diffAlgorithm = algorithm === "advanced" ? linesDiffComputers.getAdvanced() : linesDiffComputers.getLegacy();
       const originalLines = originalTextModel.getLinesContent();
       const modifiedLines = modifiedTextModel.getLinesContent();
       const result = diffAlgorithm.computeDiff(originalLines, modifiedLines, options);
       const identical = result.changes.length > 0 ? false : this._modelsAreIdentical(originalTextModel, modifiedTextModel);
-      return {
-        identical,
-        quitEarly: result.quitEarly,
-        changes: result.changes.map((m) => {
+      function getLineChanges(changes) {
+        return changes.map((m) => {
           var _a4;
           return [m.originalRange.startLineNumber, m.originalRange.endLineNumberExclusive, m.modifiedRange.startLineNumber, m.modifiedRange.endLineNumberExclusive, (_a4 = m.innerChanges) === null || _a4 === void 0 ? void 0 : _a4.map((m2) => [
             m2.originalRange.startLineNumber,
@@ -9734,7 +11178,19 @@
             m2.modifiedRange.endLineNumber,
             m2.modifiedRange.endColumn
           ])];
-        })
+        });
+      }
+      return {
+        identical,
+        quitEarly: result.hitTimeout,
+        changes: getLineChanges(result.changes),
+        moves: result.moves.map((m) => [
+          m.lineRangeMapping.original.startLineNumber,
+          m.lineRangeMapping.original.endLineNumberExclusive,
+          m.lineRangeMapping.modified.startLineNumber,
+          m.lineRangeMapping.modified.endLineNumberExclusive,
+          getLineChanges(m.changes)
+        ])
       };
     }
     static _modelsAreIdentical(original, modified) {
@@ -9752,7 +11208,7 @@
       }
       return true;
     }
-    computeMoreMinimalEdits(modelUrl, edits) {
+    computeMoreMinimalEdits(modelUrl, edits, pretty) {
       return __awaiter2(this, void 0, void 0, function* () {
         const model = this._getModel(modelUrl);
         if (!model) {
@@ -9784,7 +11240,7 @@
             result.push({ range, text });
             continue;
           }
-          const changes = stringDiff(original, text, false);
+          const changes = stringDiff(original, text, pretty);
           const editOffset = model.offsetAt(Range.lift(range).getStartPosition());
           for (const change of changes) {
             const start = model.positionAt(editOffset + change.originalStart);
@@ -9814,9 +11270,19 @@
         return computeLinks(model);
       });
     }
+    // --- BEGIN default document colors -----------------------------------------------------------
+    computeDefaultDocumentColors(modelUrl) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const model = this._getModel(modelUrl);
+        if (!model) {
+          return null;
+        }
+        return computeDefaultDocumentColors(model);
+      });
+    }
     textualSuggest(modelUrls, leadingWord, wordDef, wordDefFlags) {
       return __awaiter2(this, void 0, void 0, function* () {
-        const sw = new StopWatch(true);
+        const sw = new StopWatch();
         const wordDefRegExp = new RegExp(wordDef, wordDefFlags);
         const seen = /* @__PURE__ */ new Set();
         outer:
@@ -9929,10 +11395,10 @@
   EditorSimpleWorker._diffLimit = 1e5;
   EditorSimpleWorker._suggestionsLimit = 1e4;
   if (typeof importScripts === "function") {
-    globals.monaco = createMonacoBaseAPI();
+    globalThis.monaco = createMonacoBaseAPI();
   }
 
-  // node_modules/monaco-editor/esm/vs/editor/editor.worker.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/editor/editor.worker.js
   var initialized = false;
   function initialize(foreignModule) {
     if (initialized) {
@@ -9940,19 +11406,19 @@
     }
     initialized = true;
     const simpleWorker = new SimpleWorkerServer((msg) => {
-      self.postMessage(msg);
+      globalThis.postMessage(msg);
     }, (host) => new EditorSimpleWorker(host, foreignModule));
-    self.onmessage = (e) => {
+    globalThis.onmessage = (e) => {
       simpleWorker.onmessage(e.data);
     };
   }
-  self.onmessage = (e) => {
+  globalThis.onmessage = (e) => {
     if (!initialized) {
       initialize(null);
     }
   };
 
-  // node_modules/monaco-editor/esm/vs/language/html/html.worker.js
+  // node_modules/.pnpm/monaco-editor@0.41.0/node_modules/monaco-editor/esm/vs/language/html/html.worker.js
   function format(message, args) {
     let result;
     if (args.length === 0) {
@@ -10041,8 +11507,8 @@
     }
     LocationLink2.is = is;
   })(LocationLink || (LocationLink = {}));
-  var Color;
-  (function(Color2) {
+  var Color2;
+  (function(Color22) {
     function create(red, green, blue, alpha) {
       return {
         red,
@@ -10051,13 +11517,13 @@
         alpha
       };
     }
-    Color2.create = create;
+    Color22.create = create;
     function is(value) {
       var candidate = value;
       return Is.numberRange(candidate.red, 0, 1) && Is.numberRange(candidate.green, 0, 1) && Is.numberRange(candidate.blue, 0, 1) && Is.numberRange(candidate.alpha, 0, 1);
     }
-    Color2.is = is;
-  })(Color || (Color = {}));
+    Color22.is = is;
+  })(Color2 || (Color2 = {}));
   var ColorInformation;
   (function(ColorInformation2) {
     function create(range, color) {
@@ -10069,7 +11535,7 @@
     ColorInformation2.create = create;
     function is(value) {
       var candidate = value;
-      return Range2.is(candidate.range) && Color.is(candidate.color);
+      return Range2.is(candidate.range) && Color2.is(candidate.color);
     }
     ColorInformation2.is = is;
   })(ColorInformation || (ColorInformation = {}));
@@ -25978,7 +27444,7 @@
 monaco-editor/esm/vs/language/html/html.worker.js:
   (*!-----------------------------------------------------------------------------
    * Copyright (c) Microsoft Corporation. All rights reserved.
-   * Version: 0.36.1(6c56744c3419458f0dd48864520b759d1a3a1ca8)
+   * Version: 0.41.0(38e1e3d097f84e336c311d071a9ffb5191d4ffd1)
    * Released under the MIT license
    * https://github.com/microsoft/monaco-editor/blob/main/LICENSE.txt
    *-----------------------------------------------------------------------------*)
