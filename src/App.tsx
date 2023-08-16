@@ -1,4 +1,4 @@
-import { CssBaseline, Typography } from '@mui/material';
+import { CssBaseline, Typography, Snackbar, IconButton } from '@mui/material';
 import { Editor } from './components/Editor';
 import { useEffect, useRef, useState } from 'react';
 import { useMonaco } from '@monaco-editor/react';
@@ -12,7 +12,7 @@ import {
   Top,
   ViewPort,
 } from 'react-spaces';
-import { HistoryEdu } from '@mui/icons-material';
+import { HistoryEdu, Close } from '@mui/icons-material';
 import { PromptCrafterAppBar } from './components/PromptCrafterAppBar';
 import { nextType } from './common/rendering/RenderType';
 import { tokensView } from './common/rendering/PromptRender';
@@ -31,6 +31,7 @@ function App() {
   const [renderingOptions, setRenderingOptions] = useImmer(
     getRenderingOptions(),
   );
+  const [showCopySnackbar, setShowCopySnackbar] = useState(false);
 
   const monaco = useMonaco();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -77,7 +78,12 @@ function App() {
     if (!contents) {
       return;
     }
-    navigator.clipboard.writeText(contents);
+    try {
+      navigator.clipboard.writeText(contents);
+      setShowCopySnackbar(true);
+    } catch (_error: unknown) {
+      //
+    }
   }
 
   return (
@@ -129,6 +135,22 @@ function App() {
           <HistoryEdu color="secondary" />
         </Bottom>
       </ViewPort>
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={showCopySnackbar}
+        onClose={() => setShowCopySnackbar(false)}
+        message="Prompt Copied to Clipboard!"
+        autoHideDuration={1000}
+        action={
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={() => setShowCopySnackbar(false)}>
+            <Close fontSize="small" />
+          </IconButton>
+        }
+      />
     </>
   );
 }
