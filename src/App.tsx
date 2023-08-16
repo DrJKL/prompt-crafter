@@ -34,6 +34,7 @@ function App() {
 
   const monaco = useMonaco();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const renderedViewRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     saveActivePrompt(promptText);
@@ -68,6 +69,17 @@ function App() {
     });
   }
 
+  function copyRenderedText() {
+    if (!renderedViewRef.current) {
+      return;
+    }
+    const contents = renderedViewRef.current?.textContent;
+    if (!contents) {
+      return;
+    }
+    navigator.clipboard.writeText(contents);
+  }
+
   return (
     <>
       <CssBaseline />
@@ -77,6 +89,7 @@ function App() {
             renderingOptions={renderingOptions}
             setRenderingOptions={setRenderingOptions}
             rotateSelect={rotateSelect}
+            copyText={copyRenderedText}
           />
         </Top>
         <Fill className="p-4 pb-10">
@@ -89,7 +102,9 @@ function App() {
           </LeftResizable>
           <Fill>
             <Fill>
-              <div className="overflow-y-auto h-full p-4 pl-6">
+              <div
+                className="overflow-y-auto h-full p-4 pl-6"
+                ref={renderedViewRef}>
                 {tokensView(promptText, renderingOptions)}
               </div>
             </Fill>

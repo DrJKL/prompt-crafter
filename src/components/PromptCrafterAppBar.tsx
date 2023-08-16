@@ -11,8 +11,9 @@ import {
   FormControlLabel,
   Switch,
   Slide,
+  Tooltip,
 } from '@mui/material';
-import { NavigateNext } from '@mui/icons-material';
+import { CopyAll, NavigateNext } from '@mui/icons-material';
 import {
   RENDER_TYPES,
   RenderType,
@@ -25,11 +26,13 @@ export interface PromptCrafterAppBarProps {
   rotateSelect: () => void;
   renderingOptions: RenderingOptions;
   setRenderingOptions: Updater<RenderingOptions>;
+  copyText: () => void;
 }
 export function PromptCrafterAppBar({
   rotateSelect,
   renderingOptions,
   setRenderingOptions,
+  copyText,
 }: PromptCrafterAppBarProps) {
   function handleDisplayTypeChange(event: SelectChangeEvent<RenderType>) {
     const value: unknown = event.target.value;
@@ -110,8 +113,15 @@ export function PromptCrafterAppBar({
             </span>
           </span>
         </Slide>
+        <span className="flex-shrink pr-2 flex justify-end">
+          <Tooltip title="Copy current (rendered) prompt">
+            <IconButton aria-label="Copy prompt" onClick={copyText}>
+              <CopyAll />
+            </IconButton>
+          </Tooltip>
+        </span>
         <Typography
-          className="flex-auto text-right select-none"
+          className="flex-shrink text-right select-none"
           variant="subtitle1">
           v0.0.3
         </Typography>
