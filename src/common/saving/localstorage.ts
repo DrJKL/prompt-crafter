@@ -28,7 +28,7 @@ export function saveActivePrompt(promptText: string) {
 export function getRenderingOptions(): RenderingOptions {
   const currentValue = localStorage.getItem(RENDER_OPTIONS);
   const parsedMaybe = RenderingOptionsSchema.safeParse(
-    JSON.parse(currentValue ?? ''),
+    JSON.parse(currentValue ?? '{}'),
   );
   if (parsedMaybe.success) {
     return parsedMaybe.data;
