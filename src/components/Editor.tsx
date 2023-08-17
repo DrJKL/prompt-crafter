@@ -37,7 +37,7 @@ export function Editor(props: EditorProps & AdditionalEditorProps) {
     <>
       <Toolbar className="p-1.5 flex justify-between gap-1.5">
         <TextField
-          id=""
+          id="prompt-name-input"
           label="Prompt Name"
           value={promptName}
           onChange={(event) => setPromptName(event.target.value)}
