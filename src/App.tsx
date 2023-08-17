@@ -28,8 +28,10 @@ import {
   savedPrompts$,
 } from './common/saving/localstorage';
 import { SavedPromptDisplay } from './components/SavedPrompt';
+import { SizeUnit } from 'react-spaces/dist/core-types';
 
-/** LocalStorage keys */
+const minHeight =
+  3 * parseInt(getComputedStyle(document.documentElement)?.fontSize);
 
 function App() {
   const [promptText, setPromptText] = useState<string>(getActivePromptLocal());
@@ -38,6 +40,8 @@ function App() {
     getRenderingOptions(),
   );
   const [showCopySnackbar, setShowCopySnackbar] = useState(false);
+  const [savedPromptSectionHeight, setSavedPromptSectionHeight] =
+    useState<SizeUnit>(minHeight);
 
   const monaco = useMonaco();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -101,6 +105,19 @@ function App() {
       //
     }
   }
+  function resizeSavedPrompts() {
+    if (
+      !savedPromptSectionHeight ||
+      typeof savedPromptSectionHeight !== 'number'
+    ) {
+      return;
+    }
+    if (savedPromptSectionHeight > minHeight) {
+      setSavedPromptSectionHeight(minHeight);
+    } else {
+      setSavedPromptSectionHeight(10 * minHeight);
+    }
+  }
 
   return (
     <>
@@ -132,18 +149,21 @@ function App() {
               </div>
             </Fill>
             <BottomResizable
-              size={'3rem'}
-              minimumSize={10}
+              size={savedPromptSectionHeight}
+              trackSize
+              onResizeEnd={(newSize) => setSavedPromptSectionHeight(newSize)}
+              minimumSize={minHeight}
               className="bg-gradient-to-tr from-stone-500 to-blue-800 p-2 text-xl font-mono opacity-70">
               <Typography
                 variant="h6"
                 component="h2"
-                className="select-none cursor-default">
+                className="select-none cursor-default"
+                onDoubleClick={() => resizeSavedPrompts()}>
                 Saved Prompts
               </Typography>
               <div>
-                {savedPrompts.map((prompt) => (
-                  <SavedPromptDisplay prompt={prompt} />
+                {savedPrompts.map((prompt, idx) => (
+                  <SavedPromptDisplay key={idx} prompt={prompt} />
                 ))}
               </div>
             </BottomResizable>

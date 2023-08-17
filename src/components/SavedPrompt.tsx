@@ -31,8 +31,8 @@ export function SavedPromptDisplay({ prompt }: SavedPromptDisplayProps) {
           {name || 'UNNAMED'}
         </span>
         <span className="flex flex-grow justify-end gap-2">
-          {tags.map((tag) => (
-            <Chip variant="outlined" label={tag} />
+          {tags.map((tag, idx) => (
+            <Chip key={`${tag}-${idx}`} variant="outlined" label={tag} />
           ))}
         </span>
       </h3>
