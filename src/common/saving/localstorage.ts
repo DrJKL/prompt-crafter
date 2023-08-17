@@ -20,7 +20,7 @@ export const DEFAULT_RENDERING_OPTIONS: RenderingOptions = {
   dense: true,
 } as const;
 
-function getActivePromptLocal(): string {
+export function getActivePromptLocal(): string {
   return localStorage.getItem(ACTIVE_PROMPT) ?? '';
 }
 function saveActivePromptLocal(promptText: string) {

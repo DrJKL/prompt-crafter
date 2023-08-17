@@ -19,6 +19,7 @@ import { tokensView } from './common/rendering/PromptRender';
 import { useImmer } from 'use-immer';
 import {
   activePrompt$,
+  getActivePromptLocal,
   getRenderingOptions,
   saveActivePrompt,
   savePrompt,
@@ -28,7 +29,7 @@ import {
 /** LocalStorage keys */
 
 function App() {
-  const [promptText, setPromptText] = useState<string | null>(null);
+  const [promptText, setPromptText] = useState<string>(getActivePromptLocal());
   const [renderingOptions, setRenderingOptions] = useImmer(
     getRenderingOptions(),
   );
@@ -43,7 +44,7 @@ function App() {
     return () => sub.unsubscribe();
   }, []);
   useEffect(() => {
-    if (promptText == null) {
+    if (promptText === null) {
       return;
     }
     saveActivePrompt(promptText);
@@ -67,7 +68,7 @@ function App() {
   }
 
   function handleEditorTextChange(value: string | undefined) {
-    if (value) {
+    if (value !== undefined) {
       setPromptText(value);
     }
   }
