@@ -21,15 +21,19 @@ import {
   activePrompt$,
   getActivePromptLocal,
   getRenderingOptions,
+  getSavedPromptsLocal,
   saveActivePrompt,
   savePrompt,
   saveRenderingOptions,
+  savedPrompts$,
 } from './common/saving/localstorage';
+import { SavedPromptDisplay } from './components/SavedPrompt';
 
 /** LocalStorage keys */
 
 function App() {
   const [promptText, setPromptText] = useState<string>(getActivePromptLocal());
+  const [savedPrompts, setSavedPrompts] = useState(getSavedPromptsLocal());
   const [renderingOptions, setRenderingOptions] = useImmer(
     getRenderingOptions(),
   );
@@ -43,10 +47,13 @@ function App() {
     const sub = activePrompt$.subscribe((prompt) => setPromptText(prompt));
     return () => sub.unsubscribe();
   }, []);
+
   useEffect(() => {
-    if (promptText === null) {
-      return;
-    }
+    const sub = savedPrompts$.subscribe((prompts) => setSavedPrompts(prompts));
+    return () => sub.unsubscribe();
+  }, []);
+
+  useEffect(() => {
     saveActivePrompt(promptText);
   }, [promptText]);
 
@@ -125,12 +132,20 @@ function App() {
               </div>
             </Fill>
             <BottomResizable
-              size="10px"
+              size={'3rem'}
               minimumSize={10}
               className="bg-gradient-to-tr from-stone-500 to-blue-800 p-2 text-xl font-mono opacity-70">
-              <Typography variant="h6" component="h2" className="pl-6">
-                Saved
+              <Typography
+                variant="h6"
+                component="h2"
+                className="select-none cursor-default">
+                Saved Prompts
               </Typography>
+              <div>
+                {savedPrompts.map((prompt) => (
+                  <SavedPromptDisplay prompt={prompt} />
+                ))}
+              </div>
             </BottomResizable>
           </Fill>
         </Fill>

@@ -1,6 +1,6 @@
 import { RenderingOptions } from './../rendering/RenderType';
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, Observable, ReplaySubject, Subject, of } from 'rxjs';
+import { scan, takeUntil } from 'rxjs/operators';
 
 import {
   RenderingOptionsSchema,
@@ -43,13 +43,11 @@ export function saveRenderingOptions(renderingOptions: RenderingOptions) {
   localStorage.setItem(RENDER_OPTIONS, JSON.stringify(renderingOptions));
 }
 
-export function savePrompt(newPrompt: SavedPrompt) {
-  const existingSave = getSavedPrompts();
-  const newSave = [...existingSave, newPrompt];
-  localStorage.setItem(SAVED_PROMPTS, JSON.stringify(newSave));
+function savePromptsLocal(newPrompts: SavedPrompts) {
+  localStorage.setItem(SAVED_PROMPTS, JSON.stringify(newPrompts));
 }
 
-export function getSavedPrompts(): SavedPrompts {
+export function getSavedPromptsLocal(): SavedPrompts {
   const currentValue = localStorage.getItem(SAVED_PROMPTS);
   const parsedMaybe = SavedPromptsSchema.safeParse(
     JSON.parse(currentValue ?? '[]'),
@@ -63,17 +61,35 @@ export function getSavedPrompts(): SavedPrompts {
 
 /* Local state */
 const activePromptSubject = new BehaviorSubject(getActivePromptLocal());
+const savedPromptInputSubject = new Subject<SavedPrompt>();
+
+const savedPromptsComposed = savedPromptInputSubject.pipe(
+  scan(
+    (existingPrompts, newPrompt) => [...existingPrompts, newPrompt],
+    getSavedPromptsLocal(),
+  ),
+);
 
 /* Exports */
 export const cleanupLocalStorageSubscriptions$ = new ReplaySubject<void>();
+
 export const activePrompt$: Observable<string> = activePromptSubject;
 export function saveActivePrompt(promptText: string) {
   activePromptSubject.next(promptText);
 }
-
+export const savedPrompts$: Observable<SavedPrompts> = savedPromptsComposed;
+export function savePrompt(prompt: SavedPrompt) {
+  savedPromptInputSubject.next(prompt);
+}
 /* Persistence */
 activePrompt$
   .pipe(takeUntil(cleanupLocalStorageSubscriptions$))
   .subscribe((prompt) => {
     saveActivePromptLocal(prompt);
+  });
+
+savedPrompts$
+  .pipe(takeUntil(cleanupLocalStorageSubscriptions$))
+  .subscribe((newPrompts) => {
+    savePromptsLocal(newPrompts);
   });
