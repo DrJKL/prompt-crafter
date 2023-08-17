@@ -1,4 +1,10 @@
-import { CssBaseline, Typography, Snackbar, IconButton } from '@mui/material';
+import {
+  CssBaseline,
+  Typography,
+  Snackbar,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
 import { Editor } from './components/Editor';
 import { useEffect, useRef, useState } from 'react';
 import { useMonaco } from '@monaco-editor/react';
@@ -173,9 +179,13 @@ function App() {
           <HistoryEdu color="secondary" />
           <span>
             Made with love by{' '}
-            <a target="_blank" href="https://github.com/drjkl/prompt-crafter">
-              DrJKL
-            </a>
+            <Tooltip
+              title="Who likes to flaunt color and theming principles"
+              enterDelay={2000}>
+              <a target="_blank" href="https://github.com/drjkl/prompt-crafter">
+                DrJKL
+              </a>
+            </Tooltip>
           </span>
           <HistoryEdu color="secondary" />
         </Bottom>
