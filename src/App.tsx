@@ -18,7 +18,7 @@ import { nextType } from './common/rendering/RenderType';
 import { tokensView } from './common/rendering/PromptRender';
 import { useImmer } from 'use-immer';
 import {
-  getActivePrompt,
+  activePrompt$,
   getRenderingOptions,
   saveActivePrompt,
   savePrompt,
@@ -28,7 +28,7 @@ import {
 /** LocalStorage keys */
 
 function App() {
-  const [promptText, setPromptText] = useState(getActivePrompt());
+  const [promptText, setPromptText] = useState<string | null>(null);
   const [renderingOptions, setRenderingOptions] = useImmer(
     getRenderingOptions(),
   );
@@ -39,6 +39,13 @@ function App() {
   const renderedViewRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    const sub = activePrompt$.subscribe((prompt) => setPromptText(prompt));
+    return () => sub.unsubscribe();
+  }, []);
+  useEffect(() => {
+    if (promptText == null) {
+      return;
+    }
     saveActivePrompt(promptText);
   }, [promptText]);
 
