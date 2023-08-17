@@ -4,7 +4,14 @@ export const RENDER_TYPES = [
   'parsed',
   'parsed-formatted',
 ] as const;
+
 export type RenderType = (typeof RENDER_TYPES)[number];
+
+export interface RenderingOptions {
+  renderType: RenderType;
+  fancy: boolean;
+  dense: boolean;
+}
 
 export function isRenderType(typeMaybe: unknown): typeMaybe is RenderType {
   return (
@@ -16,10 +23,4 @@ export function isRenderType(typeMaybe: unknown): typeMaybe is RenderType {
 export function nextType(currentType: RenderType): RenderType {
   const currentRender = RENDER_TYPES.indexOf(currentType);
   return RENDER_TYPES[(currentRender + 1) % RENDER_TYPES.length];
-}
-
-export interface RenderingOptions {
-  renderType: RenderType;
-  fancy: boolean;
-  dense: boolean;
 }

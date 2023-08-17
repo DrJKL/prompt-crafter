@@ -21,6 +21,7 @@ import {
   getActivePrompt,
   getRenderingOptions,
   saveActivePrompt,
+  savePrompt,
   saveRenderingOptions,
 } from './common/saving/localstorage';
 
@@ -102,8 +103,9 @@ function App() {
           <LeftResizable size="50%">
             <Editor
               onMount={handleEditorDidMount}
-              defaultValue={promptText}
+              value={promptText}
               onChange={handleEditorTextChange}
+              handleSave={savePrompt}
             />
           </LeftResizable>
           <Fill>
