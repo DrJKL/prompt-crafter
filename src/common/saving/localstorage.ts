@@ -36,6 +36,13 @@ function saveActivePromptNameLocal(promptName: string) {
   localStorage.setItem(ACTIVE_PROMPT_NAME, promptName);
 }
 
+export function getActivePromptTagsLocal(): string[] {
+  return JSON.parse(localStorage.getItem(ACTIVE_PROMPT_TAGS) ?? '[]');
+}
+function saveActivePromptTagsLocal(promptTags: string[]) {
+  localStorage.setItem(ACTIVE_PROMPT_TAGS, JSON.stringify(promptTags));
+}
+
 export function getRenderingOptions(): RenderingOptions {
   const currentValue = localStorage.getItem(RENDER_OPTIONS);
   const parsedMaybe = RenderingOptionsSchema.safeParse(
@@ -71,6 +78,7 @@ export function getSavedPromptsLocal(): SavedPrompts {
 /* Local state */
 const activePromptSubject = new BehaviorSubject(getActivePromptLocal());
 const activePromptNameSubject = new BehaviorSubject(getActivePromptNameLocal());
+const activePromptTagsSubject = new BehaviorSubject(getActivePromptTagsLocal());
 const savedPromptInputSubject = new Subject<SavedPrompt>();
 
 const savedPromptsComposed = savedPromptInputSubject.pipe(
@@ -91,6 +99,10 @@ export const activePromptName$: Observable<string> = activePromptNameSubject;
 export function saveActivePromptName(promptName: string) {
   activePromptNameSubject.next(promptName);
 }
+export const activePromptTags$: Observable<string[]> = activePromptTagsSubject;
+export function saveActivePromptTags(promptTags: string[]) {
+  activePromptTagsSubject.next(promptTags);
+}
 export const savedPrompts$: Observable<SavedPrompts> = savedPromptsComposed;
 export function savePrompt(prompt: SavedPrompt) {
   savedPromptInputSubject.next(prompt);
@@ -106,6 +118,12 @@ activePromptName$
   .pipe(takeUntil(cleanupLocalStorageSubscriptions$))
   .subscribe((name) => {
     saveActivePromptNameLocal(name);
+  });
+
+activePromptTags$
+  .pipe(takeUntil(cleanupLocalStorageSubscriptions$))
+  .subscribe((tags) => {
+    saveActivePromptTagsLocal(tags);
   });
 
 savedPrompts$
