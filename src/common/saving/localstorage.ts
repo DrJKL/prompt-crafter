@@ -1,5 +1,5 @@
 import { RenderingOptions } from './../rendering/RenderType';
-import { BehaviorSubject, Observable, ReplaySubject, Subject, of } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 import { scan, takeUntil } from 'rxjs/operators';
 
 import {
