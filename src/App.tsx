@@ -159,15 +159,15 @@ function App() {
               trackSize
               onResizeEnd={(newSize) => setSavedPromptSectionHeight(newSize)}
               minimumSize={minHeight}
-              className="bg-gradient-to-tr from-stone-500 to-blue-800 p-2 text-xl font-mono opacity-70">
+              className="bg-gradient-to-tr from-stone-500 to-blue-800 p-2 text-xl font-mono opacity-70 flex flex-col">
               <Typography
                 variant="h6"
                 component="h2"
-                className="select-none cursor-default"
+                className="select-none cursor-default flex-shrink"
                 onDoubleClick={() => resizeSavedPrompts()}>
                 Saved Prompts
               </Typography>
-              <div>
+              <div className="overflow-y-auto flex-grow-0">
                 {savedPrompts.map((prompt, idx) => (
                   <SavedPromptDisplay key={idx} prompt={prompt} />
                 ))}
