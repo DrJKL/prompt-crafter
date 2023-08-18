@@ -3,8 +3,13 @@ import _ from 'lodash';
 import TextField from '@mui/material/TextField';
 import { Autocomplete, Toolbar, Button } from '@mui/material';
 import { Save } from '@mui/icons-material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SavedPrompt } from '../common/saving/types';
+import {
+  activePromptName$,
+  getActivePromptNameLocal,
+  saveActivePromptName,
+} from '../common/saving/localstorage';
 
 interface AdditionalEditorProps {
   handleSave: (promptDetails: SavedPrompt) => void;
@@ -25,13 +30,22 @@ const DEFAULT_OPTIONS: EditorProps = {
 export function Editor(props: EditorProps & AdditionalEditorProps) {
   const withDefaults = _.merge({}, DEFAULT_OPTIONS, props);
   const { handleSave } = withDefaults;
-  const [promptName, setPromptName] = useState('');
+  const [promptName, setPromptName] = useState(getActivePromptNameLocal());
   const [promptTags, setPromptTags] = useState<string[]>([]);
   const promptDetails: SavedPrompt = {
     name: promptName,
     tags: promptTags,
     contents: withDefaults.value ?? '',
   };
+
+  useEffect(() => {
+    const sub = activePromptName$.subscribe((name) => setPromptName(name));
+    return () => sub.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    saveActivePromptName(promptName);
+  }, [promptName]);
 
   return (
     <>

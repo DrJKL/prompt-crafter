@@ -10,6 +10,8 @@ import {
 } from './types';
 
 /** Keys */
+const ACTIVE_PROMPT_NAME = 'pc.active_prompt.name' as const;
+const ACTIVE_PROMPT_TAGS = 'pc.active_prompt.tags' as const;
 const ACTIVE_PROMPT = 'pc.active_prompt' as const;
 const RENDER_OPTIONS = 'pc.rendering_options' as const;
 const SAVED_PROMPTS = 'pc.saved_prompts' as const;
@@ -25,6 +27,13 @@ export function getActivePromptLocal(): string {
 }
 function saveActivePromptLocal(promptText: string) {
   localStorage.setItem(ACTIVE_PROMPT, promptText);
+}
+
+export function getActivePromptNameLocal(): string {
+  return localStorage.getItem(ACTIVE_PROMPT_NAME) ?? '';
+}
+function saveActivePromptNameLocal(promptName: string) {
+  localStorage.setItem(ACTIVE_PROMPT_NAME, promptName);
 }
 
 export function getRenderingOptions(): RenderingOptions {
@@ -61,6 +70,7 @@ export function getSavedPromptsLocal(): SavedPrompts {
 
 /* Local state */
 const activePromptSubject = new BehaviorSubject(getActivePromptLocal());
+const activePromptNameSubject = new BehaviorSubject(getActivePromptNameLocal());
 const savedPromptInputSubject = new Subject<SavedPrompt>();
 
 const savedPromptsComposed = savedPromptInputSubject.pipe(
@@ -77,6 +87,10 @@ export const activePrompt$: Observable<string> = activePromptSubject;
 export function saveActivePrompt(promptText: string) {
   activePromptSubject.next(promptText);
 }
+export const activePromptName$: Observable<string> = activePromptNameSubject;
+export function saveActivePromptName(promptName: string) {
+  activePromptNameSubject.next(promptName);
+}
 export const savedPrompts$: Observable<SavedPrompts> = savedPromptsComposed;
 export function savePrompt(prompt: SavedPrompt) {
   savedPromptInputSubject.next(prompt);
@@ -86,6 +100,12 @@ activePrompt$
   .pipe(takeUntil(cleanupLocalStorageSubscriptions$))
   .subscribe((prompt) => {
     saveActivePromptLocal(prompt);
+  });
+
+activePromptName$
+  .pipe(takeUntil(cleanupLocalStorageSubscriptions$))
+  .subscribe((name) => {
+    saveActivePromptNameLocal(name);
   });
 
 savedPrompts$
