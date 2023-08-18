@@ -26,7 +26,7 @@ export function SavedPromptDisplay({ prompt }: SavedPromptDisplayProps) {
     <div className="py-1">
       <h3 className="flex justify-between pb-2">
         <span
-          className=" flex-shrink cursor-pointer select-none"
+          className=" flex-shrink cursor-pointer select-none font-[cursive]"
           onClick={() => setOpen(!open)}>
           {name || 'UNNAMED'}
         </span>
