@@ -9,7 +9,7 @@ import { Editor } from './components/Editor';
 import { useEffect, useRef, useState } from 'react';
 import { useMonaco } from '@monaco-editor/react';
 import { conf, language } from './common/sdprompt_monaco';
-import monaco from 'monaco-editor';
+import monaco, { KeyCode, KeyMod } from 'monaco-editor';
 import {
   Bottom,
   BottomResizable,
@@ -35,6 +35,7 @@ import {
 } from './common/saving/localstorage';
 import { SavedPromptDisplay } from './components/SavedPrompt';
 import { SizeUnit } from 'react-spaces/dist/core-types';
+import { editAttentionMonaco } from './common/tweaks/edit_attention';
 
 const minHeight =
   3 * parseInt(getComputedStyle(document.documentElement)?.fontSize);
@@ -48,6 +49,10 @@ function App() {
   const [showCopySnackbar, setShowCopySnackbar] = useState(false);
   const [savedPromptSectionHeight, setSavedPromptSectionHeight] =
     useState<SizeUnit>(minHeight);
+  const [editorKey, setEditorKey] = useState(1);
+  function incrementEditorKey() {
+    setEditorKey(editorKey + 1);
+  }
 
   const monaco = useMonaco();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -82,6 +87,12 @@ function App() {
 
   function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
     editorRef.current = editor;
+    editor.addCommand(KeyMod.CtrlCmd | KeyCode.UpArrow, (args) => {
+      editAttentionMonaco(editor, 'up');
+    });
+    editor.addCommand(KeyMod.CtrlCmd | KeyCode.DownArrow, (args) => {
+      editAttentionMonaco(editor, 'down');
+    });
   }
 
   function handleEditorTextChange(value: string | undefined) {
@@ -140,6 +151,7 @@ function App() {
         <Fill className="p-4 pb-10">
           <LeftResizable size="50%">
             <Editor
+              key={editorKey}
               onMount={handleEditorDidMount}
               value={promptText}
               onChange={handleEditorTextChange}
@@ -187,7 +199,8 @@ function App() {
               </a>
             </Tooltip>
           </span>
-          <HistoryEdu color="secondary" />
+          {/* Here to force-remount the editor. */}
+          <HistoryEdu color="secondary" onClick={incrementEditorKey} />
         </Bottom>
       </ViewPort>
       <Snackbar
