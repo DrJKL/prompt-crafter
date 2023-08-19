@@ -87,10 +87,10 @@ function App() {
 
   function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
     editorRef.current = editor;
-    editor.addCommand(KeyMod.CtrlCmd | KeyCode.UpArrow, (args) => {
+    editor.addCommand(KeyMod.CtrlCmd | KeyCode.UpArrow, () => {
       editAttentionMonaco(editor, 'up');
     });
-    editor.addCommand(KeyMod.CtrlCmd | KeyCode.DownArrow, (args) => {
+    editor.addCommand(KeyMod.CtrlCmd | KeyCode.DownArrow, () => {
       editAttentionMonaco(editor, 'down');
     });
   }
