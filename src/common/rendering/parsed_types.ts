@@ -1,5 +1,5 @@
-export type ChunkType = 'literal' | 'variants' | 'wildcard';
-export type Chunk = Wildcard | Literal | Variants;
+export type ChunkType = 'literal' | 'variants' | 'wildcard' | 'group';
+export type Chunk = Wildcard | Literal | Variants | Group;
 
 export interface Wildcard {
   readonly type: 'wildcard';
@@ -9,6 +9,11 @@ export interface Wildcard {
 export interface Literal {
   readonly type: 'literal';
   readonly value: string;
+}
+export interface Group {
+  readonly type: 'group';
+  readonly chunks: readonly Chunk[];
+  readonly weight: number;
 }
 
 export interface Variants {

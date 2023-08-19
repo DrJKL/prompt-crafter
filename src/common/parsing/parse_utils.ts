@@ -3,6 +3,7 @@ import {
   Chunk,
   ChunkType,
   DEFAULT_BOUND,
+  Group,
   Literal,
   Variants,
   Wildcard,
@@ -37,10 +38,21 @@ export function constructVariants([, boundMaybe, variants]: any[]): Variants {
 }
 
 // eslint-disable-next-line
-export function constructLiteral([literalToken]: any[]): Literal {
+export function constructLiteral(literalToken: any[]): Literal {
   return {
     type: 'literal',
-    value: literalToken.value,
+    value: `${literalToken}`,
+  };
+}
+
+// eslint-disable-next-line
+export function constructGroup(data: any[]): Group {
+  const [chunks] = data[1];
+  const weight = data[2] ?? '1';
+  return {
+    type: 'group',
+    chunks,
+    weight: Number(weight),
   };
 }
 

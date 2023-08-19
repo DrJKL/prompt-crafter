@@ -4,6 +4,8 @@ const wildcard_enclosure = '__' as const;
 export const basicPromptLexer = moo.compile({
   vstart: /\{\s*?/,
   vend: /\s*?\}/,
+  gstart: '(',
+  gend: ')',
   bar: /\s*\|\s*/,
   bound: [
     /\d+\$\$(?:[^$|}]+?\$\$)?/, // min
@@ -19,5 +21,5 @@ export const basicPromptLexer = moo.compile({
     value: (x) =>
       x.slice(wildcard_enclosure.length, -wildcard_enclosure.length),
   },
-  literal: { match: /[^#$|{}]+/, lineBreaks: true },
+  literal: { match: /[^#$|{}()]+/, lineBreaks: true },
 });

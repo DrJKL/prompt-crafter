@@ -6,16 +6,17 @@ function id(d: any[]): any { return d[0]; }
 declare var vstart: any;
 declare var vend: any;
 declare var bar: any;
-declare var number: any;
-declare var integer: any;
 declare var bound: any;
 declare var wildcard: any;
 declare var literal: any;
+declare var gstart: any;
+declare var weight: any;
+declare var gend: any;
 
     // eslint-disable
     // @ts-nocheck
     import {basicPromptLexer} from './sdprompt_lexer';
-    import {constructVariants, flattenVariantsList, constructBound, constructWildcard, constructLiteral} from './parse_utils';
+    import {constructVariants, flattenVariantsList, constructBound, constructWildcard, constructLiteral, constructGroup} from './parse_utils';
     
     /* Utility */
     const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
@@ -58,6 +59,7 @@ const grammar: Grammar = {
     {"name": "variant_chunk$subexpression$1", "symbols": ["variants"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["wildcard"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["literal_sequence"]},
+    {"name": "variant_chunk$subexpression$1", "symbols": ["group"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["unknown"]},
     {"name": "variant_chunk", "symbols": ["variant_chunk$subexpression$1"], "postprocess": unwrap},
     {"name": "variants$ebnf$1", "symbols": ["bound"], "postprocess": id},
@@ -72,8 +74,6 @@ const grammar: Grammar = {
     {"name": "variant$ebnf$1", "symbols": ["weight"], "postprocess": id},
     {"name": "variant$ebnf$1", "symbols": [], "postprocess": () => null},
     {"name": "variant", "symbols": ["variant$ebnf$1", "variant_prompt"], "postprocess": data => data[1]},
-    {"name": "weight", "symbols": [(basicPromptLexer.has("number") ? {type: "number"} : number)]},
-    {"name": "weight", "symbols": [(basicPromptLexer.has("integer") ? {type: "integer"} : integer)], "postprocess": tag('weight')},
     {"name": "bound", "symbols": [(basicPromptLexer.has("bound") ? {type: "bound"} : bound)], "postprocess": constructBound},
     {"name": "wildcard", "symbols": [(basicPromptLexer.has("wildcard") ? {type: "wildcard"} : wildcard)], "postprocess": constructWildcard},
     {"name": "literal_sequence$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)], "postprocess": constructLiteral},
@@ -81,6 +81,10 @@ const grammar: Grammar = {
     {"name": "literal_sequence$ebnf$1$subexpression$2", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)], "postprocess": constructLiteral},
     {"name": "literal_sequence$ebnf$1", "symbols": ["literal_sequence$ebnf$1", "literal_sequence$ebnf$1$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "literal_sequence", "symbols": ["literal_sequence$ebnf$1"], "postprocess": unwrap},
+    {"name": "group$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("weight") ? {type: "weight"} : weight)], "postprocess": id},
+    {"name": "group$ebnf$1", "symbols": ["group$ebnf$1$subexpression$1"], "postprocess": id},
+    {"name": "group$ebnf$1", "symbols": [], "postprocess": () => null},
+    {"name": "group", "symbols": [(basicPromptLexer.has("gstart") ? {type: "gstart"} : gstart), "variant", "group$ebnf$1", (basicPromptLexer.has("gend") ? {type: "gend"} : gend)], "postprocess": constructGroup},
     {"name": "unknown$ebnf$1", "symbols": []},
     {"name": "unknown$ebnf$1", "symbols": ["unknown$ebnf$1", /[\s\n]/], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "unknown", "symbols": [(basicPromptLexer.has("vstart") ? {type: "vstart"} : vstart), "unknown$ebnf$1"]}

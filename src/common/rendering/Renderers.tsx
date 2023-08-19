@@ -1,5 +1,5 @@
 import { MouseEvent, ReactNode, useState } from 'react';
-import { Bound, Chunk, Literal, Variants } from './parsed_types';
+import { Bound, Chunk, Group, Literal, Variants } from './parsed_types';
 import { MenuItem, Menu } from '@mui/material';
 
 interface KeyPath {
@@ -22,6 +22,10 @@ interface BoundProps extends KeyPath {
 
 interface ChunkProps extends KeyPath {
   chunk: Chunk;
+}
+
+interface GroupProps extends KeyPath {
+  group: Group;
 }
 
 function LiteralView({ literal }: LiteralProps) {
@@ -53,6 +57,8 @@ function toText(chunk: Chunk | undefined): ReactNode {
       return chunk.value;
     case 'wildcard':
       return chunk.path;
+    case 'group':
+      return chunk.chunks.map(toText).join(',');
   }
   return null;
 }
@@ -182,6 +188,27 @@ function BoundView({ bound }: BoundProps) {
   );
 }
 
+function GroupView({ group, path = [0], handleChange, fancy }: GroupProps) {
+  return (
+    <span className="text-orange-400 font-bold">
+      (
+      {group.chunks.map((chunk, idx) => {
+        const newPath = [...path, idx];
+        return (
+          <ChunkView
+            chunk={chunk}
+            key={`group-${newPath.join('-')}`}
+            path={newPath}
+            handleChange={handleChange}
+            fancy={fancy}
+          />
+        );
+      })}
+      :{group.weight})
+    </span>
+  );
+}
+
 export function ChunkView({
   chunk,
   path = [0],
@@ -190,6 +217,10 @@ export function ChunkView({
 }: ChunkProps): ReactNode {
   if (!chunk) {
     return <>Ummmm</>;
+  }
+  console.log('here', chunk);
+  if (Array.isArray(chunk)) {
+    // debugger;
   }
   switch (chunk.type) {
     case 'literal':
@@ -212,6 +243,15 @@ export function ChunkView({
       );
     case 'wildcard':
       return <span className="text-amber-400">{chunk.path}</span>;
+    case 'group':
+      return (
+        <GroupView
+          path={path}
+          fancy={fancy}
+          group={chunk}
+          handleChange={handleChange}
+        />
+      );
   }
   return (
     <div className="whitespace-pre-wrap bg-red-600 bg-opacity-50 text-white">

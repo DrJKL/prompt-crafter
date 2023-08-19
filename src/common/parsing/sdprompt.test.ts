@@ -10,18 +10,35 @@ describe('parser', () => {
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
     const prompt = `a picture of a dog wearing a fancy hat`;
     parser.feed(prompt);
+    expect(parser.results.length).toBe(1);
+  });
+
+  it('should handle grouping', () => {
+    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+    const prompt = `(a picture) of a (dog) (wearing a fancy) hat`;
+    parser.feed(prompt);
+    expect(parser.results.length).toBe(1);
+  });
+
+  it('should handle grouping with weights', () => {
+    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+    const prompt = `(a picture:1.1) of a (dog:1.2) (wearing a fancy:0.8) hat`;
+    parser.feed(prompt);
+    expect(parser.results.length).toBe(1);
   });
 
   it('should lex a prompt with wildcards', () => {
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
     const prompt = `a picture of a {dog|cat|frog} wearing a fancy hat`;
     parser.feed(prompt);
+    expect(parser.results.length).toBe(1);
   });
 
   it('should parse a long dynamic prompt', () => {
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
     const prompt = LANDSCAPE_VERY_DYNAMIC;
     parser.feed(prompt);
+    expect(parser.results.length).toBe(1);
   });
 
   it('should handle nested wildcards', () => {
