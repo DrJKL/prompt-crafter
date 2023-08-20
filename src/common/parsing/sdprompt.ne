@@ -21,7 +21,7 @@ variant          -> weight:? variant_prompt                                    {
 
 bound            -> %bound                                                     {% constructBound %}
 
-wildcard         -> %wildcard                                                  {% constructWildcard %}
+wildcard         -> %wildcardstart %literal %wildcardend                       {% constructWildcard %}
 literal_sequence -> (%literal {% constructLiteral %}):+                        {% unwrap %}
-group            -> %gstart variant (%weight {% id %}):? %gend                 {% constructGroup %}
+group            -> %gstart variant:? (%weight {% id %}):? %gend               {% constructGroup %}
 unknown          -> %vstart [\s\n]:*

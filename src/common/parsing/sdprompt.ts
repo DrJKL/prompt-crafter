@@ -7,8 +7,9 @@ declare var vstart: any;
 declare var vend: any;
 declare var bar: any;
 declare var bound: any;
-declare var wildcard: any;
+declare var wildcardstart: any;
 declare var literal: any;
+declare var wildcardend: any;
 declare var gstart: any;
 declare var weight: any;
 declare var gend: any;
@@ -75,16 +76,18 @@ const grammar: Grammar = {
     {"name": "variant$ebnf$1", "symbols": [], "postprocess": () => null},
     {"name": "variant", "symbols": ["variant$ebnf$1", "variant_prompt"], "postprocess": data => data[1]},
     {"name": "bound", "symbols": [(basicPromptLexer.has("bound") ? {type: "bound"} : bound)], "postprocess": constructBound},
-    {"name": "wildcard", "symbols": [(basicPromptLexer.has("wildcard") ? {type: "wildcard"} : wildcard)], "postprocess": constructWildcard},
+    {"name": "wildcard", "symbols": [(basicPromptLexer.has("wildcardstart") ? {type: "wildcardstart"} : wildcardstart), (basicPromptLexer.has("literal") ? {type: "literal"} : literal), (basicPromptLexer.has("wildcardend") ? {type: "wildcardend"} : wildcardend)], "postprocess": constructWildcard},
     {"name": "literal_sequence$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)], "postprocess": constructLiteral},
     {"name": "literal_sequence$ebnf$1", "symbols": ["literal_sequence$ebnf$1$subexpression$1"]},
     {"name": "literal_sequence$ebnf$1$subexpression$2", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)], "postprocess": constructLiteral},
     {"name": "literal_sequence$ebnf$1", "symbols": ["literal_sequence$ebnf$1", "literal_sequence$ebnf$1$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "literal_sequence", "symbols": ["literal_sequence$ebnf$1"], "postprocess": unwrap},
-    {"name": "group$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("weight") ? {type: "weight"} : weight)], "postprocess": id},
-    {"name": "group$ebnf$1", "symbols": ["group$ebnf$1$subexpression$1"], "postprocess": id},
+    {"name": "group$ebnf$1", "symbols": ["variant"], "postprocess": id},
     {"name": "group$ebnf$1", "symbols": [], "postprocess": () => null},
-    {"name": "group", "symbols": [(basicPromptLexer.has("gstart") ? {type: "gstart"} : gstart), "variant", "group$ebnf$1", (basicPromptLexer.has("gend") ? {type: "gend"} : gend)], "postprocess": constructGroup},
+    {"name": "group$ebnf$2$subexpression$1", "symbols": [(basicPromptLexer.has("weight") ? {type: "weight"} : weight)], "postprocess": id},
+    {"name": "group$ebnf$2", "symbols": ["group$ebnf$2$subexpression$1"], "postprocess": id},
+    {"name": "group$ebnf$2", "symbols": [], "postprocess": () => null},
+    {"name": "group", "symbols": [(basicPromptLexer.has("gstart") ? {type: "gstart"} : gstart), "group$ebnf$1", "group$ebnf$2", (basicPromptLexer.has("gend") ? {type: "gend"} : gend)], "postprocess": constructGroup},
     {"name": "unknown$ebnf$1", "symbols": []},
     {"name": "unknown$ebnf$1", "symbols": ["unknown$ebnf$1", /[\s\n]/], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "unknown", "symbols": [(basicPromptLexer.has("vstart") ? {type: "vstart"} : vstart), "unknown$ebnf$1"]}

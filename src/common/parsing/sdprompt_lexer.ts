@@ -1,11 +1,19 @@
-import moo from 'moo';
+import moo, { Rules } from 'moo';
 const wildcard_enclosure = '__' as const;
 
-export const basicPromptLexer = moo.compile({
-  vstart: /\{\s*?/,
-  vend: /\s*?\}/,
-  gstart: '(',
-  gend: ')',
+const mainRule: Rules = {
+  vstart: { match: /\{\s*?/, push: 'variant' },
+  gstart: { match: '(', push: 'group' },
+  wildcardstart: {
+    match: wildcard_enclosure,
+    push: 'wildcard',
+  },
+
+  literal: { match: /[^#|${}()_]+/, lineBreaks: true },
+};
+
+const variantRule: Rules = {
+  vend: { match: /\s*?\}/, pop: 1 },
   bar: /\s*\|\s*/,
   bound: [
     /\d+\$\$(?:[^$|}]+?\$\$)?/, // min
@@ -14,12 +22,28 @@ export const basicPromptLexer = moo.compile({
     /\d+-\d+\$\$(?:[^$|}]+?\$\$)?/, // min-max
     /\$\$(?:[^$|}]+?\$\$)?/, // no-bound
   ],
-  wildcard: {
-    match: new RegExp(
-      `${wildcard_enclosure}[^{}#\\n\\s]+${wildcard_enclosure}`,
-    ),
-    value: (x) =>
-      x.slice(wildcard_enclosure.length, -wildcard_enclosure.length),
-  },
-  literal: { match: /[^#$|{}()]+/, lineBreaks: true },
+
+  literal: { match: /[^|${}]+/, lineBreaks: true },
+  ...mainRule,
+};
+
+const groupRule: Rules = {
+  weight: { match: /:\d+(?:\.\d*)?(?=\))/ },
+  gend: { match: ')', pop: 1 },
+  literal: { match: /[^):]+/, lineBreaks: true },
+  ...mainRule,
+};
+
+const wildcardRule = {
+  wildcardend: { match: wildcard_enclosure, pop: 1 },
+
+  literal: { match: /[^]+/, lineBreaks: true },
+  ...mainRule,
+};
+
+export const basicPromptLexer = moo.states({
+  group: groupRule,
+  variant: variantRule,
+  wildcard: wildcardRule,
+  main: mainRule,
 });

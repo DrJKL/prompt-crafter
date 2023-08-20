@@ -45,7 +45,37 @@ describe('basicPromptLexer', () => {
     const result = Array.from(basicPromptLexer)
       .map((t) => t.type)
       .join(' ');
-    console.log(result);
+    expect(result).toBeTruthy();
+  });
+
+  it('should lex with groups', () => {
+    const prompt = `(a dog) with a (fancy hat)`;
+
+    basicPromptLexer.reset(prompt);
+
+    const result = Array.from(basicPromptLexer)
+      .map((t) => t.type)
+      .join(' ');
+    expect(result).toBeTruthy();
+  });
+
+  it('should lex with weighted groups', () => {
+    const prompt = `(a dog:0.9) with a (fancy hat:1.1)`;
+
+    basicPromptLexer.reset(prompt);
+
+    const result = Array.from(basicPromptLexer)
+      .map((t) => t.type)
+      .join(' ');
+    expect(result).toBeTruthy();
+  });
+  it('should handle wildcards', () => {
+    const prompt = `__foo/bar__ __baz__ __foo/bar/baz__`;
+
+    basicPromptLexer.reset(prompt);
+
+    const result = Array.from(basicPromptLexer).map((t) => t.type);
+    expect(result.filter((s) => s === 'literal')).toHaveLength(5);
     expect(result).toBeTruthy();
   });
 });

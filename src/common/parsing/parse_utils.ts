@@ -47,8 +47,9 @@ export function constructLiteral(literalToken: any[]): Literal {
 
 // eslint-disable-next-line
 export function constructGroup(data: any[]): Group {
-  const [chunks] = data[1];
+  const [chunks] = data[1] ?? [undefined, []];
   const weight = data[2] ?? '1';
+
   return {
     type: 'group',
     chunks,
@@ -77,7 +78,7 @@ export function constructBound([boundString]: any[]): Bound {
 }
 
 // eslint-disable-next-line
-export function constructWildcard([wildcardPath]: any[]): Wildcard {
+export function constructWildcard([, wildcardPath]: any[]): Wildcard {
   return {
     type: 'wildcard',
     path: wildcardPath.value,

@@ -242,7 +242,7 @@ export function ChunkView({
         />
       );
     case 'wildcard':
-      return <span className="text-amber-400">{chunk.path}</span>;
+      return <span className="text-amber-600">{chunk.path}</span>;
     case 'group':
       return (
         <GroupView
