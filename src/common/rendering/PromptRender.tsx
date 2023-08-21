@@ -21,41 +21,56 @@ export function tokensView(prompt: string, options: RenderingOptions) {
 }
 
 function rawView(prompt: string) {
-  basicPromptLexer.reset(prompt);
-  return (
-    <div className="whitespace-pre-wrap">
-      {Array.from(basicPromptLexer).map((token, idx) => (
-        <span key={`${idx}-${token}`}>{token.value}</span>
-      ))}
-    </div>
-  );
+  try {
+    basicPromptLexer.reset(prompt);
+    return (
+      <div className="whitespace-pre-wrap">
+        {Array.from(basicPromptLexer).map((token, idx) => (
+          <span key={`${idx}-${token}`}>{token.value}</span>
+        ))}
+      </div>
+    );
+  } catch (err: unknown) {
+    if (err instanceof Error) return <pre>{err.message}</pre>;
+    return <pre>{`${err}`}</pre>;
+  }
 }
 
 function tokenView(prompt: string) {
-  basicPromptLexer.reset(prompt);
-  return (
-    <div className="whitespace-pre-wrap">
-      {Array.from(basicPromptLexer).map((token, idx) => (
-        <Tooltip
-          key={idx}
-          title={JSON.stringify(token, null, 1)}
-          sx={{ '& .MuiTooltip-popper': { whiteSpace: 'pre-wrap' } }}>
-          <span key={`${idx}-${token}`}>{token.type} </span>
-        </Tooltip>
-      ))}
-    </div>
-  );
+  try {
+    basicPromptLexer.reset(prompt);
+
+    return (
+      <div className="whitespace-pre-wrap">
+        {Array.from(basicPromptLexer).map((token, idx) => (
+          <Tooltip
+            key={idx}
+            title={JSON.stringify(token, null, 1)}
+            sx={{ '& .MuiTooltip-popper': { whiteSpace: 'pre-wrap' } }}>
+            <span key={`${idx}-${token}`}>{token.type} </span>
+          </Tooltip>
+        ))}
+      </div>
+    );
+  } catch (err: unknown) {
+    if (err instanceof Error) return <pre>{err.message}</pre>;
+    return <pre>{`${err}`}</pre>;
+  }
 }
 
 function parseView(prompt: string) {
   const parser = new Parser(Grammar.fromCompiled(grammar));
   try {
     parser.feed(prompt);
-    return (
-      <div className="whitespace-pre-wrap">
-        {JSON.stringify(parser.results, null, 2)}
-      </div>
-    );
+    const allResults = parser.results;
+    return allResults.map(([parseResult]) => (
+      <>
+        <hr />
+        <div className="whitespace-pre-wrap">
+          {JSON.stringify(parseResult, null, 2)}
+        </div>
+      </>
+    ));
   } catch (error: unknown) {
     return (
       <div>
@@ -67,25 +82,45 @@ function parseView(prompt: string) {
 }
 
 function formattedParseView(prompt: string, fancy = true, dense = true) {
-  const parser = new Parser(Grammar.fromCompiled(grammar));
+  const parser = new Parser(Grammar.fromCompiled(grammar), {
+    keepHistory: true,
+  });
   try {
+    if (!prompt) {
+      return <div>No input to parse 😀</div>;
+    }
     parser.feed(prompt);
     if (!parser.results || !parser.results.length) {
-      return <div>Failed to parse...</div>;
+      return (
+        <>
+          <div>Failed to parse...</div>
+          <h2>Prompt</h2>
+          <pre className="bg-white text-black w-full min-h-[10em]">
+            {prompt}
+          </pre>
+        </>
+      );
     }
-    const [[results]]: Array<Array<Array<Chunk>>> = parser.results; // Strip outer Array
-
+    const allResults: Array<Array<Array<Chunk>>> = parser.results;
+    const ambiguousParse = allResults.length > 1;
     return (
-      <div className={dense ? 'whitespace-normal' : `whitespace-pre-line`}>
-        {results.map((chunk, idx) => (
-          <ChunkView
-            chunk={chunk}
-            path={[0, idx]}
-            fancy={fancy}
-            key={`${idx}-chunk-${JSON.stringify(chunk)}`}
-          />
+      <>
+        {allResults.map(([results], idx) => (
+          <div
+            key={`parse-result-${idx}`}
+            className={dense ? 'whitespace-normal' : `whitespace-pre-line`}>
+            {ambiguousParse && <div>{idx}</div>}
+            {results.map((chunk, idx) => (
+              <ChunkView
+                chunk={chunk}
+                path={[0, idx]}
+                fancy={fancy}
+                key={`${idx}-chunk-${JSON.stringify(chunk)}`}
+              />
+            ))}
+          </div>
         ))}
-      </div>
+      </>
     );
   } catch (error: unknown) {
     if (!(error instanceof Error)) {
