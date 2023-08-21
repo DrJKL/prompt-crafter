@@ -129,7 +129,7 @@ function FancyVariantView({
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        title={JSON.stringify(variants)}
+        title={pathToString('fancy-variant', path)}
         onClick={handleClick}>
         {variant &&
           ChunkView({
@@ -162,7 +162,7 @@ function FancyVariantView({
                 },
               }}
               onClick={(event) => selectVariant(event, v, idx)}
-              key={pathToString('fancy-variant', newPath)}>
+              key={pathToString('fancy-variant-option', newPath)}>
               {v &&
                 ChunkView({
                   chunk: v,
