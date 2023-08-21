@@ -189,10 +189,13 @@ function BoundView({ bound }: BoundProps) {
 }
 
 function GroupView({ group, path = [0], handleChange, fancy }: GroupProps) {
+  if (!group.chunks) {
+    return <div>This isn't a group: {`${JSON.stringify(group)}`}</div>;
+  }
   return (
     <span className="text-orange-400 font-bold">
       (
-      {group.chunks.map((chunk, idx) => {
+      {group.chunks?.map((chunk, idx) => {
         const newPath = [...path, idx];
         return (
           <ChunkView
@@ -216,11 +219,7 @@ export function ChunkView({
   fancy,
 }: ChunkProps): ReactNode {
   if (!chunk) {
-    return <>Ummmm</>;
-  }
-  console.log('here', chunk);
-  if (Array.isArray(chunk)) {
-    // debugger;
+    return <>Ummmm...</>;
   }
   switch (chunk.type) {
     case 'literal':
