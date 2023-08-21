@@ -51,14 +51,23 @@ function VariantView({ variants, path = [0], fancy }: VariantProps) {
   );
 }
 
-function toText(chunk: Chunk | undefined): ReactNode {
+function toText(chunk: Chunk | undefined, keyPath: KeyPath): ReactNode {
   switch (chunk?.type) {
     case 'literal':
       return chunk.value;
     case 'wildcard':
       return chunk.path;
     case 'group':
-      return chunk.chunks.map(toText).join(',');
+      return chunk.chunks.map((subChunk, idx) => {
+        const newPath = [...(keyPath.path ?? []), idx];
+        return (
+          <ChunkView
+            chunk={subChunk}
+            key={`group-chunk-${newPath.join('-')}`}
+            {...keyPath}
+          />
+        );
+      });
   }
   return null;
 }
@@ -87,6 +96,7 @@ function FancyVariantView({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
+    event.stopPropagation();
     setAnchorEl(event.currentTarget);
   }
   function handleClose() {
@@ -102,7 +112,8 @@ function FancyVariantView({
       handleClose();
     };
 
-  function selectVariant(chunk: Chunk, idx: number) {
+  function selectVariant(event: MouseEvent, chunk: Chunk, idx: number) {
+    event.stopPropagation();
     if (chunk.type === 'variants') {
       return;
     }
@@ -117,16 +128,26 @@ function FancyVariantView({
 
   return (
     <>
-      <a
-        className="text-pink-500 font-bold cursor-pointer hover:text-pink-800"
+      <span
+        className={`text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 ${
+          fancy
+            ? 'border-pink-500 border-2 rounded-md p-0.5 hover:border-pink-200'
+            : ''
+        }`}
         aria-roledescription="button"
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         title={JSON.stringify(variants)}
         onClick={handleClick}>
-        {toText(variant)}
-      </a>
+        {variant &&
+          ChunkView({
+            chunk: variant,
+            path,
+            handleChange,
+            fancy,
+          })}
+      </span>
 
       <Menu
         anchorEl={anchorEl}
@@ -149,16 +170,15 @@ function FancyVariantView({
                   },
                 },
               }}
-              onClick={() => selectVariant(v, idx)}
+              onClick={(event) => selectVariant(event, v, idx)}
               key={`fancy-variant-${newPath.join('-')}`}>
-              {v
-                ? ChunkView({
-                    chunk: v,
-                    path: newPath,
-                    handleChange: handleChangeInternal(idx),
-                    fancy,
-                  })
-                : null}
+              {v &&
+                ChunkView({
+                  chunk: v,
+                  path: newPath,
+                  handleChange: handleChangeInternal(idx),
+                  fancy,
+                })}
             </MenuItem>
           );
         })}
@@ -193,7 +213,12 @@ function GroupView({ group, path = [0], handleChange, fancy }: GroupProps) {
     return <div>This isn't a group: {`${JSON.stringify(group)}`}</div>;
   }
   return (
-    <span className="text-orange-400 font-bold">
+    <span
+      className={`${
+        fancy
+          ? 'border-red-500 border-opacity-50 border-2 rounded-md p-0.5'
+          : ''
+      } text-purple-200 font-bold`}>
       (
       {group.chunks?.map((chunk, idx) => {
         const newPath = [...path, idx];
