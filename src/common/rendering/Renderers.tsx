@@ -28,19 +28,31 @@ interface GroupProps extends KeyPath {
   group: Group;
 }
 
-function LiteralView({ literal }: LiteralProps) {
-  return <span className="text-pink-400 font-bold">{literal.value}</span>;
+function pathToString(prefix: string, path: number[]): string {
+  return `${prefix}-${path.join('-')}`;
+}
+
+function LiteralView({ literal, path = [0] }: LiteralProps) {
+  return (
+    <span
+      className="text-pink-400 font-bold"
+      title={pathToString('literal', path)}>
+      {literal.value}
+    </span>
+  );
 }
 
 function VariantView({ variants, path = [0], fancy }: VariantProps) {
   return (
-    <span className="text-blue-400">
+    <span className="text-blue-400" title={pathToString('basic-variant', path)}>
       {' { '}
       {variants.bound && <BoundView bound={variants.bound} path={path} />}
       {variants.variants?.flat().map((v, idx) => {
         const newPath = [...path, idx];
         return (
-          <span className="variant-option" key={`variant-${newPath.join('-')}`}>
+          <span
+            className="variant-option"
+            key={pathToString('variant', newPath)}>
             {idx > 0 ? ' | ' : ''}
             {v ? ChunkView({ chunk: v, fancy, path: newPath }) : ''}
           </span>
@@ -49,27 +61,6 @@ function VariantView({ variants, path = [0], fancy }: VariantProps) {
       {' } '}
     </span>
   );
-}
-
-function toText(chunk: Chunk | undefined, keyPath: KeyPath): ReactNode {
-  switch (chunk?.type) {
-    case 'literal':
-      return chunk.value;
-    case 'wildcard':
-      return chunk.path;
-    case 'group':
-      return chunk.chunks.map((subChunk, idx) => {
-        const newPath = [...(keyPath.path ?? []), idx];
-        return (
-          <ChunkView
-            chunk={subChunk}
-            key={`group-chunk-${newPath.join('-')}`}
-            {...keyPath}
-          />
-        );
-      });
-  }
-  return null;
 }
 
 function getLiteralFromVariants(
@@ -171,7 +162,7 @@ function FancyVariantView({
                 },
               }}
               onClick={(event) => selectVariant(event, v, idx)}
-              key={`fancy-variant-${newPath.join('-')}`}>
+              key={pathToString('fancy-variant', newPath)}>
               {v &&
                 ChunkView({
                   chunk: v,
@@ -187,18 +178,24 @@ function FancyVariantView({
   );
 }
 
-function BoundView({ bound }: BoundProps) {
+function BoundView({ bound, path = [0] }: BoundProps) {
   const defaultRange = bound.min === 1 && bound.max === 1;
   const defaultSeparator = bound.separator === ', ';
 
   const rangeSpan = (
-    <span className="text-emerald-600">
+    <span
+      className="text-emerald-600"
+      title={pathToString('bound-range', path)}>
       {bound.min}-{bound.max} $$
     </span>
   );
 
   const separatorSpan = (
-    <span className="text-emerald-400">{bound.separator}$$ </span>
+    <span
+      className="text-emerald-400"
+      title={pathToString('bound-separator', path)}>
+      {bound.separator}$${' '}
+    </span>
   );
   return (
     <>
@@ -225,7 +222,7 @@ function GroupView({ group, path = [0], handleChange, fancy }: GroupProps) {
         return (
           <ChunkView
             chunk={chunk}
-            key={`group-${newPath.join('-')}`}
+            key={pathToString('group', newPath)}
             path={newPath}
             handleChange={handleChange}
             fancy={fancy}
@@ -277,6 +274,7 @@ export function ChunkView({
         />
       );
   }
+  chunk satisfies never;
   return (
     <div className="whitespace-pre-wrap bg-red-600 bg-opacity-50 text-white">
       {JSON.stringify(chunk)}
