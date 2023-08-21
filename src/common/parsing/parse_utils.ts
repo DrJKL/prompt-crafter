@@ -47,9 +47,9 @@ export function constructLiteral(literalToken: any[]): Literal {
 
 // eslint-disable-next-line
 export function constructGroup(data: any[]): Group {
-  const [chunks] = data[1] ?? [undefined, []];
+  const contents = data[1];
   const weight = data[2] ?? '1';
-
+  const chunks = contents?.[0] ?? [];
   return {
     type: 'group',
     chunks,

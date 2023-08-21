@@ -1,6 +1,10 @@
 import moo, { Rules } from 'moo';
 const wildcard_enclosure = '__' as const;
 
+const WEIGHT_PARTIAL = '\\s*\\d+(?:\\.\\d*)?\\s*(?=\\))';
+const WEIGHT_PATTERN = `:${WEIGHT_PARTIAL}`;
+const ANTIWEIGHT_PATTERN = `:(?!${WEIGHT_PARTIAL})`;
+
 const mainRule: Rules = {
   vstart: { match: /\{\s*?/, push: 'variant' },
   gstart: { match: '(', push: 'group' },
@@ -9,12 +13,13 @@ const mainRule: Rules = {
     push: 'wildcard',
   },
 
-  literal: { match: /[^#|${}()_]+/, lineBreaks: true },
+  literal: {
+    match: new RegExp(`[^#|\${}()_]+`),
+    lineBreaks: true,
+  },
 };
 
 const variantRule: Rules = {
-  vend: { match: /\s*?\}/, pop: 1 },
-  bar: /\s*\|\s*/,
   bound: [
     /\d+\$\$(?:[^$|}]+?\$\$)?/, // min
     /-\d+\$\$(?:[^$|}]+?\$\$)?/, // min-omitted
@@ -22,28 +27,34 @@ const variantRule: Rules = {
     /\d+-\d+\$\$(?:[^$|}]+?\$\$)?/, // min-max
     /\$\$(?:[^$|}]+?\$\$)?/, // no-bound
   ],
-
-  literal: { match: /[^|${}]+/, lineBreaks: true },
   ...mainRule,
+  vend: { match: /\s*?\}/, pop: 1 },
+  bar: /\s*\|\s*/,
 };
 
 const groupRule: Rules = {
-  weight: { match: /:\d+(?:\.\d*)?(?=\))/ },
-  gend: { match: ')', pop: 1 },
-  literal: { match: /[^):]+/, lineBreaks: true },
   ...mainRule,
+  weight: {
+    match: new RegExp(WEIGHT_PATTERN),
+    value: (x: string) => x.substring(1),
+  },
+  gend: { match: ')', pop: 1 },
+  literal: {
+    match: new RegExp(
+      `(?:[^{}_():]|(?:${ANTIWEIGHT_PATTERN}))+(?!${WEIGHT_PATTERN})?`,
+    ),
+    lineBreaks: true,
+  },
 };
 
 const wildcardRule = {
-  wildcardend: { match: wildcard_enclosure, pop: 1 },
-
-  literal: { match: /[^]+/, lineBreaks: true },
   ...mainRule,
+  wildcardend: { match: wildcard_enclosure, pop: 1 },
 };
 
 export const basicPromptLexer = moo.states({
+  main: mainRule,
   group: groupRule,
   variant: variantRule,
   wildcard: wildcardRule,
-  main: mainRule,
 });

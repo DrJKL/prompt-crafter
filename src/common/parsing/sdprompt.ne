@@ -12,16 +12,14 @@
 
 @lexer basicPromptLexer
 
-variant_prompt   -> (variant_chunk {% id %}):*                          
+variant_prompt   -> (variant_chunk {% id %}):+                         
 
-variant_chunk    -> (variants | wildcard | literal_sequence | group | unknown) {% unwrap %}
-variants         -> %vstart bound:? variants_list:?  %vend                     {% constructVariants %}
-variants_list    -> variant (%bar variant {% (data) => data[1][0] %}):*        {% flattenVariantsList %}
-variant          -> weight:? variant_prompt                                    {% data => data[1] %}
+variant_chunk    -> (%literal  | group | variants | wildcard |  unknown)              {% unwrap %}
+variants         -> %vstart bound:? variants_list:?  %vend                            {% constructVariants %}
+variants_list    -> variant_prompt (%bar variant_prompt {% (data) => data[1][0] %}):* {% flattenVariantsList %}
 
-bound            -> %bound                                                     {% constructBound %}
+bound            -> %bound                                                            {% constructBound %}
 
-wildcard         -> %wildcardstart %literal %wildcardend                       {% constructWildcard %}
-literal_sequence -> (%literal {% constructLiteral %}):+                        {% unwrap %}
-group            -> %gstart variant:? (%weight {% id %}):? %gend               {% constructGroup %}
-unknown          -> %vstart [\s\n]:*
+wildcard         -> %wildcardstart %literal %wildcardend                              {% constructWildcard %}
+group            -> %gstart variant_prompt:? %weight:? %gend                          {% constructGroup %}
+unknown          -> (%vstart|%gstart|%wildcardstart) [\s\n]:*

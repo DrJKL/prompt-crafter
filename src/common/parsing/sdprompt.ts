@@ -3,12 +3,12 @@
 // Bypasses TS6133. Allow declared but unused functions.
 // @ts-ignore
 function id(d: any[]): any { return d[0]; }
+declare var literal: any;
 declare var vstart: any;
 declare var vend: any;
 declare var bar: any;
 declare var bound: any;
 declare var wildcardstart: any;
-declare var literal: any;
 declare var wildcardend: any;
 declare var gstart: any;
 declare var weight: any;
@@ -53,14 +53,15 @@ interface Grammar {
 const grammar: Grammar = {
   Lexer: basicPromptLexer,
   ParserRules: [
-    {"name": "variant_prompt$ebnf$1", "symbols": []},
     {"name": "variant_prompt$ebnf$1$subexpression$1", "symbols": ["variant_chunk"], "postprocess": id},
-    {"name": "variant_prompt$ebnf$1", "symbols": ["variant_prompt$ebnf$1", "variant_prompt$ebnf$1$subexpression$1"], "postprocess": (d) => d[0].concat([d[1]])},
+    {"name": "variant_prompt$ebnf$1", "symbols": ["variant_prompt$ebnf$1$subexpression$1"]},
+    {"name": "variant_prompt$ebnf$1$subexpression$2", "symbols": ["variant_chunk"], "postprocess": id},
+    {"name": "variant_prompt$ebnf$1", "symbols": ["variant_prompt$ebnf$1", "variant_prompt$ebnf$1$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "variant_prompt", "symbols": ["variant_prompt$ebnf$1"]},
+    {"name": "variant_chunk$subexpression$1", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)]},
+    {"name": "variant_chunk$subexpression$1", "symbols": ["group"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["variants"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["wildcard"]},
-    {"name": "variant_chunk$subexpression$1", "symbols": ["literal_sequence"]},
-    {"name": "variant_chunk$subexpression$1", "symbols": ["group"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["unknown"]},
     {"name": "variant_chunk", "symbols": ["variant_chunk$subexpression$1"], "postprocess": unwrap},
     {"name": "variants$ebnf$1", "symbols": ["bound"], "postprocess": id},
@@ -69,28 +70,22 @@ const grammar: Grammar = {
     {"name": "variants$ebnf$2", "symbols": [], "postprocess": () => null},
     {"name": "variants", "symbols": [(basicPromptLexer.has("vstart") ? {type: "vstart"} : vstart), "variants$ebnf$1", "variants$ebnf$2", (basicPromptLexer.has("vend") ? {type: "vend"} : vend)], "postprocess": constructVariants},
     {"name": "variants_list$ebnf$1", "symbols": []},
-    {"name": "variants_list$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("bar") ? {type: "bar"} : bar), "variant"], "postprocess": (data) => data[1][0]},
+    {"name": "variants_list$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("bar") ? {type: "bar"} : bar), "variant_prompt"], "postprocess": (data) => data[1][0]},
     {"name": "variants_list$ebnf$1", "symbols": ["variants_list$ebnf$1", "variants_list$ebnf$1$subexpression$1"], "postprocess": (d) => d[0].concat([d[1]])},
-    {"name": "variants_list", "symbols": ["variant", "variants_list$ebnf$1"], "postprocess": flattenVariantsList},
-    {"name": "variant$ebnf$1", "symbols": ["weight"], "postprocess": id},
-    {"name": "variant$ebnf$1", "symbols": [], "postprocess": () => null},
-    {"name": "variant", "symbols": ["variant$ebnf$1", "variant_prompt"], "postprocess": data => data[1]},
+    {"name": "variants_list", "symbols": ["variant_prompt", "variants_list$ebnf$1"], "postprocess": flattenVariantsList},
     {"name": "bound", "symbols": [(basicPromptLexer.has("bound") ? {type: "bound"} : bound)], "postprocess": constructBound},
     {"name": "wildcard", "symbols": [(basicPromptLexer.has("wildcardstart") ? {type: "wildcardstart"} : wildcardstart), (basicPromptLexer.has("literal") ? {type: "literal"} : literal), (basicPromptLexer.has("wildcardend") ? {type: "wildcardend"} : wildcardend)], "postprocess": constructWildcard},
-    {"name": "literal_sequence$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)], "postprocess": constructLiteral},
-    {"name": "literal_sequence$ebnf$1", "symbols": ["literal_sequence$ebnf$1$subexpression$1"]},
-    {"name": "literal_sequence$ebnf$1$subexpression$2", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)], "postprocess": constructLiteral},
-    {"name": "literal_sequence$ebnf$1", "symbols": ["literal_sequence$ebnf$1", "literal_sequence$ebnf$1$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
-    {"name": "literal_sequence", "symbols": ["literal_sequence$ebnf$1"], "postprocess": unwrap},
-    {"name": "group$ebnf$1", "symbols": ["variant"], "postprocess": id},
+    {"name": "group$ebnf$1", "symbols": ["variant_prompt"], "postprocess": id},
     {"name": "group$ebnf$1", "symbols": [], "postprocess": () => null},
-    {"name": "group$ebnf$2$subexpression$1", "symbols": [(basicPromptLexer.has("weight") ? {type: "weight"} : weight)], "postprocess": id},
-    {"name": "group$ebnf$2", "symbols": ["group$ebnf$2$subexpression$1"], "postprocess": id},
+    {"name": "group$ebnf$2", "symbols": [(basicPromptLexer.has("weight") ? {type: "weight"} : weight)], "postprocess": id},
     {"name": "group$ebnf$2", "symbols": [], "postprocess": () => null},
     {"name": "group", "symbols": [(basicPromptLexer.has("gstart") ? {type: "gstart"} : gstart), "group$ebnf$1", "group$ebnf$2", (basicPromptLexer.has("gend") ? {type: "gend"} : gend)], "postprocess": constructGroup},
+    {"name": "unknown$subexpression$1", "symbols": [(basicPromptLexer.has("vstart") ? {type: "vstart"} : vstart)]},
+    {"name": "unknown$subexpression$1", "symbols": [(basicPromptLexer.has("gstart") ? {type: "gstart"} : gstart)]},
+    {"name": "unknown$subexpression$1", "symbols": [(basicPromptLexer.has("wildcardstart") ? {type: "wildcardstart"} : wildcardstart)]},
     {"name": "unknown$ebnf$1", "symbols": []},
     {"name": "unknown$ebnf$1", "symbols": ["unknown$ebnf$1", /[\s\n]/], "postprocess": (d) => d[0].concat([d[1]])},
-    {"name": "unknown", "symbols": [(basicPromptLexer.has("vstart") ? {type: "vstart"} : vstart), "unknown$ebnf$1"]}
+    {"name": "unknown", "symbols": ["unknown$subexpression$1", "unknown$ebnf$1"]}
   ],
   ParserStart: "variant_prompt",
 };
