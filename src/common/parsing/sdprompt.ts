@@ -17,10 +17,10 @@ declare var gend: any;
     // eslint-disable
     // @ts-nocheck
     import {basicPromptLexer} from './sdprompt_lexer';
-    import {constructVariants, flattenVariantsList, constructBound, constructWildcard, constructLiteral, constructGroup} from './parse_utils';
+    import {constructVariants, flattenVariantsList, constructBound, constructWildcard,  constructGroup, constructLiteral} from './parse_utils';
     
     /* Utility */
-    const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
+    // const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
     const unwrap = (data: any[]) => data[0][0];
 
 interface NearleyToken {
@@ -71,6 +71,7 @@ const grammar: Grammar = {
     {"name": "variants", "symbols": [(basicPromptLexer.has("vstart") ? {type: "vstart"} : vstart), "variants$ebnf$1", "variants$ebnf$2", (basicPromptLexer.has("vend") ? {type: "vend"} : vend)], "postprocess": constructVariants},
     {"name": "variants_list$ebnf$1", "symbols": []},
     {"name": "variants_list$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("bar") ? {type: "bar"} : bar), "variant_prompt"], "postprocess": (data) => data[1][0]},
+    {"name": "variants_list$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("bar") ? {type: "bar"} : bar)], "postprocess": _ => [constructLiteral('')]},
     {"name": "variants_list$ebnf$1", "symbols": ["variants_list$ebnf$1", "variants_list$ebnf$1$subexpression$1"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "variants_list", "symbols": ["variant_prompt", "variants_list$ebnf$1"], "postprocess": flattenVariantsList},
     {"name": "bound", "symbols": [(basicPromptLexer.has("bound") ? {type: "bound"} : bound)], "postprocess": constructBound},

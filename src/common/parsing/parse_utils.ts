@@ -25,9 +25,14 @@ export function flattenVariantsList([firstVariant, restOfVariants]: any[]) {
   return flattened;
 }
 
-// eslint-disable-next-line
-export function constructVariants([, boundMaybe, variants]: any[]): Variants {
+export function constructVariants([
+  ,
+  boundMaybe,
+  variantsMaybe,
+]: // eslint-disable-next-line
+any[]): Variants {
   const bound = boundMaybe ?? DEFAULT_BOUND;
+  const variants = variantsMaybe ?? [];
   const selections = generateDefaultSelection(bound, variants);
   return {
     type: 'variants',
@@ -38,7 +43,7 @@ export function constructVariants([, boundMaybe, variants]: any[]): Variants {
 }
 
 // eslint-disable-next-line
-export function constructLiteral(literalToken: any[]): Literal {
+export function constructLiteral(literalToken: any[] | string): Literal {
   return {
     type: 'literal',
     value: `${literalToken}`,
@@ -48,7 +53,7 @@ export function constructLiteral(literalToken: any[]): Literal {
 // eslint-disable-next-line
 export function constructGroup(data: any[]): Group {
   const contents = data[1];
-  const weight = data[2] ?? '1';
+  const weight = data[2] ?? '1.1';
   const chunks = contents?.[0] ?? [];
   return {
     type: 'group',
