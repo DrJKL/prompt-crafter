@@ -36,27 +36,31 @@ import {
 import { SavedPromptDisplay } from './components/SavedPrompt';
 import { SizeUnit } from 'react-spaces/dist/core-types';
 import { editAttentionMonaco } from './common/tweaks/edit_attention';
+import { getPromptTokens, parsePrompt } from './common/parsing/app_parsing';
 
 const minHeight =
   3 * parseInt(getComputedStyle(document.documentElement)?.fontSize);
 
 function App() {
   const [promptText, setPromptText] = useState<string>(getActivePromptLocal());
+
   const [savedPrompts, setSavedPrompts] = useState(getSavedPromptsLocal());
   const [renderingOptions, setRenderingOptions] = useImmer(
     getRenderingOptions(),
   );
+
   const [showCopySnackbar, setShowCopySnackbar] = useState(false);
   const [savedPromptSectionHeight, setSavedPromptSectionHeight] =
     useState<SizeUnit>(minHeight);
+
   const [editorKey, setEditorKey] = useState(1);
-  function incrementEditorKey() {
-    setEditorKey(editorKey + 1);
-  }
 
   const monaco = useMonaco();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const renderedViewRef = useRef<HTMLDivElement | null>(null);
+
+  const promptTokens = getPromptTokens(promptText);
+  const parsedPrompt = parsePrompt(promptText);
 
   useEffect(() => {
     const sub = activePrompt$.subscribe((prompt) => setPromptText(prompt));
@@ -84,6 +88,10 @@ function App() {
     monaco.languages.setLanguageConfiguration('sdprompt', conf);
     monaco.languages.setMonarchTokensProvider('sdprompt', language);
   }, [monaco]);
+
+  function incrementEditorKey() {
+    setEditorKey(editorKey + 1);
+  }
 
   function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
     editorRef.current = editor;
@@ -163,7 +171,7 @@ function App() {
               <div
                 className="overflow-y-auto h-full p-4 pl-6"
                 ref={renderedViewRef}>
-                {tokensView(promptText, renderingOptions)}
+                {tokensView(promptTokens, parsedPrompt, renderingOptions)}
               </div>
             </Fill>
             <BottomResizable
@@ -175,7 +183,7 @@ function App() {
               <Typography
                 variant="h6"
                 component="h2"
-                className="select-none cursor-default flex-shrink"
+                className="select-none cursor-pointer flex-shrink"
                 onDoubleClick={() => resizeSavedPrompts()}>
                 Saved Prompts
               </Typography>

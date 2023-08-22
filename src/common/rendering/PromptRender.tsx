@@ -1,31 +1,32 @@
-import { Grammar, Parser } from 'nearley';
-import grammar from '../parsing/sdprompt';
-import { basicPromptLexer } from '../parsing/sdprompt_lexer';
 import { RenderingOptions } from './RenderType';
-import { Chunk } from './parsed_types';
 import { ChunkView } from './Renderers';
 import { Tooltip } from '@mui/material';
+import { ParseResult } from '../parsing/app_parsing';
+import { Token } from 'moo';
 
-export function tokensView(prompt: string, options: RenderingOptions) {
+export function tokensView(
+  tokens: Token[],
+  parsedResults: ParseResult,
+  options: RenderingOptions,
+) {
   const { renderType, fancy, dense } = options;
   switch (renderType) {
     case 'raw':
-      return rawView(prompt);
+      return rawView(tokens);
     case 'tokens':
-      return tokenView(prompt);
+      return tokenView(tokens);
     case 'parsed':
-      return parseView(prompt);
+      return parseView(parsedResults);
     case 'parsed-formatted':
-      return formattedParseView(prompt, fancy, dense);
+      return formattedParseView(parsedResults, fancy, dense);
   }
 }
 
-function rawView(prompt: string) {
+function rawView(tokens: Token[]) {
   try {
-    basicPromptLexer.reset(prompt);
     return (
       <div className="whitespace-pre-wrap">
-        {Array.from(basicPromptLexer).map((token, idx) => (
+        {tokens.map((token, idx) => (
           <span key={`${idx}-${token}`}>{token.value}</span>
         ))}
       </div>
@@ -36,13 +37,11 @@ function rawView(prompt: string) {
   }
 }
 
-function tokenView(prompt: string) {
+function tokenView(tokens: Token[]) {
   try {
-    basicPromptLexer.reset(prompt);
-
     return (
       <div className="whitespace-pre-wrap">
-        {Array.from(basicPromptLexer).map((token, idx) => (
+        {tokens.map((token, idx) => (
           <Tooltip
             key={idx}
             title={JSON.stringify(token, null, 1)}
@@ -58,11 +57,8 @@ function tokenView(prompt: string) {
   }
 }
 
-function parseView(prompt: string) {
-  const parser = new Parser(Grammar.fromCompiled(grammar));
+function parseView(allResults: ParseResult) {
   try {
-    parser.feed(prompt);
-    const allResults = parser.results;
     return allResults.map(([parseResult]) => (
       <>
         <hr />
@@ -81,27 +77,19 @@ function parseView(prompt: string) {
   }
 }
 
-function formattedParseView(prompt: string, fancy = true, dense = true) {
-  const parser = new Parser(Grammar.fromCompiled(grammar), {
-    keepHistory: true,
-  });
+function formattedParseView(
+  allResults: ParseResult,
+  fancy = true,
+  dense = true,
+) {
   try {
-    if (!prompt) {
-      return <div>No input to parse 😀</div>;
-    }
-    parser.feed(prompt);
-    if (!parser.results || !parser.results.length) {
+    if (!allResults || !allResults.length) {
       return (
         <>
           <div>Failed to parse...</div>
-          <h2>Prompt</h2>
-          <pre className="bg-white text-black w-full min-h-[10em]">
-            {prompt}
-          </pre>
         </>
       );
     }
-    const allResults: Array<Array<Array<Chunk>>> = parser.results;
     const ambiguousParse = allResults.length > 1;
     return (
       <>
