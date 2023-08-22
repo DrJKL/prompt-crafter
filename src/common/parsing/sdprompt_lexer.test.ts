@@ -78,4 +78,37 @@ describe('basicPromptLexer', () => {
     expect(result.filter((s) => s === 'literal')).toHaveLength(5);
     expect(result).toBeTruthy();
   });
+
+  it('should handle wildcard in groups', () => {
+    const prompt = `(__classicArtists__:0.5)`;
+
+    basicPromptLexer.reset(prompt);
+
+    const result = Array.from(basicPromptLexer)
+      .map((t) => t.type)
+      .join(' ');
+    expect(result).toBeTruthy();
+  });
+
+  it('should handle underscores in the middle of wildcards', () => {
+    const prompt = `__classic_artists__`;
+
+    basicPromptLexer.reset(prompt);
+
+    const result = Array.from(basicPromptLexer)
+      .map((t) => t.type)
+      .join(' ');
+    expect(result).toBeTruthy();
+  });
+
+  it('should handle a complex prompt with wildcards and weights', () => {
+    const prompt = `Epic __EmbPrimeArtists__ [detailed color pencil:photo shoot:0.3] by __fantasyArtist__ and (__classicArtists__:0.5) and (__classicArtists__:0.5), HQ, 8K, hyper detailed, The __female__ surrounded by __dreamyThings__ (face looking __expression__:1.5), __keyword__, __keyword__, __keyword__, __timeOfDay__, timeless realization of the facts of life and our time is limited on this earth, Action, cinematic dramatic lighting, bokeh, shot on Canon 5D,masterpiece [oil painting:hyperrealism:0.3] in the style of (__compositionArtists__:0.5)`;
+
+    basicPromptLexer.reset(prompt);
+
+    const result = Array.from(basicPromptLexer)
+      .map((t) => t.type)
+      .join(' ');
+    expect(result).toBeTruthy();
+  });
 });
