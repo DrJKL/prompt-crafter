@@ -12,7 +12,7 @@
 
 @lexer basicPromptLexer
 
-variant_prompt   -> (variant_chunk {% id %}):+                         
+variant_prompt   -> (variant_chunk {% id %}):+                                        
 
 variant_chunk    -> (%literal  | group | variants | wildcard |  unknown)              {% unwrap %}
 variants         -> %vstart bound:? variants_list:?  %vend                            {% constructVariants %}
