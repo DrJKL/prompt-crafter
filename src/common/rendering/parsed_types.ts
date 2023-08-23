@@ -1,6 +1,10 @@
 export type ChunkType = 'literal' | 'variants' | 'wildcard' | 'group';
 export type Chunk = Wildcard | Literal | Variants | Group;
 
+export type Prompt = readonly Chunk[]; // List of Chunks
+
+export type ParseResult = Prompt[][];
+
 export interface Wildcard {
   readonly type: 'wildcard';
   readonly path: string;
@@ -12,14 +16,14 @@ export interface Literal {
 }
 export interface Group {
   readonly type: 'group';
-  readonly chunks: readonly Chunk[];
+  readonly chunks: Prompt;
   readonly weight: number;
 }
 
 export interface Variants {
   readonly type: 'variants';
   readonly bound: Bound;
-  readonly variants: readonly Chunk[][];
+  readonly variants: readonly Prompt[];
 
   /**
    * Indices for variant selections.
@@ -29,7 +33,7 @@ export interface Variants {
    * There should be >= max(min, 1) non-negative indices
    *
    */
-  readonly selections: readonly number[];
+  selections: readonly number[];
 }
 
 export interface Bound {

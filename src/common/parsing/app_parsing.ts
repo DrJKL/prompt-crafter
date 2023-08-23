@@ -2,9 +2,7 @@ import { Token } from 'moo';
 import { basicPromptLexer } from './sdprompt_lexer';
 import { Grammar, Parser } from 'nearley';
 import grammar from './sdprompt';
-import { Chunk } from '../rendering/parsed_types';
-
-export type ParseResult = Chunk[][][];
+import { ParseResult } from '../rendering/parsed_types';
 
 export function getPromptTokens(prompt: string): Token[] {
   basicPromptLexer.reset(prompt);

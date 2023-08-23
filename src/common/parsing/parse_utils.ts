@@ -5,6 +5,7 @@ import {
   DEFAULT_BOUND,
   Group,
   Literal,
+  Prompt,
   Variants,
   Wildcard,
 } from '../rendering/parsed_types';
@@ -13,14 +14,18 @@ const BOUND_FORMAT = new RegExp(
   '(?<min>\\d+)?(?:(?<dash>-)(?<max>\\d+)?)?\\$\\$(?:(?<separator>[^$]+?)\\$\\$)?',
 );
 
-export function countType(chunks: readonly Chunk[][], type: ChunkType): number {
+export function countType(chunks: readonly Prompt[], type: ChunkType): number {
   return chunks.filter(([chunk]) => chunk.type === type).length;
 }
 
 /* Chunks */
 
 // eslint-disable-next-line
-export function flattenVariantsList([firstVariant, restOfVariants]: any[]) {
+export function flattenVariantsList([
+  firstVariant,
+  restOfVariants,
+]: // eslint-disable-next-line
+any[]): Prompt[] {
   const flattened = [...firstVariant, ...restOfVariants];
   return flattened;
 }
