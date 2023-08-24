@@ -96,7 +96,10 @@ function modifySelection(
       leafHopefully.selections = selection;
       return;
     }
-    console.error('Something has gone horribly awry', leafHopefully);
+    console.error(
+      'Something has gone horribly awry',
+      JSON.parse(JSON.stringify(leafHopefully)),
+    );
   } catch (err: unknown) {
     console.error(err);
   }
