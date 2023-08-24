@@ -1,11 +1,12 @@
-import { ChangeEvent, Fragment, MouseEvent, ReactNode, useState } from 'react';
-import { Bound, Chunk, Group, Literal, Prompt, Variants } from './parsed_types';
+import { ChangeEvent, Fragment, MouseEvent, useState } from 'react';
+import { Bound, Group, Literal, Prompt, Variants } from './parsed_types';
 import { MenuItem, Menu, Slide, Checkbox } from '@mui/material';
 import { SelectionUpdateFn } from './PromptRender';
 import { Close } from '@mui/icons-material';
 import { xor } from 'lodash';
+import { ChunkView } from './ChunkView';
 
-interface KeyPath {
+export interface KeyPath {
   path: number[];
   updateSelection: SelectionUpdateFn;
   fancy: boolean;
@@ -28,10 +29,6 @@ interface BoundProps extends KeyPath {
   bound: Bound;
 }
 
-interface ChunkProps extends KeyPath {
-  chunk: Chunk;
-}
-
 interface GroupProps extends KeyPath {
   group: Group;
 }
@@ -40,7 +37,7 @@ function pathToString(prefix: string, path: number[]): string {
   return `${prefix}-${path.join('-')}`;
 }
 
-function LiteralView({ literal, path }: LiteralProps) {
+export function LiteralView({ literal, path }: LiteralProps) {
   return (
     <span
       className="text-pink-400 font-bold"
@@ -50,7 +47,12 @@ function LiteralView({ literal, path }: LiteralProps) {
   );
 }
 
-function VariantView({ variants, path, fancy, updateSelection }: VariantProps) {
+export function VariantView({
+  variants,
+  path,
+  fancy,
+  updateSelection,
+}: VariantProps) {
   return (
     <span className="text-blue-400" title={pathToString('basic-variant', path)}>
       {' { '}
@@ -80,7 +82,7 @@ function VariantView({ variants, path, fancy, updateSelection }: VariantProps) {
   );
 }
 
-function FancyVariantView({
+export function FancyVariantView({
   variants,
   path,
   updateSelection,
@@ -277,7 +279,7 @@ function BoundView({ bound, path }: BoundProps) {
   );
 }
 
-function GroupView({ group, path, fancy, updateSelection }: GroupProps) {
+export function GroupView({ group, path, fancy, updateSelection }: GroupProps) {
   if (!group.chunks) {
     return <div>This isn't a group: {`${JSON.stringify(group)}`}</div>;
   }
@@ -304,60 +306,5 @@ function GroupView({ group, path, fancy, updateSelection }: GroupProps) {
       })}
       :{group.weight})
     </span>
-  );
-}
-
-function ChunkView({
-  chunk,
-  path,
-  updateSelection,
-  fancy,
-}: ChunkProps): ReactNode {
-  if (!chunk) {
-    return <>Ummmm...</>;
-  }
-  switch (chunk.type) {
-    case 'literal':
-      return (
-        <LiteralView
-          updateSelection={updateSelection}
-          literal={chunk}
-          fancy={fancy}
-          path={path}
-        />
-      );
-    case 'variants':
-      return fancy ? (
-        <FancyVariantView
-          variants={chunk}
-          path={path}
-          fancy={fancy}
-          updateSelection={updateSelection}
-        />
-      ) : (
-        <VariantView
-          updateSelection={updateSelection}
-          variants={chunk}
-          path={path}
-          fancy={fancy}
-        />
-      );
-    case 'wildcard':
-      return <span className="text-amber-600">{chunk.path}</span>;
-    case 'group':
-      return (
-        <GroupView
-          updateSelection={updateSelection}
-          path={path}
-          fancy={fancy}
-          group={chunk}
-        />
-      );
-  }
-  chunk satisfies never;
-  return (
-    <div className="whitespace-pre-wrap bg-red-600 bg-opacity-50 text-white">
-      {JSON.stringify(chunk)}
-    </div>
   );
 }
