@@ -1,14 +1,24 @@
 import { RenderingOptions } from './RenderType';
-import { ChunkView } from './Renderers';
+import { PromptView } from './Renderers';
 import { Tooltip } from '@mui/material';
-import { ParseResult } from '../parsing/app_parsing';
 import { Token } from 'moo';
+import { ParseResult } from './parsed_types';
 
-export function tokensView(
-  tokens: Token[],
-  parsedResults: ParseResult,
-  options: RenderingOptions,
-) {
+export type SelectionUpdateFn = (path: number[], selection: number[]) => void;
+
+export interface RenderedPromptProps {
+  tokens: Token[];
+  parsedResults: ParseResult;
+  options: RenderingOptions;
+  updateSelection: SelectionUpdateFn;
+}
+
+export function RenderedPrompt({
+  tokens,
+  parsedResults,
+  options,
+  updateSelection,
+}: RenderedPromptProps) {
   const { renderType, fancy, dense } = options;
   switch (renderType) {
     case 'raw':
@@ -18,7 +28,7 @@ export function tokensView(
     case 'parsed':
       return parseView(parsedResults);
     case 'parsed-formatted':
-      return formattedParseView(parsedResults, fancy, dense);
+      return formattedParseView(parsedResults, updateSelection, fancy, dense);
   }
 }
 
@@ -59,13 +69,13 @@ function tokenView(tokens: Token[]) {
 
 function parseView(allResults: ParseResult) {
   try {
-    return allResults.map(([parseResult]) => (
-      <>
+    return allResults.map(([parseResult], idx) => (
+      <div key={idx} className="contents">
         <hr />
         <div className="whitespace-pre-wrap">
           {JSON.stringify(parseResult, null, 2)}
         </div>
-      </>
+      </div>
     ));
   } catch (error: unknown) {
     return (
@@ -79,6 +89,7 @@ function parseView(allResults: ParseResult) {
 
 function formattedParseView(
   allResults: ParseResult,
+  updateSelection: SelectionUpdateFn,
   fancy = true,
   dense = true,
 ) {
@@ -96,16 +107,18 @@ function formattedParseView(
         {allResults.map(([results], idx) => (
           <div
             key={`parse-result-${idx}`}
-            className={dense ? 'whitespace-normal' : `whitespace-pre-line`}>
+            className={`leading-8 ${
+              dense ? 'whitespace-normal' : `whitespace-pre-line`
+            }`}>
             {ambiguousParse && <div>{idx}</div>}
-            {results.map((chunk, idx) => (
-              <ChunkView
-                chunk={chunk}
-                path={[0, idx]}
-                fancy={fancy}
-                key={`${idx}-chunk-${JSON.stringify(chunk)}`}
-              />
-            ))}
+            <PromptView
+              prompt={results}
+              path={[idx]}
+              fancy={fancy}
+              updateSelection={updateSelection}
+              separator=" "
+              key={idx}
+            />
           </div>
         ))}
       </>

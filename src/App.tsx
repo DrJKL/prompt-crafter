@@ -21,8 +21,8 @@ import {
 import { HistoryEdu, Close } from '@mui/icons-material';
 import { PromptCrafterAppBar } from './components/PromptCrafterAppBar';
 import { nextType } from './common/rendering/RenderType';
-import { tokensView } from './common/rendering/PromptRender';
-import { useImmer } from 'use-immer';
+import { RenderedPrompt } from './common/rendering/PromptRender';
+import { useImmer, useImmerReducer } from 'use-immer';
 import {
   activePrompt$,
   getActivePromptLocal,
@@ -37,9 +37,69 @@ import { SavedPromptDisplay } from './components/SavedPrompt';
 import { SizeUnit } from 'react-spaces/dist/core-types';
 import { editAttentionMonaco } from './common/tweaks/edit_attention';
 import { getPromptTokens, parsePrompt } from './common/parsing/app_parsing';
+import { current } from 'immer';
+import { ParseResult, Prompt } from './common/rendering/parsed_types';
 
 const minHeight =
   3 * parseInt(getComputedStyle(document.documentElement)?.fontSize);
+
+type ModifyPromptAction =
+  | { type: 'reset'; results: ParseResult }
+  | { type: 'choose-variant'; path: number[]; selection: number[] };
+
+function variantSelectionReducer(
+  draft: ParseResult,
+  action: ModifyPromptAction,
+) {
+  switch (action.type) {
+    case 'reset':
+      return action.results;
+    case 'choose-variant':
+      return modifySelection(draft, action.path, action.selection);
+  }
+  return draft;
+}
+
+function modifySelection(
+  draft: ParseResult,
+  path: number[],
+  selection: number[],
+) {
+  const undraft = current(draft);
+  const firstParse = draft[0];
+  if (!firstParse) {
+    console.error(`Can't modify selection, bad Chunks provided: ${undraft}`);
+    return draft;
+  }
+  let chunkCursor: Prompt[] = firstParse;
+  for (let i = 0; i < path.length - 2; i += 2) {
+    if (path[i] < 0 || path[i + 1] < 0) {
+      return;
+    }
+    const chunk = chunkCursor[path[i]];
+    const nextVariants = chunk[path[i + 1]];
+    if (nextVariants?.type !== 'variants') {
+      console.error(`Found non-variable sub-path when trying to update
+      ${chunk} in
+      ${draft} with path
+      ${path}`);
+
+      return draft;
+    }
+    chunkCursor = [...nextVariants.variants];
+  }
+  try {
+    const leafHopefully =
+      chunkCursor[path[path.length - 2]][path[path.length - 1]];
+    if (leafHopefully?.type === 'variants') {
+      leafHopefully.selections = selection;
+      return;
+    }
+    console.error('Something has gone horribly awry', leafHopefully);
+  } catch (err: unknown) {
+    console.error(err);
+  }
+}
 
 function App() {
   const [promptText, setPromptText] = useState<string>(getActivePromptLocal());
@@ -60,7 +120,19 @@ function App() {
   const renderedViewRef = useRef<HTMLDivElement | null>(null);
 
   const promptTokens = getPromptTokens(promptText);
-  const parsedPrompt = parsePrompt(promptText);
+
+  const [workingPrompt, dispatch] = useImmerReducer<
+    ParseResult,
+    ModifyPromptAction
+  >(variantSelectionReducer, []);
+
+  useEffect(() => {
+    dispatch({ type: 'reset', results: parsePrompt(promptText) });
+  }, [promptText, dispatch]);
+
+  function updateSelection(path: number[], selection: number[]) {
+    dispatch({ type: 'choose-variant', path, selection });
+  }
 
   useEffect(() => {
     const sub = activePrompt$.subscribe((prompt) => setPromptText(prompt));
@@ -171,7 +243,12 @@ function App() {
               <div
                 className="overflow-y-auto h-full p-4 pl-6"
                 ref={renderedViewRef}>
-                {tokensView(promptTokens, parsedPrompt, renderingOptions)}
+                <RenderedPrompt
+                  options={renderingOptions}
+                  tokens={promptTokens}
+                  parsedResults={workingPrompt}
+                  updateSelection={updateSelection}
+                />
               </div>
             </Fill>
             <BottomResizable

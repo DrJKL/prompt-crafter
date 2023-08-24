@@ -1,11 +1,17 @@
 import { MouseEvent, ReactNode, useState } from 'react';
-import { Bound, Chunk, Group, Literal, Variants } from './parsed_types';
-import { MenuItem, Menu } from '@mui/material';
+import { Bound, Chunk, Group, Literal, Prompt, Variants } from './parsed_types';
+import { MenuItem, Menu, Slide } from '@mui/material';
+import { SelectionUpdateFn } from './PromptRender';
 
 interface KeyPath {
-  path?: number[];
-  handleChange?: (path: number[]) => void;
-  fancy?: boolean;
+  path: number[];
+  updateSelection: SelectionUpdateFn;
+  fancy: boolean;
+}
+
+interface PromptProps extends KeyPath {
+  prompt: Prompt;
+  separator: string;
 }
 
 interface LiteralProps extends KeyPath {
@@ -32,21 +38,28 @@ function pathToString(prefix: string, path: number[]): string {
   return `${prefix}-${path.join('-')}`;
 }
 
-function LiteralView({ literal, path = [0] }: LiteralProps) {
+function LiteralView({ literal, path }: LiteralProps) {
   return (
     <span
       className="text-pink-400 font-bold"
       title={pathToString('literal', path)}>
-      {literal.value}
+      {literal.value.trim()}
     </span>
   );
 }
 
-function VariantView({ variants, path = [0], fancy }: VariantProps) {
+function VariantView({ variants, path, fancy, updateSelection }: VariantProps) {
   return (
     <span className="text-blue-400" title={pathToString('basic-variant', path)}>
       {' { '}
-      {variants.bound && <BoundView bound={variants.bound} path={path} />}
+      {variants.bound && (
+        <BoundView
+          bound={variants.bound}
+          updateSelection={updateSelection}
+          fancy={fancy}
+          path={path}
+        />
+      )}
       {variants.variants?.flat().map((v, idx) => {
         const newPath = [...path, idx];
         return (
@@ -54,7 +67,9 @@ function VariantView({ variants, path = [0], fancy }: VariantProps) {
             className="variant-option"
             key={pathToString('variant', newPath)}>
             {idx > 0 ? ' | ' : ''}
-            {v ? ChunkView({ chunk: v, fancy, path: newPath }) : ''}
+            {v
+              ? ChunkView({ chunk: v, fancy, path: newPath, updateSelection })
+              : ''}
           </span>
         );
       })}
@@ -63,25 +78,10 @@ function VariantView({ variants, path = [0], fancy }: VariantProps) {
   );
 }
 
-function getLiteralFromVariants(
-  variants: Variants,
-  path: readonly number[],
-): Chunk | undefined {
-  let currentSet = variants.variants.flat();
-  for (const node of path) {
-    const variantsMaybe = currentSet[node];
-    if (variantsMaybe?.type !== 'variants') {
-      return variantsMaybe;
-    }
-    currentSet = variantsMaybe.variants.flat();
-  }
-  return undefined;
-}
-
 function FancyVariantView({
   variants,
-  path = [0],
-  handleChange,
+  path,
+  updateSelection,
   fancy,
 }: VariantProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -93,34 +93,24 @@ function FancyVariantView({
   function handleClose() {
     setAnchorEl(null);
   }
-  const [selectedVariant, setVariant] = useState([0]);
-  const variant = getLiteralFromVariants(variants, selectedVariant);
+  const variant = variants.variants
+    .filter((_v, i) => variants.selections.includes(i))
+    .flat(1);
 
-  const changeHandler =
-    handleChange ??
-    function (path: number[]) {
-      setVariant(path);
-      handleClose();
-    };
+  const changeHandler = function (path: number[], selection: number[]) {
+    updateSelection?.(path, selection);
+    handleClose();
+  };
 
-  function selectVariant(event: MouseEvent, chunk: Chunk, idx: number) {
+  function selectVariant(event: MouseEvent, path: number[], idx: number) {
     event.stopPropagation();
-    if (chunk.type === 'variants') {
-      return;
-    }
-    changeHandler([idx]);
-  }
-
-  function handleChangeInternal(idx: number) {
-    return (path: number[]) => {
-      changeHandler([idx, ...path]);
-    };
+    changeHandler(path, [idx]);
   }
 
   return (
     <>
       <span
-        className={`text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 ${
+        className={`mx-0.5 text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 ${
           fancy
             ? 'border-pink-500 border-2 rounded-md p-0.5 hover:border-pink-200'
             : ''
@@ -129,23 +119,27 @@ function FancyVariantView({
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        title={pathToString('fancy-variant', path)}
+        title={
+          pathToString('fancy-variant', path) + ` : ${variants.selections}`
+        }
         onClick={handleClick}>
-        {variant &&
-          ChunkView({
-            chunk: variant,
-            path,
-            handleChange,
-            fancy,
-          })}
+        {variant && (
+          <PromptView
+            prompt={variant}
+            path={path}
+            fancy={fancy}
+            updateSelection={updateSelection}
+            separator={variants.bound.separator}
+          />
+        )}
       </span>
-
       <Menu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        TransitionComponent={Slide}
         className="text-blue-400">
-        {variants.variants?.flat().map((v, idx) => {
+        {variants.variants?.map((v, idx) => {
           const newPath = [...path, idx];
           return (
             <MenuItem
@@ -161,15 +155,16 @@ function FancyVariantView({
                   },
                 },
               }}
-              onClick={(event) => selectVariant(event, v, idx)}
+              onClick={(event) => selectVariant(event, path, idx)}
               key={pathToString('fancy-variant-option', newPath)}>
-              {v &&
-                ChunkView({
-                  chunk: v,
-                  path: newPath,
-                  handleChange: handleChangeInternal(idx),
-                  fancy,
-                })}
+              <PromptView
+                prompt={v}
+                key={pathToString('variant-option', newPath)}
+                path={newPath}
+                updateSelection={updateSelection}
+                fancy={fancy}
+                separator=","
+              />
             </MenuItem>
           );
         })}
@@ -178,7 +173,33 @@ function FancyVariantView({
   );
 }
 
-function BoundView({ bound, path = [0] }: BoundProps) {
+export function PromptView({
+  prompt,
+  path,
+  updateSelection,
+  separator,
+  fancy,
+}: PromptProps) {
+  return (
+    prompt &&
+    prompt.map((c, idx) => {
+      const newPath = [...path, idx];
+      return (
+        <span key={idx}>
+          {idx > 0 && <span>{separator}</span>}
+          <ChunkView
+            chunk={c}
+            path={newPath}
+            updateSelection={updateSelection}
+            fancy={fancy}
+          />
+        </span>
+      );
+    })
+  );
+}
+
+function BoundView({ bound, path }: BoundProps) {
   const defaultRange = bound.min === 1 && bound.max === 1;
   const defaultSeparator = bound.separator === ', ';
 
@@ -205,10 +226,11 @@ function BoundView({ bound, path = [0] }: BoundProps) {
   );
 }
 
-function GroupView({ group, path = [0], handleChange, fancy }: GroupProps) {
+function GroupView({ group, path, fancy, updateSelection }: GroupProps) {
   if (!group.chunks) {
     return <div>This isn't a group: {`${JSON.stringify(group)}`}</div>;
   }
+
   return (
     <span
       className={`${
@@ -224,8 +246,8 @@ function GroupView({ group, path = [0], handleChange, fancy }: GroupProps) {
             chunk={chunk}
             key={pathToString('group', newPath)}
             path={newPath}
-            handleChange={handleChange}
             fancy={fancy}
+            updateSelection={updateSelection}
           />
         );
       })}
@@ -234,10 +256,10 @@ function GroupView({ group, path = [0], handleChange, fancy }: GroupProps) {
   );
 }
 
-export function ChunkView({
+function ChunkView({
   chunk,
-  path = [0],
-  handleChange,
+  path,
+  updateSelection,
   fancy,
 }: ChunkProps): ReactNode {
   if (!chunk) {
@@ -245,21 +267,28 @@ export function ChunkView({
   }
   switch (chunk.type) {
     case 'literal':
-      return <LiteralView literal={chunk} fancy={fancy} path={path} />;
+      return (
+        <LiteralView
+          updateSelection={updateSelection}
+          literal={chunk}
+          fancy={fancy}
+          path={path}
+        />
+      );
     case 'variants':
       return fancy ? (
         <FancyVariantView
           variants={chunk}
           path={path}
           fancy={fancy}
-          handleChange={handleChange}
+          updateSelection={updateSelection}
         />
       ) : (
         <VariantView
+          updateSelection={updateSelection}
           variants={chunk}
           path={path}
           fancy={fancy}
-          handleChange={handleChange}
         />
       );
     case 'wildcard':
@@ -267,10 +296,10 @@ export function ChunkView({
     case 'group':
       return (
         <GroupView
+          updateSelection={updateSelection}
           path={path}
           fancy={fancy}
           group={chunk}
-          handleChange={handleChange}
         />
       );
   }
