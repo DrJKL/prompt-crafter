@@ -5,8 +5,13 @@ import grammar from './sdprompt';
 import { ParseResult } from '../rendering/parsed_types';
 
 export function getPromptTokens(prompt: string): Token[] {
-  basicPromptLexer.reset(prompt);
-  return Array.from(basicPromptLexer);
+  try {
+    basicPromptLexer.reset(prompt);
+    return Array.from(basicPromptLexer);
+  } catch (err: unknown) {
+    console.error(err);
+    return [];
+  }
 }
 
 export function parsePrompt(prompt: string): ParseResult {

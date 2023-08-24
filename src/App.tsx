@@ -57,6 +57,7 @@ function variantSelectionReducer(
     case 'choose-variant':
       return modifySelection(draft, action.path, action.selection);
   }
+  action satisfies never;
   return draft;
 }
 
@@ -127,7 +128,12 @@ function App() {
   >(variantSelectionReducer, []);
 
   useEffect(() => {
-    dispatch({ type: 'reset', results: parsePrompt(promptText) });
+    try {
+      const results = parsePrompt(promptText);
+      dispatch({ type: 'reset', results });
+    } catch (err: unknown) {
+      console.error(err);
+    }
   }, [promptText, dispatch]);
 
   function updateSelection(path: number[], selection: number[]) {
