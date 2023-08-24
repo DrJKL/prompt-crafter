@@ -1,6 +1,6 @@
 import { Chunk } from './parsed_types';
 import { ReactNode } from 'react';
-import { FancyVariantView, VariantView } from './Renderers';
+import { FancyVariantView, VariantView } from './VariantsViews';
 import { GroupView } from './GroupView';
 import { LiteralView } from './LiteralView';
 import { KeyPath } from './rendering_utils';
