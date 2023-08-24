@@ -76,7 +76,7 @@ export function constructBound([boundString]: any[]): Bound {
     const maxMaybe = safeNumberParse(matches.groups['max']);
     const min = minMaybe ?? 1;
     const max = maxMaybe ?? (hasDash ? -1 : min);
-    const separator = matches.groups['separator'] ?? ', ';
+    const separator = matches.groups['separator'] ?? ',';
     return {
       type: 'bound',
       min,
@@ -104,12 +104,26 @@ function safeNumberParse(value: string): number | undefined {
   return numberMaybe;
 }
 
-function generateDefaultSelection(bound: Bound, variants: readonly Chunk[]) {
-  const { min, max } = bound;
-  const realMin = min <= 0 ? 1 : min;
+/**
+ *
+ * Returns an array with the maximum allowed number selected
+ *
+ * @param bound
+ * @param variants
+ * @returns
+ */
+export function generateDefaultSelection(
+  bound: Bound,
+  variants: readonly Chunk[],
+) {
+  const { max } = bound;
   const realMax =
-    max >= variants.length ? variants.length : max <= 0 ? variants.length : max;
-  const length = realMax - realMin + 1;
+    max >= variants.length
+      ? variants.length //
+      : max <= 0
+      ? variants.length
+      : max;
+  const length = realMax;
   const selectionArray = Array.from({ length }, (_, idx) => idx);
   return selectionArray;
 }

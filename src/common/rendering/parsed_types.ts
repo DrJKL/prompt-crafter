@@ -47,5 +47,5 @@ export const DEFAULT_BOUND: Bound = {
   type: 'bound',
   min: 1,
   max: 1,
-  separator: ', ',
+  separator: ',',
 };
