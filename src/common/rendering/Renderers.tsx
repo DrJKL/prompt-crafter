@@ -1,8 +1,9 @@
-import { Fragment, MouseEvent, ReactNode, useState } from 'react';
+import { ChangeEvent, Fragment, MouseEvent, ReactNode, useState } from 'react';
 import { Bound, Chunk, Group, Literal, Prompt, Variants } from './parsed_types';
-import { MenuItem, Menu, Slide } from '@mui/material';
+import { MenuItem, Menu, Slide, Checkbox } from '@mui/material';
 import { SelectionUpdateFn } from './PromptRender';
 import { Close } from '@mui/icons-material';
+import { xor } from 'lodash';
 
 interface KeyPath {
   path: number[];
@@ -87,26 +88,45 @@ function FancyVariantView({
 }: VariantProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
+  const fullSelection = variants.selections.length >= variants.bound.max;
+  const enoughSelected = variants.selections.length >= variants.bound.min;
+
+  const variant = variants.variants
+    .filter((_v, i) => variants.selections.includes(i))
+    .flat();
+
   function handleClick(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
   }
-  function handleClose() {
+  function handleClose(
+    // eslint-disable-next-line
+    _event?: {},
+    reason?: 'backdropClick' | 'escapeKeyDown',
+  ) {
+    if (reason === 'backdropClick' && !enoughSelected) {
+      return;
+    }
+
     setAnchorEl(null);
   }
-  const variant = variants.variants
-    .filter((_v, i) => variants.selections.includes(i))
-    .flat(1);
 
   const changeHandler = function (path: number[], selection: number[]) {
     updateSelection(path, selection);
     handleClose();
   };
 
-  function selectVariant(event: MouseEvent, path: number[], idx: number) {
-    event.stopPropagation();
-    changeHandler(path, [idx]);
+  function editSelections(
+    _event: ChangeEvent<HTMLInputElement>,
+    path: number[],
+    idx: number,
+  ) {
+    const currentSelection = [...variants.selections];
+    const targetItem = [idx];
+    const newSelection = xor(currentSelection, targetItem);
+    updateSelection(path, newSelection);
   }
 
   return (
@@ -143,7 +163,9 @@ function FancyVariantView({
         className="text-blue-400">
         <MenuItem disabled sx={{ '&.Mui-disabled': { opacity: 100 } }}>
           <span className="text-white opacity-100">
-            {variants.selections.length}/{variants.bound.max} selected
+            Selected: {variants.selections.length}
+            <br /> Minimum: {variants.bound.min}
+            <br /> Maximum: {variants.bound.max}
           </span>
         </MenuItem>
         {variants.variants?.map((v, idx) => {
@@ -170,8 +192,12 @@ function FancyVariantView({
                   },
                 },
               ]}
-              onClick={(event) => selectVariant(event, path, idx)}
               key={pathToString('fancy-variant-option', newPath)}>
+              <Checkbox
+                checked={isSelected}
+                disabled={fullSelection && !isSelected}
+                onChange={(e) => editSelections(e, path, idx)}
+              />
               <PromptView
                 prompt={v}
                 key={pathToString('variant-option', newPath)}
@@ -184,6 +210,7 @@ function FancyVariantView({
           );
         })}
         <MenuItem
+          disabled={!enoughSelected}
           onClick={handleClose}
           sx={{
             textAlign: 'center',
