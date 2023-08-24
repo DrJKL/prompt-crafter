@@ -1,7 +1,8 @@
-import { MouseEvent, ReactNode, useState } from 'react';
+import { Fragment, MouseEvent, ReactNode, useState } from 'react';
 import { Bound, Chunk, Group, Literal, Prompt, Variants } from './parsed_types';
 import { MenuItem, Menu, Slide } from '@mui/material';
 import { SelectionUpdateFn } from './PromptRender';
+import { Close } from '@mui/icons-material';
 
 interface KeyPath {
   path: number[];
@@ -86,7 +87,8 @@ function FancyVariantView({
 }: VariantProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  function handleClick(event: MouseEvent<HTMLAnchorElement>) {
+  function handleClick(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
   }
@@ -98,7 +100,7 @@ function FancyVariantView({
     .flat(1);
 
   const changeHandler = function (path: number[], selection: number[]) {
-    updateSelection?.(path, selection);
+    updateSelection(path, selection);
     handleClose();
   };
 
@@ -109,10 +111,10 @@ function FancyVariantView({
 
   return (
     <>
-      <span
-        className={`mx-0.5 text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 ${
+      <button
+        className={`variants-button mx-0.5 text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 ${
           fancy
-            ? 'border-pink-500 border-2 rounded-md p-0.5 hover:border-pink-200'
+            ? 'border-pink-500 border-2 rounded-md px-1 py-0 hover:border-pink-200'
             : ''
         }`}
         aria-roledescription="button"
@@ -122,7 +124,7 @@ function FancyVariantView({
         title={
           pathToString('fancy-variant', path) + ` : ${variants.selections}`
         }
-        onClick={handleClick}>
+        onClickCapture={handleClick}>
         {variant && (
           <PromptView
             prompt={variant}
@@ -132,42 +134,64 @@ function FancyVariantView({
             separator={variants.bound.separator}
           />
         )}
-      </span>
+      </button>
       <Menu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         TransitionComponent={Slide}
         className="text-blue-400">
+        <MenuItem disabled sx={{ '&.Mui-disabled': { opacity: 100 } }}>
+          <span className="text-white opacity-100">
+            {variants.selections.length}/{variants.bound.max} selected
+          </span>
+        </MenuItem>
         {variants.variants?.map((v, idx) => {
           const newPath = [...path, idx];
+          const isSelected = variants.selections.includes(idx);
           return (
             <MenuItem
-              className="variant-option"
               disableRipple
               value={idx}
-              sx={{
-                '&:has( > a )': {
-                  // This will probably be broken in Firefox (without a config set for :has)
-                  padding: 0,
-                  '& > a': {
-                    padding: '6px 16px',
+              sx={[
+                {
+                  borderBottom: '2px inset #FFF6',
+                },
+                isSelected && {
+                  boxShadow: 'inset 0 0 4px 0 white',
+                },
+                {
+                  '&:has( > .variants-button )': {
+                    // This will probably be broken in Firefox (without a config set for :has)
+                    padding: 0,
+                    '& > .variants-button': {
+                      marginInline: '1rem',
+                    },
                   },
                 },
-              }}
+              ]}
               onClick={(event) => selectVariant(event, path, idx)}
               key={pathToString('fancy-variant-option', newPath)}>
               <PromptView
                 prompt={v}
                 key={pathToString('variant-option', newPath)}
                 path={newPath}
-                updateSelection={updateSelection}
+                updateSelection={changeHandler}
                 fancy={fancy}
                 separator=","
               />
             </MenuItem>
           );
         })}
+        <MenuItem
+          onClick={handleClose}
+          sx={{
+            textAlign: 'center',
+            justifyContent: 'center',
+            paddingBlockEnd: '0',
+          }}>
+          <Close />
+        </MenuItem>
       </Menu>
     </>
   );
@@ -185,7 +209,7 @@ export function PromptView({
     prompt.map((c, idx) => {
       const newPath = [...path, idx];
       return (
-        <span key={idx}>
+        <Fragment key={idx}>
           {idx > 0 && <span>{separator}</span>}
           <ChunkView
             chunk={c}
@@ -193,7 +217,7 @@ export function PromptView({
             updateSelection={updateSelection}
             fancy={fancy}
           />
-        </span>
+        </Fragment>
       );
     })
   );
