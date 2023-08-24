@@ -23,7 +23,7 @@ export function VariantView({
       {' { '}
       {variants.bound && (
         <BoundView
-          bound={variants.bound}
+          variants={variants}
           updateSelection={updateSelection}
           fancy={fancy}
           path={path}
@@ -79,11 +79,6 @@ export function FancyVariantView({
 
     setAnchorEl(null);
   }
-
-  const changeHandler = function (path: number[], selection: number[]) {
-    updateSelection(path, selection);
-    handleClose();
-  };
 
   function editSelections(
     _event: ChangeEvent<HTMLInputElement>,
@@ -169,7 +164,7 @@ export function FancyVariantView({
                 prompt={v}
                 key={pathToString('variant-option', newPath)}
                 path={newPath}
-                updateSelection={changeHandler}
+                updateSelection={updateSelection}
                 fancy={fancy}
                 separator=","
               />

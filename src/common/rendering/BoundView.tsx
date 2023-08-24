@@ -1,19 +1,24 @@
-import { Bound } from './parsed_types';
+import { Bound, DEFAULT_BOUND, Variants } from './parsed_types';
 import { pathToString, KeyPath } from './rendering_utils';
 
 interface BoundProps extends KeyPath {
-  bound: Bound;
+  variants: Variants;
 }
 
-export function BoundView({ bound, path }: BoundProps) {
-  const defaultRange = bound.min === 1 && bound.max === 1;
-  const defaultSeparator = bound.separator === ', ';
+export function BoundView({ path, variants }: BoundProps) {
+  const { bound } = variants;
+  const defaultRange =
+    bound.min === DEFAULT_BOUND.min && //
+    bound.max === DEFAULT_BOUND.max;
+  const defaultSeparator = bound.separator === DEFAULT_BOUND.separator;
+
+  const realMax = bound.max === -1 ? variants.variants.length : bound.max;
 
   const rangeSpan = (
     <span
       className="text-emerald-600"
       title={pathToString('bound-range', path)}>
-      {bound.min}-{bound.max} $$
+      {bound.min}-{realMax} $$
     </span>
   );
 
@@ -26,8 +31,8 @@ export function BoundView({ bound, path }: BoundProps) {
   );
   return (
     <>
-      {defaultRange ? null : rangeSpan}
-      {defaultSeparator ? null : separatorSpan}
+      {defaultRange || rangeSpan}
+      {defaultSeparator || separatorSpan}
     </>
   );
 }
