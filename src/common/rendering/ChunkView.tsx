@@ -1,7 +1,8 @@
 import { Chunk } from './parsed_types';
 import { ReactNode } from 'react';
-import { FancyVariantView, VariantView, GroupView, KeyPath } from './Renderers';
+import { FancyVariantView, VariantView, GroupView } from './Renderers';
 import { LiteralView } from './LiteralView';
+import { KeyPath } from './rendering_utils';
 
 export interface ChunkProps extends KeyPath {
   chunk: Chunk;

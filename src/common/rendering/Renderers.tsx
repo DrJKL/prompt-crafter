@@ -1,16 +1,10 @@
 import { ChangeEvent, Fragment, MouseEvent, useState } from 'react';
 import { Bound, Group, Prompt, Variants } from './parsed_types';
 import { MenuItem, Menu, Slide, Checkbox } from '@mui/material';
-import { SelectionUpdateFn } from './PromptRender';
 import { Close } from '@mui/icons-material';
 import { xor } from 'lodash';
 import { ChunkView } from './ChunkView';
-
-export interface KeyPath {
-  path: number[];
-  updateSelection: SelectionUpdateFn;
-  fancy: boolean;
-}
+import { pathToString, KeyPath } from './rendering_utils';
 
 interface PromptProps extends KeyPath {
   prompt: Prompt;
@@ -21,16 +15,8 @@ interface VariantProps extends KeyPath {
   variants: Variants;
 }
 
-interface BoundProps extends KeyPath {
-  bound: Bound;
-}
-
 interface GroupProps extends KeyPath {
   group: Group;
-}
-
-export function pathToString(prefix: string, path: number[]): string {
-  return `${prefix}-${path.join('-')}`;
 }
 
 export function VariantView({
@@ -263,6 +249,10 @@ function BoundView({ bound, path }: BoundProps) {
       {defaultSeparator ? null : separatorSpan}
     </>
   );
+}
+
+interface BoundProps extends KeyPath {
+  bound: Bound;
 }
 
 export function GroupView({ group, path, fancy, updateSelection }: GroupProps) {
