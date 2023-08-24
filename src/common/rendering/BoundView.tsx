@@ -1,4 +1,4 @@
-import { Bound, DEFAULT_BOUND, Variants } from './parsed_types';
+import { DEFAULT_BOUND, Variants } from './parsed_types';
 import { pathToString, KeyPath } from './rendering_utils';
 
 interface BoundProps extends KeyPath {
