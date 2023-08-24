@@ -36,6 +36,13 @@ describe('parse_utils', () => {
     });
   });
 
+  describe('separator', () => {
+    it('empty case', () => {
+      const actual = constructBound([{ value: '$$$$' }]);
+      expect(actual.separator).toBe('');
+    });
+  });
+
   describe('defaultSelection', () => {
     it('min only', () => {
       const bound = constructBound([{ value: '3$$' }]);
