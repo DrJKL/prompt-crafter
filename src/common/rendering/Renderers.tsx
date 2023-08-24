@@ -1,5 +1,5 @@
 import { ChangeEvent, Fragment, MouseEvent, useState } from 'react';
-import { Bound, Group, Literal, Prompt, Variants } from './parsed_types';
+import { Bound, Group, Prompt, Variants } from './parsed_types';
 import { MenuItem, Menu, Slide, Checkbox } from '@mui/material';
 import { SelectionUpdateFn } from './PromptRender';
 import { Close } from '@mui/icons-material';
@@ -17,10 +17,6 @@ interface PromptProps extends KeyPath {
   separator: string;
 }
 
-interface LiteralProps extends KeyPath {
-  literal: Literal;
-}
-
 interface VariantProps extends KeyPath {
   variants: Variants;
 }
@@ -33,18 +29,8 @@ interface GroupProps extends KeyPath {
   group: Group;
 }
 
-function pathToString(prefix: string, path: number[]): string {
+export function pathToString(prefix: string, path: number[]): string {
   return `${prefix}-${path.join('-')}`;
-}
-
-export function LiteralView({ literal, path }: LiteralProps) {
-  return (
-    <span
-      className="text-pink-400 font-bold"
-      title={pathToString('literal', path)}>
-      {literal.value.trim()}
-    </span>
-  );
 }
 
 export function VariantView({
