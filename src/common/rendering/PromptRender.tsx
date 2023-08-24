@@ -1,5 +1,5 @@
 import { RenderingOptions } from './RenderType';
-import { PromptView } from './Renderers';
+import { PromptView } from './PromptView';
 import { Tooltip } from '@mui/material';
 import { Token } from 'moo';
 import { ParseResult } from './parsed_types';

@@ -1,16 +1,12 @@
-import { ChangeEvent, Fragment, MouseEvent, useState } from 'react';
-import { Prompt, Variants } from './parsed_types';
+import { ChangeEvent, MouseEvent, useState } from 'react';
+import { Variants } from './parsed_types';
 import { MenuItem, Menu, Slide, Checkbox } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { xor } from 'lodash';
 import { ChunkView } from './ChunkView';
 import { pathToString, KeyPath } from './rendering_utils';
 import { BoundView } from './BoundView';
-
-interface PromptProps extends KeyPath {
-  prompt: Prompt;
-  separator: string;
-}
+import { PromptView } from './PromptView';
 
 interface VariantProps extends KeyPath {
   variants: Variants;
@@ -192,31 +188,5 @@ export function FancyVariantView({
         </MenuItem>
       </Menu>
     </>
-  );
-}
-
-export function PromptView({
-  prompt,
-  path,
-  updateSelection,
-  separator,
-  fancy,
-}: PromptProps) {
-  return (
-    prompt &&
-    prompt.map((c, idx) => {
-      const newPath = [...path, idx];
-      return (
-        <Fragment key={idx}>
-          {idx > 0 && <span>{separator}</span>}
-          <ChunkView
-            chunk={c}
-            path={newPath}
-            updateSelection={updateSelection}
-            fancy={fancy}
-          />
-        </Fragment>
-      );
-    })
   );
 }
