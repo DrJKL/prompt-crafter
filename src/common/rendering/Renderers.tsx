@@ -1,5 +1,5 @@
 import { ChangeEvent, Fragment, MouseEvent, useState } from 'react';
-import { Group, Prompt, Variants } from './parsed_types';
+import { Prompt, Variants } from './parsed_types';
 import { MenuItem, Menu, Slide, Checkbox } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { xor } from 'lodash';
@@ -14,10 +14,6 @@ interface PromptProps extends KeyPath {
 
 interface VariantProps extends KeyPath {
   variants: Variants;
-}
-
-interface GroupProps extends KeyPath {
-  group: Group;
 }
 
 export function VariantView({
@@ -222,35 +218,5 @@ export function PromptView({
         </Fragment>
       );
     })
-  );
-}
-
-export function GroupView({ group, path, fancy, updateSelection }: GroupProps) {
-  if (!group.chunks) {
-    return <div>This isn't a group: {`${JSON.stringify(group)}`}</div>;
-  }
-
-  return (
-    <span
-      className={`${
-        fancy
-          ? 'border-red-500 border-opacity-50 border-2 rounded-md p-0.5'
-          : ''
-      } text-purple-200 font-bold`}>
-      (
-      {group.chunks?.map((chunk, idx) => {
-        const newPath = [...path, idx];
-        return (
-          <ChunkView
-            chunk={chunk}
-            key={pathToString('group', newPath)}
-            path={newPath}
-            fancy={fancy}
-            updateSelection={updateSelection}
-          />
-        );
-      })}
-      :{group.weight})
-    </span>
   );
 }
