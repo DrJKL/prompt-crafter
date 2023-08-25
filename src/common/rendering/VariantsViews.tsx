@@ -1,6 +1,12 @@
 import { ChangeEvent, MouseEvent, useState } from 'react';
 import { Variants } from './parsed_types';
-import { MenuItem, Menu, Slide, Checkbox } from '@mui/material';
+import {
+  MenuItem,
+  Menu,
+  Slide,
+  Checkbox,
+  FormControlLabel,
+} from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { xor } from 'lodash';
 import { ChunkView } from './ChunkView';
@@ -126,8 +132,7 @@ export function FancyVariantView({
         <MenuItem disabled sx={{ '&.Mui-disabled': { opacity: 100 } }}>
           <span className="text-white opacity-100">
             Selected: {variants.selections.length}
-            <br /> Minimum: {variants.bound.min}
-            <br /> Maximum: {variants.bound.max}
+            <br /> Min-max: {variants.bound.min}-{variants.bound.max}
           </span>
         </MenuItem>
         {variants.variants?.map((v, idx) => {
@@ -135,38 +140,39 @@ export function FancyVariantView({
           const isSelected = variants.selections.includes(idx);
           return (
             <MenuItem
-              disableRipple
+              // disableRipple
+              disabled={fullSelection && !isSelected}
               value={idx}
               sx={[
                 {
                   borderBottom: '2px inset #FFF6',
+                  padding: '0',
                 },
-                isSelected && {
-                  boxShadow: 'inset 0 0 4px 0 white',
-                },
-                {
-                  '&:has( > .variants-button )': {
-                    // This will probably be broken in Firefox (without a config set for :has)
-                    padding: 0,
-                    '& > .variants-button': {
-                      marginInline: '1rem',
-                    },
+                isSelected &&
+                  {
+                    // boxShadow: 'inset 0 0 4px 0 white',
                   },
-                },
               ]}
               key={pathToString('fancy-variant-option', newPath)}>
-              <Checkbox
-                checked={isSelected}
-                disabled={fullSelection && !isSelected}
-                onChange={(e) => editSelections(e, path, idx)}
-              />
-              <PromptView
-                prompt={v}
-                key={pathToString('variant-option', newPath)}
-                path={newPath}
-                updateSelection={updateSelection}
-                fancy={fancy}
-                separator=","
+              <FormControlLabel
+                sx={{ width: '100%', margin: '0' }}
+                control={
+                  <Checkbox
+                    checked={isSelected}
+                    disabled={fullSelection && !isSelected}
+                    onChange={(e) => editSelections(e, path, idx)}
+                  />
+                }
+                label={
+                  <PromptView
+                    prompt={v}
+                    key={pathToString('variant-option', newPath)}
+                    path={newPath}
+                    updateSelection={updateSelection}
+                    fancy={fancy}
+                    separator=" "
+                  />
+                }
               />
             </MenuItem>
           );
