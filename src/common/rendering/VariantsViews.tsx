@@ -1,4 +1,4 @@
-import { ChangeEvent, MouseEvent, useState } from 'react';
+import { ChangeEvent, Fragment, MouseEvent, useState } from 'react';
 import { Variants } from './parsed_types';
 import {
   MenuItem,
@@ -65,9 +65,9 @@ export function FancyVariantView({
   const fullSelection = variants.selections.length >= variants.bound.max;
   const enoughSelected = variants.selections.length >= variants.bound.min;
 
-  const variant = variants.variants
-    .filter((_v, i) => variants.selections.includes(i))
-    .flat();
+  const variant = variants.variants.filter((_v, i) =>
+    variants.selections.includes(i),
+  );
 
   function handleClick(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
@@ -96,11 +96,12 @@ export function FancyVariantView({
     const newSelection = xor(currentSelection, targetItem);
     updateSelection(path, newSelection);
   }
+  const { separator } = variants.bound;
 
   return (
     <>
       <button
-        className={`variants-button mx-0.5 text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 ${
+        className={`variants-button mx-0.5 min-h-[32px] align-middle text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 ${
           fancy
             ? 'border-pink-500 border-2 rounded-md px-1 py-0 hover:border-pink-200'
             : ''
@@ -113,15 +114,18 @@ export function FancyVariantView({
           pathToString('fancy-variant', path) + ` : ${variants.selections}`
         }
         onClickCapture={handleClick}>
-        {variant && (
-          <PromptView
-            prompt={variant}
-            path={path}
-            fancy={fancy}
-            updateSelection={updateSelection}
-            separator={variants.bound.separator}
-          />
-        )}
+        {variant &&
+          variant.map((v, idx) => (
+            <Fragment key={idx}>
+              {idx > 0 && separator && <span>{separator}</span>}
+              <PromptView
+                prompt={v}
+                path={path}
+                fancy={fancy}
+                updateSelection={updateSelection}
+              />
+            </Fragment>
+          ))}
       </button>
       <Menu
         anchorEl={anchorEl}
@@ -148,10 +152,9 @@ export function FancyVariantView({
                   borderBottom: '2px inset #FFF6',
                   padding: '0',
                 },
-                isSelected &&
-                  {
-                    // boxShadow: 'inset 0 0 4px 0 white',
-                  },
+                isSelected && {
+                  boxShadow: 'inset 0 0 2px 0 white',
+                },
               ]}
               key={pathToString('fancy-variant-option', newPath)}>
               <FormControlLabel
@@ -170,7 +173,6 @@ export function FancyVariantView({
                     path={newPath}
                     updateSelection={updateSelection}
                     fancy={fancy}
-                    separator=" "
                   />
                 }
               />
