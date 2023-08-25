@@ -116,7 +116,7 @@ function formattedParseView(
               path={[idx]}
               fancy={fancy}
               updateSelection={updateSelection}
-              separator=" "
+              separator=""
               key={idx}
             />
           </div>
