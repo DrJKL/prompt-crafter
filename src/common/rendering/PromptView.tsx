@@ -11,6 +11,7 @@ export function PromptView({
   path,
   updateSelection,
   fancy,
+  dense,
 }: PromptProps) {
   return (
     prompt &&
@@ -23,6 +24,7 @@ export function PromptView({
           path={newPath}
           updateSelection={updateSelection}
           fancy={fancy}
+          dense={dense}
         />
       );
     })

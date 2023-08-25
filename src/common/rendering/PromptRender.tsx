@@ -107,14 +107,17 @@ function formattedParseView(
         {allResults.map(([results], idx) => (
           <div
             key={`parse-result-${idx}`}
-            className={`leading-8 ${
-              dense ? 'whitespace-normal' : `whitespace-pre-line`
+            className={`${
+              dense
+                ? 'flex-wrap flex gap-[4px_2px] items-end whitespace-normal'
+                : `whitespace-pre-line`
             }`}>
             {ambiguousParse && <div>{idx}</div>}
             <PromptView
               prompt={results}
               path={[idx]}
               fancy={fancy}
+              dense={dense}
               updateSelection={updateSelection}
               key={idx}
             />

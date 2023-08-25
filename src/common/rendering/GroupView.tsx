@@ -6,7 +6,13 @@ interface GroupProps extends KeyPath {
   group: Group;
 }
 
-export function GroupView({ group, path, fancy, updateSelection }: GroupProps) {
+export function GroupView({
+  group,
+  path,
+  fancy,
+  dense,
+  updateSelection,
+}: GroupProps) {
   if (!group.chunks) {
     return <div>This isn't a group: {`${JSON.stringify(group)}`}</div>;
   }
@@ -14,7 +20,7 @@ export function GroupView({ group, path, fancy, updateSelection }: GroupProps) {
   return (
     <span
       className={`${
-        fancy ? 'border-red-500 border-opacity-50 border-2 rounded-md p-1' : ''
+        fancy ? 'border-red-500 border-opacity-50 border-2 rounded-md' : ''
       } text-purple-200 font-bold`}>
       (
       {group.chunks?.map((chunk, idx) => {
@@ -25,6 +31,7 @@ export function GroupView({ group, path, fancy, updateSelection }: GroupProps) {
             key={pathToString('group', newPath)}
             path={newPath}
             fancy={fancy}
+            dense={dense}
             updateSelection={updateSelection}
           />
         );

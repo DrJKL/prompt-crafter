@@ -14,6 +14,7 @@ export function ChunkView({
   path,
   updateSelection,
   fancy,
+  dense,
 }: ChunkProps): ReactNode {
   if (!chunk) {
     return <>Ummmm...</>;
@@ -25,6 +26,7 @@ export function ChunkView({
           updateSelection={updateSelection}
           literal={chunk}
           fancy={fancy}
+          dense={dense}
           path={path}
         />
       );
@@ -34,6 +36,7 @@ export function ChunkView({
           variants={chunk}
           path={path}
           fancy={fancy}
+          dense={dense}
           updateSelection={updateSelection}
         />
       ) : (
@@ -42,6 +45,7 @@ export function ChunkView({
           variants={chunk}
           path={path}
           fancy={fancy}
+          dense={dense}
         />
       );
     case 'wildcard':
@@ -52,6 +56,7 @@ export function ChunkView({
           updateSelection={updateSelection}
           path={path}
           fancy={fancy}
+          dense={dense}
           group={chunk}
         />
       );

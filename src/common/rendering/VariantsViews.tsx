@@ -22,6 +22,7 @@ export function VariantView({
   variants,
   path,
   fancy,
+  dense,
   updateSelection,
 }: VariantProps) {
   return (
@@ -32,6 +33,7 @@ export function VariantView({
           variants={variants}
           updateSelection={updateSelection}
           fancy={fancy}
+          dense={dense}
           path={path}
         />
       )}
@@ -43,7 +45,13 @@ export function VariantView({
             key={pathToString('variant', newPath)}>
             {idx > 0 ? ' | ' : ''}
             {v
-              ? ChunkView({ chunk: v, fancy, path: newPath, updateSelection })
+              ? ChunkView({
+                  chunk: v,
+                  fancy,
+                  dense,
+                  path: newPath,
+                  updateSelection,
+                })
               : ''}
           </span>
         );
@@ -58,6 +66,7 @@ export function FancyVariantView({
   path,
   updateSelection,
   fancy,
+  dense,
 }: VariantProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -101,7 +110,7 @@ export function FancyVariantView({
   return (
     <>
       <button
-        className={`variants-button mx-0.5 min-h-[32px] align-middle text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 ${
+        className={`align-baseline text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 ${
           fancy
             ? 'border-pink-500 border-2 rounded-md px-1 py-0 hover:border-pink-200'
             : ''
@@ -122,10 +131,12 @@ export function FancyVariantView({
                 prompt={v}
                 path={path}
                 fancy={fancy}
+                dense={dense}
                 updateSelection={updateSelection}
               />
             </Fragment>
           ))}
+        {!variant.length && '...'}
       </button>
       <Menu
         anchorEl={anchorEl}
@@ -173,6 +184,7 @@ export function FancyVariantView({
                     path={newPath}
                     updateSelection={updateSelection}
                     fancy={fancy}
+                    dense={dense}
                   />
                 }
               />
