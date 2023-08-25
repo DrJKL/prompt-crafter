@@ -44,15 +44,15 @@ export function VariantView({
             className="variant-option"
             key={pathToString('variant', newPath)}>
             {idx > 0 ? ' | ' : ''}
-            {v
-              ? ChunkView({
-                  chunk: v,
-                  fancy,
-                  dense,
-                  path: newPath,
-                  updateSelection,
-                })
-              : ''}
+            {v && (
+              <ChunkView
+                chunk={v}
+                fancy={fancy}
+                dense={dense}
+                path={newPath}
+                updateSelection={updateSelection}
+              />
+            )}
           </span>
         );
       })}
