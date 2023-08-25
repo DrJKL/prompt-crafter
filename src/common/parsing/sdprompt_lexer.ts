@@ -6,7 +6,7 @@ const WEIGHT_PATTERN = `:${WEIGHT_PARTIAL}`;
 const ANTIWEIGHT_PATTERN = `:(?!${WEIGHT_PARTIAL})`;
 const NON_WILDCARD_UNDERSCORE = `_(?!_)`;
 
-const SEPARATOR_PATTERN = `\\$\\$(?:[^$|}]*?\\$\\$)?`;
+const SEPARATOR_PATTERN = `\\$\\$(?:(?:[^$|}]|\\$(?!\\$))*?\\$\\$)?`;
 
 const boundMatchers = [
   new RegExp(`\\d+${SEPARATOR_PATTERN}`), // min

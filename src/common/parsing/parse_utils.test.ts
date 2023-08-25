@@ -41,6 +41,14 @@ describe('parse_utils', () => {
       const actual = constructBound([{ value: '$$$$' }]);
       expect(actual.separator).toBe('');
     });
+    it('a word', () => {
+      const actual = constructBound([{ value: '$$ and $$' }]);
+      expect(actual.separator).toBe(' and ');
+    });
+    it('something with a dollar sign', () => {
+      const actual = constructBound([{ value: '$$ -$- $$' }]);
+      expect(actual.separator).toBe(' -$- ');
+    });
   });
 
   describe('defaultSelection', () => {

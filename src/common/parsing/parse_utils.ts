@@ -11,7 +11,7 @@ import {
 } from '../rendering/parsed_types';
 
 const BOUND_FORMAT = new RegExp(
-  '(?<min>\\d+)?(?:(?<dash>-)(?<max>\\d+)?)?\\$\\$(?:(?<separator>[^$]*?)\\$\\$)?',
+  '(?<min>\\d+)?(?:(?<dash>-)(?<max>\\d+)?)?\\$\\$(?:(?<separator>(?:[^$|}]|\\$(?!\\$))*?)\\$\\$)?',
 );
 
 export function countType(chunks: readonly Prompt[], type: ChunkType): number {
