@@ -14,9 +14,7 @@ export function GroupView({ group, path, fancy, updateSelection }: GroupProps) {
   return (
     <span
       className={`${
-        fancy
-          ? 'border-red-500 border-opacity-50 border-2 rounded-md p-0.5'
-          : ''
+        fancy ? 'border-red-500 border-opacity-50 border-2 rounded-md p-1' : ''
       } text-purple-200 font-bold`}>
       (
       {group.chunks?.map((chunk, idx) => {
