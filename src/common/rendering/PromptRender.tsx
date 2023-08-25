@@ -107,9 +107,9 @@ function formattedParseView(
         {allResults.map(([results], idx) => (
           <div
             key={`parse-result-${idx}`}
-            className={`${
+            className={` gap-[4px_2px]  ${
               dense
-                ? 'flex-wrap flex gap-[4px_2px] items-end whitespace-normal'
+                ? 'flex-wrap flexitems-end whitespace-normal'
                 : `whitespace-pre-line`
             }`}>
             {ambiguousParse && <div>{idx}</div>}
