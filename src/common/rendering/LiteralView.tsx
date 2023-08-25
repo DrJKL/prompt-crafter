@@ -10,7 +10,7 @@ export function LiteralView({ literal, path }: LiteralProps) {
     <span
       className="text-pink-400 font-bold"
       title={pathToString('literal', path)}>
-      {literal.value.trim()}
+      {literal.value}
     </span>
   );
 }
