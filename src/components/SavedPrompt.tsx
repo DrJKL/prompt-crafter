@@ -11,7 +11,7 @@ export function SavedPromptDisplay({ prompt }: SavedPromptDisplayProps) {
 
   const [open, setOpen] = useState(false);
 
-  const promptText = useRef<HTMLParagraphElement | null>(null);
+  const promptText = useRef<HTMLPreElement | null>(null);
 
   function handlePromptDoubleClick() {
     const promptTextNode = promptText.current;
@@ -37,12 +37,12 @@ export function SavedPromptDisplay({ prompt }: SavedPromptDisplayProps) {
         </span>
       </h3>
       <Collapse in={open}>
-        <p
+        <pre
           ref={promptText}
           className="h-40 overflow-auto bg-gray-800 bg-opacity-50"
           onDoubleClick={handlePromptDoubleClick}>
           {contents}
-        </p>
+        </pre>
       </Collapse>
       <hr />
     </div>
