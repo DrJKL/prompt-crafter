@@ -39,12 +39,14 @@ import { editAttentionMonaco } from './common/tweaks/edit_attention';
 import { getPromptTokens, parsePrompt } from './common/parsing/app_parsing';
 import { current } from 'immer';
 import { ParseResult, Prompt } from './common/rendering/parsed_types';
+import { randomizeAllResults } from './common/random/randomize';
 
 const minHeight =
   3 * parseInt(getComputedStyle(document.documentElement)?.fontSize);
 
 type ModifyPromptAction =
   | { type: 'reset'; results: ParseResult }
+  | { type: 'randomize' }
   | { type: 'choose-variant'; path: number[]; selection: number[] };
 
 function variantSelectionReducer(
@@ -56,6 +58,9 @@ function variantSelectionReducer(
       return action.results;
     case 'choose-variant':
       return modifySelection(draft, action.path, action.selection);
+    case 'randomize':
+      randomizeAllResults(draft);
+      return;
   }
   action satisfies never;
   return draft;
@@ -211,6 +216,11 @@ function App() {
       //
     }
   }
+
+  function randomizePrompt() {
+    dispatch({ type: 'randomize' });
+  }
+
   function resizeSavedPrompts() {
     if (
       !savedPromptSectionHeight ||
@@ -235,6 +245,7 @@ function App() {
             setRenderingOptions={setRenderingOptions}
             rotateSelect={rotateSelect}
             copyText={copyRenderedText}
+            randomizePrompt={randomizePrompt}
           />
         </Top>
         <Fill className="p-4 pb-10">

@@ -13,7 +13,7 @@ import {
   Slide,
   Tooltip,
 } from '@mui/material';
-import { CopyAll, NavigateNext } from '@mui/icons-material';
+import { CopyAll, NavigateNext, Shuffle } from '@mui/icons-material';
 import {
   RENDER_TYPES,
   RenderType,
@@ -27,12 +27,14 @@ export interface PromptCrafterAppBarProps {
   renderingOptions: RenderingOptions;
   setRenderingOptions: Updater<RenderingOptions>;
   copyText: () => void;
+  randomizePrompt: () => void;
 }
 export function PromptCrafterAppBar({
   rotateSelect,
   renderingOptions,
   setRenderingOptions,
   copyText,
+  randomizePrompt,
 }: PromptCrafterAppBarProps) {
   function handleDisplayTypeChange(event: SelectChangeEvent<RenderType>) {
     const value: unknown = event.target.value;
@@ -117,6 +119,13 @@ export function PromptCrafterAppBar({
           <Tooltip title="Copy current (rendered) prompt">
             <IconButton aria-label="Copy prompt" onClick={copyText}>
               <CopyAll />
+            </IconButton>
+          </Tooltip>
+        </span>
+        <span className="flex-shrink pr-2 flex justify-end">
+          <Tooltip title="Shuffle current (rendered) prompt">
+            <IconButton aria-label="Shuffle prompt" onClick={randomizePrompt}>
+              <Shuffle />
             </IconButton>
           </Tooltip>
         </span>
