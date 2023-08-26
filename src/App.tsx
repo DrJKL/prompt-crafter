@@ -37,7 +37,7 @@ import { SavedPromptDisplay } from './components/SavedPrompt';
 import { SizeUnit } from 'react-spaces/dist/core-types';
 import { editAttentionMonaco } from './common/tweaks/edit_attention';
 import { getPromptTokens, parsePrompt } from './common/parsing/app_parsing';
-import { current } from 'immer';
+import { Draft, current } from 'immer';
 import { ParseResult, Prompt } from './common/rendering/parsed_types';
 import { randomizeAllResults } from './common/random/randomize';
 
@@ -50,7 +50,7 @@ type ModifyPromptAction =
   | { type: 'choose-variant'; path: number[]; selection: number[] };
 
 function variantSelectionReducer(
-  draft: ParseResult,
+  draft: Draft<ParseResult>,
   action: ModifyPromptAction,
 ) {
   switch (action.type) {
@@ -67,7 +67,7 @@ function variantSelectionReducer(
 }
 
 function modifySelection(
-  draft: ParseResult,
+  draft: Draft<ParseResult>,
   path: number[],
   selection: number[],
 ) {
@@ -77,7 +77,7 @@ function modifySelection(
     console.error(`Can't modify selection, bad Chunks provided: ${undraft}`);
     return draft;
   }
-  let chunkCursor: Prompt[] = firstParse;
+  let chunkCursor: Draft<Prompt>[] = firstParse;
   for (let i = 0; i < path.length - 2; i += 2) {
     if (path[i] < 0 || path[i + 1] < 0) {
       return;

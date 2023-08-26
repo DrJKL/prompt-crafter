@@ -33,7 +33,7 @@ export interface Variants {
    * There should be >= max(min, 1) non-negative indices
    *
    */
-  selections: readonly number[];
+  readonly selections: readonly number[];
 }
 
 export interface Bound {
