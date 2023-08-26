@@ -29,7 +29,9 @@
 - [ ] Weighting
 - [x] Multiple: `{2$$chocolate|vanilla|strawberry}`
 - [x] Custom Separator: `{2$$ and $$chocolate|vanilla|strawberry}`
-- [ ] Range of Options `{1-2$$ and $$chocolate|vanilla|strawberry}`
+- [x] Range of Options `{1-2$$ and $$chocolate|vanilla|strawberry}`
+- [x] Generate single random instances
+- [ ] Combinatorics
 
 ## General Features
 
