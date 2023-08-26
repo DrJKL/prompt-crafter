@@ -109,7 +109,7 @@ function formattedParseView(
             key={`parse-result-${idx}`}
             className={` gap-[4px_2px]  ${
               dense
-                ? 'flex-wrap flexitems-end whitespace-normal'
+                ? 'flex-wrap flex items-baseline whitespace-normal'
                 : `whitespace-pre-line`
             }`}>
             {ambiguousParse && <div>{idx}</div>}
