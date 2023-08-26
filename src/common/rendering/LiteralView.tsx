@@ -8,7 +8,7 @@ interface LiteralProps extends KeyPath {
 export function LiteralView({ literal, path, dense }: LiteralProps) {
   return (
     <span
-      className={`text-pink-400 font-bold ${dense ? 'whitespace-nowrap' : ''}`}
+      className={`text-pink-400 font-bold`}
       title={pathToString('literal', path)}>
       {literal.value}
     </span>
