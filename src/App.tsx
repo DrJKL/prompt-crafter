@@ -4,9 +4,10 @@ import {
   Snackbar,
   IconButton,
   Tooltip,
+  Slide,
 } from '@mui/material';
 import { Editor } from './components/Editor';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMonaco } from '@monaco-editor/react';
 import { conf, language } from './common/sdprompt_monaco';
 import monaco, { KeyCode, KeyMod } from 'monaco-editor';
@@ -40,13 +41,15 @@ import { getPromptTokens, parsePrompt } from './common/parsing/app_parsing';
 import { Draft, current } from 'immer';
 import { ParseResult, Prompt } from './common/rendering/parsed_types';
 import { randomizeAllResults } from './common/random/randomize';
+import { TransitionGroup } from 'react-transition-group';
+import seedrandom, { PRNG } from 'seedrandom';
 
 const minHeight =
   3 * parseInt(getComputedStyle(document.documentElement)?.fontSize);
 
 type ModifyPromptAction =
   | { type: 'reset'; results: ParseResult }
-  | { type: 'randomize' }
+  | { type: 'randomize'; prng: PRNG }
   | { type: 'choose-variant'; path: number[]; selection: number[] };
 
 function variantSelectionReducer(
@@ -59,7 +62,7 @@ function variantSelectionReducer(
     case 'choose-variant':
       return modifySelection(draft, action.path, action.selection);
     case 'randomize':
-      randomizeAllResults(draft);
+      randomizeAllResults(draft, action.prng);
       return;
   }
   action satisfies never;
@@ -112,6 +115,8 @@ function modifySelection(
 
 function App() {
   const [promptText, setPromptText] = useState<string>(getActivePromptLocal());
+  const [seed, setSeed] = useState('so random.');
+  const prng = useMemo(() => seedrandom.alea(seed), [seed]);
 
   const [savedPrompts, setSavedPrompts] = useState(getSavedPromptsLocal());
   const [renderingOptions, setRenderingOptions] = useImmer(
@@ -146,6 +151,10 @@ function App() {
 
   function updateSelection(path: number[], selection: number[]) {
     dispatch({ type: 'choose-variant', path, selection });
+  }
+
+  function randomizePrompt() {
+    dispatch({ type: 'randomize', prng });
   }
 
   useEffect(() => {
@@ -217,10 +226,6 @@ function App() {
     }
   }
 
-  function randomizePrompt() {
-    dispatch({ type: 'randomize' });
-  }
-
   function resizeSavedPrompts() {
     if (
       !savedPromptSectionHeight ||
@@ -263,12 +268,18 @@ function App() {
               <div
                 className="overflow-y-auto h-full p-4 pl-6"
                 ref={renderedViewRef}>
-                <RenderedPrompt
-                  options={renderingOptions}
-                  tokens={promptTokens}
-                  parsedResults={workingPrompt}
-                  updateSelection={updateSelection}
-                />
+                <TransitionGroup>
+                  <Slide direction="down">
+                    <div>
+                      <RenderedPrompt
+                        options={renderingOptions}
+                        tokens={promptTokens}
+                        parsedResults={workingPrompt}
+                        updateSelection={updateSelection}
+                      />
+                    </div>
+                  </Slide>
+                </TransitionGroup>
               </div>
             </Fill>
             <BottomResizable

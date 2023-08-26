@@ -5,23 +5,24 @@ import {
   Prompt,
   Variants,
 } from '../rendering/parsed_types';
-import seedrandom from 'seedrandom';
+import { PRNG } from 'seedrandom';
 
 export function randomizeAllResults(
   allResults: Draft<ParseResult>,
+  prng: PRNG,
 ): ParseResult {
-  allResults.flat().forEach(randomizePromptInPlace);
+  allResults.flat().forEach((prompt) => randomizePromptInPlace(prompt, prng));
   return allResults;
 }
 
-function randomizePromptInPlace(prompt: Draft<Prompt>): void {
+function randomizePromptInPlace(prompt: Draft<Prompt>, prng: PRNG): void {
   for (const chunk of prompt) {
     switch (chunk.type) {
       case 'group':
-        randomizePromptInPlace(chunk.chunks);
+        randomizePromptInPlace(chunk.chunks, prng);
         break;
       case 'variants':
-        randomizeVariantsInPlace(chunk);
+        randomizeVariantsInPlace(chunk, prng);
         break;
       case 'wildcard':
         // TODO
@@ -30,30 +31,27 @@ function randomizePromptInPlace(prompt: Draft<Prompt>): void {
   }
 }
 
-// /*
-const prng = seedrandom.alea('so random.');
-/*/
-const prng = Math.random;
-//*/
-
-function randomizeVariantsInPlace(variants: Draft<Variants>) {
+function randomizeVariantsInPlace(variants: Draft<Variants>, prng: PRNG) {
   const { bound, variants: options } = variants;
-  const count = getRandomInBounds(bound);
+  const count = getRandomInBounds(bound, prng);
   const allSelections = allPossibleSelections(options.length);
-  const shuffled = shuffle(allSelections);
+  const shuffled = shuffle(allSelections, prng);
   const selections = shuffled.slice(0, count);
   variants.selections = selections;
-  selections.map((i) => options[i]).forEach((o) => randomizePromptInPlace(o));
+  selections
+    .map((i) => options[i])
+    .forEach((o) => randomizePromptInPlace(o, prng));
 }
 
-function getRandomInBounds(bound: Bound) {
+function getRandomInBounds(bound: Bound, prng: PRNG) {
   return Math.floor(prng() * (bound.max - bound.min)) + bound.min;
 }
 
 function allPossibleSelections(length: number) {
   return Array.from({ length }, (_v, idx) => idx);
 }
-function shuffle<T>(array: T[]) {
+
+function shuffle<T>(array: T[], prng: PRNG) {
   const length = array?.length ?? 0;
   if (!length) {
     return [];
