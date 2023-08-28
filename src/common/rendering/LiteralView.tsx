@@ -5,10 +5,10 @@ interface LiteralProps extends KeyPath {
   literal: Literal;
 }
 
-export function LiteralView({ literal, path, dense }: LiteralProps) {
+export function LiteralView({ literal, path }: LiteralProps) {
   return (
     <span
-      className={`text-pink-400 font-bold`}
+      className={`text-pink-400 font-bold flex-[0_1_fit-content]`}
       title={pathToString('literal', path)}>
       {literal.value}
     </span>

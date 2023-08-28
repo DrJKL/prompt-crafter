@@ -20,7 +20,9 @@ export function GroupView({
   return (
     <span
       className={`${
-        fancy ? 'border-red-500 border-opacity-50 border-2 rounded-md' : ''
+        fancy
+          ? 'border-red-500 border-opacity-50 border-2 rounded-md flex-[0_1_fit-content]'
+          : ''
       } text-purple-200 font-bold`}>
       (
       {group.chunks?.map((chunk, idx) => {
