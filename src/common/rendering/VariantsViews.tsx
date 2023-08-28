@@ -114,7 +114,7 @@ export function FancyVariantView({
       <span
         ref={transitionContainer}
         className="overflow-hidden transition-all w-fit">
-        <button
+        <span
           className={`align-baseline text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 flex-[0_1_fit-content] ${
             fancy
               ? 'border-pink-500 border-2 rounded-md px-1 py-0 hover:border-pink-200'
@@ -142,7 +142,7 @@ export function FancyVariantView({
               </Fragment>
             ))}
           {!variant.length && '...'}
-        </button>
+        </span>
       </span>
       <Menu
         anchorEl={anchorEl}
