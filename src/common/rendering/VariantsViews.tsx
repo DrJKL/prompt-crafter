@@ -13,6 +13,7 @@ import { ChunkView } from './ChunkView';
 import { pathToString, KeyPath } from './rendering_utils';
 import { BoundView } from './BoundView';
 import { PromptView } from './PromptView';
+import { fixBound } from '../random/randomize';
 
 interface VariantProps extends KeyPath {
   variants: Variants;
@@ -73,7 +74,10 @@ export function FancyVariantView({
 
   const transitionContainer = useRef<HTMLSpanElement>(null);
 
-  const { separator, min, max } = variants.bound;
+  const { separator, min, max } = fixBound(
+    variants.bound,
+    variants.variants.length,
+  );
 
   const fullSelection = variants.selections.length >= max;
   const enoughSelected = variants.selections.length >= min;

@@ -20,6 +20,14 @@ export function randomDir() {
   return directions[Math.floor(Math.random() * 4)];
 }
 
+export function fixBound(bound: Bound, optionsCount: number): Bound {
+  const max =
+    bound.max > 0 && bound.max <= optionsCount ? bound.max : optionsCount;
+  const min =
+    bound.min > optionsCount ? optionsCount : bound.min > 0 ? bound.min : 1;
+  return { ...bound, min, max };
+}
+
 function randomizePromptInPlace(prompt: Draft<Prompt>, prng: PRNG): void {
   for (const chunk of prompt) {
     switch (chunk.type) {
@@ -49,10 +57,7 @@ function randomizeVariantsInPlace(variants: Draft<Variants>, prng: PRNG) {
 }
 
 function getRandomInBounds(bound: Bound, optionsCount: number, prng: PRNG) {
-  const max =
-    bound.max > 0 && bound.max <= optionsCount ? bound.max : optionsCount;
-  const min =
-    bound.min > optionsCount ? optionsCount : bound.min > 0 ? bound.min : 1;
+  const { min, max } = fixBound(bound, optionsCount);
   return Math.floor(prng() * (max + 1 - min)) + min;
 }
 
