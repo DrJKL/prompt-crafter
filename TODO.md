@@ -5,7 +5,7 @@
 - [x] Save current prompt to local storage
 - [x] Save named prompts to local storage
 - [ ] Save history to local storage
-- [ ] Allow deleting history items
+- [x] Allow deleting history items
 
 ## Autocomplete
 

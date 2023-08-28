@@ -1,7 +1,9 @@
 import { Chip, Collapse, Tooltip, IconButton } from '@mui/material';
 import { SavedPrompt } from '../common/saving/types';
 import { useRef, useState } from 'react';
-import { NorthWest } from '@mui/icons-material';
+import { DeleteForever, NorthWest } from '@mui/icons-material';
+import { useConfirm } from 'material-ui-confirm';
+import { deletePromptLocal } from '../common/saving/localstorage';
 
 export interface SavedPromptDisplayProps {
   prompt: SavedPrompt;
@@ -15,6 +17,7 @@ export function SavedPromptDisplay({
   const { name, contents, tags } = prompt;
 
   const [open, setOpen] = useState(false);
+  const confirm = useConfirm();
 
   const promptText = useRef<HTMLPreElement | null>(null);
 
@@ -25,6 +28,18 @@ export function SavedPromptDisplay({
     }
     window.getSelection()?.removeAllRanges();
     window.getSelection()?.selectAllChildren(promptTextNode);
+  }
+
+  async function handleDelete() {
+    try {
+      await confirm({
+        description: `Are you sure you want to delete ${name}?`,
+      });
+
+      deletePromptLocal(prompt);
+    } catch (err: unknown) {
+      console.error(`Canceled deletion of ${name}\n${err}`);
+    }
   }
 
   return (
@@ -56,6 +71,12 @@ export function SavedPromptDisplay({
                 setPromptText(contents);
               }}>
               <NorthWest />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Delete this Saved Prompt">
+            <IconButton aria-label="" onClick={handleDelete}>
+              <DeleteForever />
             </IconButton>
           </Tooltip>
         </div>

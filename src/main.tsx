@@ -1,12 +1,13 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
 import { Button, ThemeProvider, createTheme } from '@mui/material';
 import { red } from '@mui/material/colors';
-import { BrowserRouter } from 'react-router-dom';
+import { ConfirmProvider } from 'material-ui-confirm';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App.tsx';
 import { saveActivePrompt } from './common/saving/localstorage.ts';
+import './index.css';
 
 const theme = createTheme({
   palette: {
@@ -51,7 +52,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <BrowserRouter>
         <ErrorBoundary fallbackRender={fallbackRender}>
-          <App />
+          <ConfirmProvider>
+            <App />
+          </ConfirmProvider>
         </ErrorBoundary>
       </BrowserRouter>
     </ThemeProvider>

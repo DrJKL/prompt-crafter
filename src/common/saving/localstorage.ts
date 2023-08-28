@@ -1,6 +1,12 @@
 import { RenderingOptions } from './../rendering/RenderType';
-import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
-import { scan, takeUntil } from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  Observable,
+  ReplaySubject,
+  Subject,
+  merge,
+} from 'rxjs';
+import { scan, shareReplay, takeUntil } from 'rxjs/operators';
 
 import {
   RenderingOptionsSchema,
@@ -9,6 +15,7 @@ import {
   SavedPromptsSchema,
 } from './types';
 import { getDefaultPrompts } from '../../examples/prompts';
+import { isArray, isEqual } from 'lodash';
 
 /** Keys */
 const ACTIVE_PROMPT_NAME = 'pc.active_prompt.name' as const;
@@ -64,6 +71,13 @@ function savePromptsLocal(newPrompts: SavedPrompts) {
   localStorage.setItem(SAVED_PROMPTS, JSON.stringify(newPrompts));
 }
 
+export function deletePromptLocal(promptToDelete: SavedPrompt) {
+  const currentPrompts = getSavedPromptsLocal();
+  const filtered = currentPrompts.filter((p) => !isEqual(p, promptToDelete));
+  savePromptsLocal(filtered);
+  forceUpdatePromptsSubject.next(filtered);
+}
+
 export function getSavedPromptsLocal(): SavedPrompts {
   const currentValue = localStorage.getItem(SAVED_PROMPTS);
   const parsedMaybe = SavedPromptsSchema.safeParse(
@@ -83,13 +97,19 @@ export function getSavedPromptsLocal(): SavedPrompts {
 const activePromptSubject = new BehaviorSubject(getActivePromptLocal());
 const activePromptNameSubject = new BehaviorSubject(getActivePromptNameLocal());
 const activePromptTagsSubject = new BehaviorSubject(getActivePromptTagsLocal());
+const forceUpdatePromptsSubject = new Subject<SavedPrompts>();
 const savedPromptInputSubject = new Subject<SavedPrompt>();
 
-const savedPromptsComposed = savedPromptInputSubject.pipe(
+const savedPromptsComposed = merge(
+  savedPromptInputSubject,
+  forceUpdatePromptsSubject,
+).pipe(
   scan(
-    (existingPrompts, newPrompt) => [...existingPrompts, newPrompt],
+    (existingPrompts, newPrompt) =>
+      isArray(newPrompt) ? newPrompt : [...existingPrompts, newPrompt],
     getSavedPromptsLocal(),
   ),
+  shareReplay(1),
 );
 
 /* Exports */
@@ -111,6 +131,7 @@ export const savedPrompts$: Observable<SavedPrompts> = savedPromptsComposed;
 export function savePrompt(prompt: SavedPrompt) {
   savedPromptInputSubject.next(prompt);
 }
+
 /* Persistence */
 activePrompt$
   .pipe(takeUntil(cleanupLocalStorageSubscriptions$))
