@@ -299,7 +299,7 @@ function App() {
                 variant="h6"
                 component="h2"
                 className="select-none cursor-pointer flex-shrink"
-                onDoubleClick={() => resizeSavedPrompts()}>
+                onClick={() => resizeSavedPrompts()}>
                 Saved Prompts
               </Typography>
               <div className="overflow-y-auto flex-grow-0">
