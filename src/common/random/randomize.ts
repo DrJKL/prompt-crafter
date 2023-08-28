@@ -15,6 +15,11 @@ export function randomizeAllResults(
   return allResults;
 }
 
+const directions = ['up', 'down', 'left', 'right'] as const;
+export function randomDir() {
+  return directions[Math.floor(Math.random() * 4)];
+}
+
 function randomizePromptInPlace(prompt: Draft<Prompt>, prng: PRNG): void {
   for (const chunk of prompt) {
     switch (chunk.type) {

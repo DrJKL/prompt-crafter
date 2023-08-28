@@ -1,4 +1,4 @@
-import { ChangeEvent, Fragment, MouseEvent, useState } from 'react';
+import { ChangeEvent, Fragment, MouseEvent, useRef, useState } from 'react';
 import { Variants } from './parsed_types';
 import {
   MenuItem,
@@ -71,6 +71,8 @@ export function FancyVariantView({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
+  const transitionContainer = useRef<HTMLSpanElement>(null);
+
   const fullSelection = variants.selections.length >= variants.bound.max;
   const enoughSelected = variants.selections.length >= variants.bound.min;
 
@@ -81,7 +83,7 @@ export function FancyVariantView({
   function handleClick(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     event.stopPropagation();
-    setAnchorEl(event.currentTarget);
+    setAnchorEl(event.currentTarget.closest('span'));
   }
   function handleClose(
     // eslint-disable-next-line
@@ -109,35 +111,39 @@ export function FancyVariantView({
 
   return (
     <>
-      <button
-        className={`align-baseline text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 ${
-          fancy
-            ? 'border-pink-500 border-2 rounded-md px-1 py-0 hover:border-pink-200'
-            : ''
-        }`}
-        aria-roledescription="button"
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        title={
-          pathToString('fancy-variant', path) + ` : ${variants.selections}`
-        }
-        onClickCapture={handleClick}>
-        {variant &&
-          variant.map((v, idx) => (
-            <Fragment key={idx}>
-              {idx > 0 && separator && <span>{separator}</span>}
-              <PromptView
-                prompt={v}
-                path={path}
-                fancy={fancy}
-                dense={dense}
-                updateSelection={updateSelection}
-              />
-            </Fragment>
-          ))}
-        {!variant.length && '...'}
-      </button>
+      <span
+        ref={transitionContainer}
+        className="overflow-hidden transition-all w-fit">
+        <button
+          className={`align-baseline text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 flex-[0_1_fit-content] ${
+            fancy
+              ? 'border-pink-500 border-2 rounded-md px-1 py-0 hover:border-pink-200'
+              : ''
+          }`}
+          aria-roledescription="button"
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          title={
+            pathToString('fancy-variant', path) + ` : ${variants.selections}`
+          }
+          onClickCapture={handleClick}>
+          {variant &&
+            variant.map((v, idx) => (
+              <Fragment key={idx}>
+                {idx > 0 && separator && <span>{separator}</span>}
+                <PromptView
+                  prompt={v}
+                  path={path}
+                  fancy={fancy}
+                  dense={dense}
+                  updateSelection={updateSelection}
+                />
+              </Fragment>
+            ))}
+          {!variant.length && '...'}
+        </button>
+      </span>
       <Menu
         anchorEl={anchorEl}
         open={open}

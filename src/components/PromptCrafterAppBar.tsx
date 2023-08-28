@@ -12,6 +12,7 @@ import {
   Switch,
   Slide,
   Tooltip,
+  TextField,
 } from '@mui/material';
 import { CopyAll, NavigateNext, Shuffle } from '@mui/icons-material';
 import {
@@ -28,6 +29,8 @@ export interface PromptCrafterAppBarProps {
   setRenderingOptions: Updater<RenderingOptions>;
   copyText: () => void;
   randomizePrompt: () => void;
+  seed: string;
+  setSeed: (seed: string) => void;
 }
 export function PromptCrafterAppBar({
   rotateSelect,
@@ -35,6 +38,8 @@ export function PromptCrafterAppBar({
   setRenderingOptions,
   copyText,
   randomizePrompt,
+  seed,
+  setSeed,
 }: PromptCrafterAppBarProps) {
   function handleDisplayTypeChange(event: SelectChangeEvent<RenderType>) {
     const value: unknown = event.target.value;
@@ -115,6 +120,15 @@ export function PromptCrafterAppBar({
             </span>
           </span>
         </Slide>
+        <span className="flex-1">
+          <TextField
+            size="small"
+            id="seed-input"
+            label="Seed"
+            value={seed}
+            onChange={(e) => setSeed(e.target.value)}
+          />
+        </span>
         <span className="flex-shrink pr-2 flex justify-end">
           <Tooltip title="Copy current (rendered) prompt">
             <IconButton aria-label="Copy prompt" onClick={copyText}>

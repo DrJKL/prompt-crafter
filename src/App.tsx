@@ -40,8 +40,8 @@ import { editAttentionMonaco } from './common/tweaks/edit_attention';
 import { getPromptTokens, parsePrompt } from './common/parsing/app_parsing';
 import { Draft, current } from 'immer';
 import { ParseResult, Prompt } from './common/rendering/parsed_types';
-import { randomizeAllResults } from './common/random/randomize';
-import { TransitionGroup } from 'react-transition-group';
+import { randomDir, randomizeAllResults } from './common/random/randomize';
+import { SwitchTransition } from 'react-transition-group';
 import seedrandom, { PRNG } from 'seedrandom';
 
 const minHeight =
@@ -115,6 +115,7 @@ function modifySelection(
 
 function App() {
   const [promptText, setPromptText] = useState<string>(getActivePromptLocal());
+  const [timesRandomized, setTimesRandomized] = useState(0);
   const [seed, setSeed] = useState('so random.');
   const prng = useMemo(() => seedrandom.alea(seed), [seed]);
 
@@ -155,6 +156,7 @@ function App() {
 
   function randomizePrompt() {
     dispatch({ type: 'randomize', prng });
+    setTimesRandomized((prev) => prev + 1);
   }
 
   useEffect(() => {
@@ -251,6 +253,8 @@ function App() {
             rotateSelect={rotateSelect}
             copyText={copyRenderedText}
             randomizePrompt={randomizePrompt}
+            seed={seed}
+            setSeed={setSeed}
           />
         </Top>
         <Fill className="p-4 pb-10">
@@ -266,10 +270,13 @@ function App() {
           <Fill>
             <Fill>
               <div
-                className="overflow-y-auto h-full p-4 pl-6"
+                className="overflow-y-auto p-4 pl-6 overflow-x-hidden max-h-full h-fit"
                 ref={renderedViewRef}>
-                <TransitionGroup>
-                  <Slide direction="down">
+                <SwitchTransition>
+                  <Slide
+                    easing="ease-in-out"
+                    direction={randomDir()}
+                    key={timesRandomized}>
                     <div>
                       <RenderedPrompt
                         options={renderingOptions}
@@ -279,7 +286,7 @@ function App() {
                       />
                     </div>
                   </Slide>
-                </TransitionGroup>
+                </SwitchTransition>
               </div>
             </Fill>
             <BottomResizable
