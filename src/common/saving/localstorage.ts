@@ -8,6 +8,7 @@ import {
   SavedPrompts,
   SavedPromptsSchema,
 } from './types';
+import { getDefaultPrompts } from '../../examples/prompts';
 
 /** Keys */
 const ACTIVE_PROMPT_NAME = 'pc.active_prompt.name' as const;
@@ -69,6 +70,9 @@ export function getSavedPromptsLocal(): SavedPrompts {
     JSON.parse(currentValue ?? '[]'),
   );
   if (parsedMaybe.success) {
+    if (parsedMaybe.data.length === 0) {
+      return getDefaultPrompts();
+    }
     return parsedMaybe.data;
   }
   console.error(parsedMaybe.error);

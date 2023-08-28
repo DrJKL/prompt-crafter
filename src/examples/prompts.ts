@@ -1,3 +1,4 @@
+import { SavedPrompt, SavedPrompts } from './../common/saving/types';
 import dedent from 'dedent';
 
 /**
@@ -42,3 +43,28 @@ Frazetta| John Constable |J.C. Dahl }
 and
 {1-2$$James Gurney | Craig Mullins| Android Jones |Justin Maller | John Berkey| Roger Dean| Rodney Matthews | Chris Foss| Nicolas Roeg | Geoffrey Hayes | John Harris| Dinotopia| Jon Foster| Brom| Brian Froud | Alan Lee},
 `;
+
+export const BASIC_ALPHABET_FOR_SEED_DEMO = dedent`
+{A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z}
+{A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z}
+{A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z}
+{A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z}
+{A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z}
+{A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z}
+{A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z}
+`;
+
+export function getDefaultPrompts(): SavedPrompts {
+  return [
+    {
+      name: 'Lemmy Dynamic Landscape',
+      tags: ['Default'],
+      contents: LANDSCAPE_VERY_DYNAMIC,
+    },
+    {
+      name: 'Alphabet Demo',
+      tags: ['Default'],
+      contents: BASIC_ALPHABET_FOR_SEED_DEMO,
+    },
+  ];
+}
