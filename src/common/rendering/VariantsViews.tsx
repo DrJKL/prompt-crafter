@@ -73,8 +73,10 @@ export function FancyVariantView({
 
   const transitionContainer = useRef<HTMLSpanElement>(null);
 
-  const fullSelection = variants.selections.length >= variants.bound.max;
-  const enoughSelected = variants.selections.length >= variants.bound.min;
+  const { separator, min, max } = variants.bound;
+
+  const fullSelection = variants.selections.length >= max;
+  const enoughSelected = variants.selections.length >= min;
 
   const variant = variants.variants.filter((_v, i) =>
     variants.selections.includes(i),
@@ -107,7 +109,6 @@ export function FancyVariantView({
     const newSelection = xor(currentSelection, targetItem);
     updateSelection(path, newSelection);
   }
-  const { separator } = variants.bound;
 
   return (
     <>
@@ -153,7 +154,7 @@ export function FancyVariantView({
         <MenuItem disabled sx={{ '&.Mui-disabled': { opacity: 100 } }}>
           <span className="text-white opacity-100">
             Selected: {variants.selections.length}
-            <br /> Min-max: {variants.bound.min}-{variants.bound.max}
+            <br /> Min-max: {min}-{max}
           </span>
         </MenuItem>
         {variants.variants?.map((v, idx) => {
