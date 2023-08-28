@@ -4,7 +4,6 @@ import {
   Snackbar,
   IconButton,
   Tooltip,
-  Slide,
 } from '@mui/material';
 import { Editor } from './components/Editor';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -40,8 +39,7 @@ import { editAttentionMonaco } from './common/tweaks/edit_attention';
 import { getPromptTokens, parsePrompt } from './common/parsing/app_parsing';
 import { Draft, current } from 'immer';
 import { ParseResult, Prompt } from './common/rendering/parsed_types';
-import { randomDir, randomizeAllResults } from './common/random/randomize';
-import { SwitchTransition } from 'react-transition-group';
+import { randomizeAllResults } from './common/random/randomize';
 import seedrandom, { PRNG } from 'seedrandom';
 
 const minHeight =
@@ -115,7 +113,7 @@ function modifySelection(
 
 function App() {
   const [promptText, setPromptText] = useState<string>(getActivePromptLocal());
-  const [timesRandomized, setTimesRandomized] = useState(0);
+  const [_timesRandomized, setTimesRandomized] = useState(0);
   const [seed, setSeed] = useState('so random.');
   const prng = useMemo(() => seedrandom.alea(seed), [seed]);
 
@@ -272,21 +270,14 @@ function App() {
               <div
                 className="overflow-y-auto p-4 pl-6 overflow-x-hidden max-h-full h-fit"
                 ref={renderedViewRef}>
-                <SwitchTransition>
-                  <Slide
-                    easing="ease-in-out"
-                    direction={randomDir()}
-                    key={timesRandomized}>
-                    <div>
-                      <RenderedPrompt
-                        options={renderingOptions}
-                        tokens={promptTokens}
-                        parsedResults={workingPrompt}
-                        updateSelection={updateSelection}
-                      />
-                    </div>
-                  </Slide>
-                </SwitchTransition>
+                <div>
+                  <RenderedPrompt
+                    options={renderingOptions}
+                    tokens={promptTokens}
+                    parsedResults={workingPrompt}
+                    updateSelection={updateSelection}
+                  />
+                </div>
               </div>
             </Fill>
             <BottomResizable
