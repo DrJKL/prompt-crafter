@@ -13,20 +13,17 @@ export function PromptView({
   fancy,
   dense,
 }: PromptProps) {
-  return (
-    prompt &&
-    prompt.map((c, idx) => {
-      const newPath = [...path, idx];
-      return (
-        <ChunkView
-          key={idx}
-          chunk={c}
-          path={newPath}
-          updateSelection={updateSelection}
-          fancy={fancy}
-          dense={dense}
-        />
-      );
-    })
-  );
+  return prompt?.map((c, idx) => {
+    const newPath = [...path, idx];
+    return (
+      <ChunkView
+        key={idx}
+        chunk={c}
+        path={newPath}
+        updateSelection={updateSelection}
+        fancy={fancy}
+        dense={dense}
+      />
+    );
+  });
 }

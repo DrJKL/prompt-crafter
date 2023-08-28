@@ -118,36 +118,34 @@ export function FancyVariantView({
     <>
       <span
         ref={transitionContainer}
-        className="overflow-hidden transition-all w-fit">
-        <span
-          className={`align-baseline text-pink-500 font-bold cursor-pointer transition-all hover:text-pink-800 flex-[0_1_fit-content] ${
-            fancy
-              ? 'border-pink-500 border-2 rounded-md px-1 py-0 hover:border-pink-200'
-              : ''
-          }`}
-          aria-roledescription="button"
-          aria-controls={open ? 'basic-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
-          title={
-            pathToString('fancy-variant', path) + ` : ${variants.selections}`
-          }
-          onClickCapture={handleClick}>
-          {variant &&
-            variant.map((v, idx) => (
-              <Fragment key={idx}>
-                {idx > 0 && separator && <span>{separator}</span>}
-                <PromptView
-                  prompt={v}
-                  path={path}
-                  fancy={fancy}
-                  dense={dense}
-                  updateSelection={updateSelection}
-                />
-              </Fragment>
-            ))}
-          {!variant.length && '...'}
-        </span>
+        className={`align-baseline text-pink-500 font-bold cursor-pointer transition-all flex-[0_1_fit-content] ${
+          fancy
+            ? 'border-pink-500 border-2 rounded-md px-1 py-0 hover:border-pink-200'
+            : ''
+        }`}
+        aria-roledescription="button"
+        aria-controls={open ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        title={
+          pathToString('fancy-variant', path) + ` : ${variants.selections}`
+        }
+        onClickCapture={handleClick}>
+        {variant.map((v, idx) => (
+          <Fragment key={idx}>
+            {idx > 0 && separator && (
+              <span className="flex-auto">{separator}</span>
+            )}
+            <PromptView
+              prompt={v}
+              path={path}
+              fancy={fancy}
+              dense={dense}
+              updateSelection={updateSelection}
+            />
+          </Fragment>
+        ))}
+        {!variant.length && '...'}
       </span>
       <Menu
         anchorEl={anchorEl}
@@ -161,7 +159,7 @@ export function FancyVariantView({
             <br /> Min-max: {min}-{max}
           </span>
         </MenuItem>
-        {variants.variants?.map((v, idx) => {
+        {variants.variants.map((v, idx) => {
           const newPath = [...path, idx];
           const isSelected = variants.selections.includes(idx);
           return (
