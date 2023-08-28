@@ -49,8 +49,10 @@ function randomizeVariantsInPlace(variants: Draft<Variants>, prng: PRNG) {
 }
 
 function getRandomInBounds(bound: Bound, optionsCount: number, prng: PRNG) {
-  const max = bound.max > 0 ? bound.max : optionsCount;
-  const min = bound.min > 0 ? bound.min : 1;
+  const max =
+    bound.max > 0 && bound.max <= optionsCount ? bound.max : optionsCount;
+  const min =
+    bound.min > optionsCount ? optionsCount : bound.min > 0 ? bound.min : 1;
   return Math.floor(prng() * (max + 1 - min)) + min;
 }
 
