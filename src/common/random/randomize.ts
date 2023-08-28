@@ -38,7 +38,7 @@ function randomizePromptInPlace(prompt: Draft<Prompt>, prng: PRNG): void {
 
 function randomizeVariantsInPlace(variants: Draft<Variants>, prng: PRNG) {
   const { bound, variants: options } = variants;
-  const count = getRandomInBounds(bound, prng);
+  const count = getRandomInBounds(bound, options.length, prng);
   const allSelections = allPossibleSelections(options.length);
   const shuffled = shuffle(allSelections, prng);
   const selections = shuffled.slice(0, count);
@@ -48,8 +48,10 @@ function randomizeVariantsInPlace(variants: Draft<Variants>, prng: PRNG) {
     .forEach((o) => randomizePromptInPlace(o, prng));
 }
 
-function getRandomInBounds(bound: Bound, prng: PRNG) {
-  return Math.floor(prng() * (bound.max + 1 - bound.min)) + bound.min;
+function getRandomInBounds(bound: Bound, optionsCount: number, prng: PRNG) {
+  const max = bound.max > 0 ? bound.max : optionsCount;
+  const min = bound.min > 0 ? bound.min : 1;
+  return Math.floor(prng() * (max + 1 - min)) + min;
 }
 
 function allPossibleSelections(length: number) {
