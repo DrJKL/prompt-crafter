@@ -1,12 +1,17 @@
-import { Chip, Collapse } from '@mui/material';
+import { Chip, Collapse, Tooltip, IconButton } from '@mui/material';
 import { SavedPrompt } from '../common/saving/types';
 import { useRef, useState } from 'react';
+import { NorthWest } from '@mui/icons-material';
 
 export interface SavedPromptDisplayProps {
   prompt: SavedPrompt;
+  setPromptText: (prompt: string) => void;
 }
 
-export function SavedPromptDisplay({ prompt }: SavedPromptDisplayProps) {
+export function SavedPromptDisplay({
+  prompt,
+  setPromptText,
+}: SavedPromptDisplayProps) {
   const { name, contents, tags } = prompt;
 
   const [open, setOpen] = useState(false);
@@ -43,6 +48,17 @@ export function SavedPromptDisplay({ prompt }: SavedPromptDisplayProps) {
           onDoubleClick={handlePromptDoubleClick}>
           {contents}
         </pre>
+        <div>
+          <Tooltip title="Replace current prompt with saved prompt">
+            <IconButton
+              aria-label=""
+              onClick={() => {
+                setPromptText(contents);
+              }}>
+              <NorthWest />
+            </IconButton>
+          </Tooltip>
+        </div>
       </Collapse>
       <hr />
     </div>

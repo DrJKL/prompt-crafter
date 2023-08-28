@@ -304,7 +304,11 @@ function App() {
               </Typography>
               <div className="overflow-y-auto flex-grow-0">
                 {savedPrompts.map((prompt, idx) => (
-                  <SavedPromptDisplay key={idx} prompt={prompt} />
+                  <SavedPromptDisplay
+                    key={idx}
+                    prompt={prompt}
+                    setPromptText={setPromptText}
+                  />
                 ))}
               </div>
             </BottomResizable>
