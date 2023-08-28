@@ -49,7 +49,7 @@ function randomizeVariantsInPlace(variants: Draft<Variants>, prng: PRNG) {
 }
 
 function getRandomInBounds(bound: Bound, prng: PRNG) {
-  return Math.floor(prng() * (bound.max - bound.min)) + bound.min;
+  return Math.ceil(prng() * (bound.max - bound.min)) + bound.min;
 }
 
 function allPossibleSelections(length: number) {
