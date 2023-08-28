@@ -1,4 +1,4 @@
-import { SavedPrompt, SavedPrompts } from './../common/saving/types';
+import { SavedPrompts } from './../common/saving/types';
 import dedent from 'dedent';
 
 /**
