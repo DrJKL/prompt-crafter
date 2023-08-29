@@ -10,7 +10,7 @@ import { animated, easings, useTransition } from '@react-spring/web';
 import { xor } from 'lodash';
 import { ChangeEvent, MouseEvent, useMemo, useRef, useState } from 'react';
 import { fixBound } from '@pc-random/randomize';
-import { BoundView } from '@rendering/BoundView';
+import { BoundView } from '@components/chunks/BoundView';
 import { ChunkView } from '@rendering/ChunkView';
 import { PromptView } from '@rendering/PromptView';
 import { Variants } from '@rendering/parsed_types';

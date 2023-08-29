@@ -1,5 +1,5 @@
-import { DEFAULT_BOUND, Variants } from './parsed_types';
-import { pathToString, KeyPath } from './rendering_utils';
+import { DEFAULT_BOUND, Variants } from '@rendering/parsed_types';
+import { pathToString, KeyPath } from '@rendering/rendering_utils';
 
 interface BoundProps extends KeyPath {
   variants: Variants;
