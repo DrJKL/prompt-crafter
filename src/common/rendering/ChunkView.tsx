@@ -5,7 +5,7 @@ import {
   VariantView,
 } from '@components/chunks/VariantsViews';
 import { GroupView } from './GroupView';
-import { LiteralView } from './LiteralView';
+import { LiteralView } from '../../components/chunks/LiteralView';
 import { KeyPath } from './rendering_utils';
 
 export interface ChunkProps extends KeyPath {

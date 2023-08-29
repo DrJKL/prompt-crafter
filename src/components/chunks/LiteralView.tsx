@@ -1,5 +1,5 @@
-import { Literal } from './parsed_types';
-import { KeyPath, pathToString } from './rendering_utils';
+import { Literal } from '@rendering/parsed_types';
+import { KeyPath, pathToString } from '@rendering/rendering_utils';
 
 interface LiteralProps extends KeyPath {
   literal: Literal;
