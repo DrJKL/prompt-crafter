@@ -4,7 +4,7 @@ import {
   FancyVariantView,
   VariantView,
 } from '@components/chunks/VariantsViews';
-import { GroupView } from './GroupView';
+import { GroupView } from '../../components/chunks/GroupView';
 import { LiteralView } from '../../components/chunks/LiteralView';
 import { KeyPath } from './rendering_utils';
 
