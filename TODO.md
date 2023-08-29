@@ -38,3 +38,9 @@
 - [x] Weighted sections of prompts: `(dog:1.2)`
 - [ ] Prompt Travel: `(dog:cat:0,.5)`
 - [ ] Alternating: `[Dog|Cat]`
+
+## UI/UX Polish
+
+- [x] Animate changes in variants
+- [ ] Smoother save/restore process
+- [ ] Visualization of Combinatorics (Tree? Something 4-dimensional?)
