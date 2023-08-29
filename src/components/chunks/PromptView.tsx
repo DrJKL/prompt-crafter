@@ -1,8 +1,8 @@
-import { Prompt } from './parsed_types';
-import { ChunkView } from '../../components/chunks/ChunkView';
-import { KeyPath } from './rendering_utils';
-import { ForwardedRef, forwardRef } from 'react';
 import { animated } from '@react-spring/web';
+import { Prompt } from '@rendering/parsed_types';
+import { KeyPath } from '@rendering/rendering_utils';
+import { ForwardedRef, forwardRef } from 'react';
+import { ChunkView } from './ChunkView';
 
 interface PromptProps extends KeyPath {
   prompt: Prompt;

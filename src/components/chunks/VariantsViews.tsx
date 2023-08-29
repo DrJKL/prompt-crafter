@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { fixBound } from '@pc-random/randomize';
 import { animated, easings, useTransition } from '@react-spring/web';
-import { PromptView } from '@rendering/PromptView';
+import { PromptView } from '@components/chunks/PromptView';
 import { Variants } from '@rendering/parsed_types';
 import { KeyPath, pathToString } from '@rendering/rendering_utils';
 import { xor } from 'lodash';
