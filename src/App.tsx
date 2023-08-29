@@ -1,15 +1,14 @@
+import { useMonaco } from '@monaco-editor/react';
+import { Close, HistoryEdu } from '@mui/icons-material';
 import {
   CssBaseline,
-  Typography,
-  Snackbar,
   IconButton,
+  Snackbar,
   Tooltip,
+  Typography,
 } from '@mui/material';
-import { Editor } from './components/Editor';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useMonaco } from '@monaco-editor/react';
-import { conf, language } from './common/sdprompt_monaco';
 import monaco, { KeyCode, KeyMod } from 'monaco-editor';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bottom,
   BottomResizable,
@@ -18,11 +17,17 @@ import {
   Top,
   ViewPort,
 } from 'react-spaces';
-import { HistoryEdu, Close } from '@mui/icons-material';
-import { PromptCrafterAppBar } from './components/PromptCrafterAppBar';
+import { SizeUnit } from 'react-spaces/dist/core-types';
+import seedrandom from 'seedrandom';
+import { useImmer, useImmerReducer } from 'use-immer';
+import { getPromptTokens, parsePrompt } from './common/parsing/app_parsing';
+import {
+  ModifyPromptAction,
+  variantSelectionReducer,
+} from './common/prompt_modification';
 import { nextType } from './common/rendering/RenderType';
 import { RenderedPrompt } from './common/rendering/RenderedPrompt';
-import { useImmer, useImmerReducer } from 'use-immer';
+import { ParseResult } from './common/rendering/parsed_types';
 import {
   activePrompt$,
   getActivePromptLocal,
@@ -33,16 +38,11 @@ import {
   saveRenderingOptions,
   savedPrompts$,
 } from './common/saving/localstorage';
-import { SavedPromptDisplay } from './components/SavedPrompt';
-import { SizeUnit } from 'react-spaces/dist/core-types';
+import { conf, language } from './common/sdprompt_monaco';
 import { editAttentionMonaco } from './common/tweaks/edit_attention';
-import { getPromptTokens, parsePrompt } from './common/parsing/app_parsing';
-import { ParseResult } from './common/rendering/parsed_types';
-import seedrandom from 'seedrandom';
-import {
-  ModifyPromptAction,
-  variantSelectionReducer,
-} from './common/prompt_modification';
+import { Editor } from './components/Editor';
+import { PromptCrafterAppBar } from './components/PromptCrafterAppBar';
+import { SavedPromptDisplay } from './components/SavedPrompt';
 
 const minHeight =
   3 * parseInt(getComputedStyle(document.documentElement)?.fontSize);
