@@ -9,12 +9,12 @@ import {
 import { animated, easings, useTransition } from '@react-spring/web';
 import { xor } from 'lodash';
 import { ChangeEvent, MouseEvent, useMemo, useRef, useState } from 'react';
-import { fixBound } from '../random/randomize';
-import { BoundView } from './BoundView';
-import { ChunkView } from './ChunkView';
-import { PromptView } from './PromptView';
-import { Variants } from './parsed_types';
-import { KeyPath, pathToString } from './rendering_utils';
+import { fixBound } from '@pc-random/randomize';
+import { BoundView } from '@rendering/BoundView';
+import { ChunkView } from '@rendering/ChunkView';
+import { PromptView } from '@rendering/PromptView';
+import { Variants } from '@rendering/parsed_types';
+import { KeyPath, pathToString } from '@rendering/rendering_utils';
 
 interface VariantProps extends KeyPath {
   variants: Variants;

@@ -24,7 +24,7 @@
     "baseUrl": "./src",
     "paths": {
       "@components/*": [
-        "./common/components/*"
+        "./components/*"
       ],
       "@common/*": [
         "./common/*"
