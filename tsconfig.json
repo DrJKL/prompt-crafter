@@ -34,11 +34,15 @@
       ],
       "@rendering/*": [
         "./common/rendering/*"
+      ],
+      "@wildcard-browser/": [
+        "../external/wildcard-browser/src",
       ]
     }
   },
   "include": [
-    "src"
+    "src",
+    "external"
   ],
   "references": [
     {

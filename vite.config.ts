@@ -10,6 +10,10 @@ export default defineConfig({
       '@components': path.resolve(__dirname, './src/components'),
       '@pc-random': path.resolve(__dirname, './src/common/random'),
       '@rendering': path.resolve(__dirname, './src/common/rendering'),
+      '@wildcard-browser': path.resolve(
+        __dirname,
+        './external/wildcard-browser/src',
+      ),
     },
   },
   plugins: [
