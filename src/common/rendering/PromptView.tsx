@@ -1,5 +1,5 @@
 import { Prompt } from './parsed_types';
-import { ChunkView } from './ChunkView';
+import { ChunkView } from '../../components/chunks/ChunkView';
 import { KeyPath } from './rendering_utils';
 import { ForwardedRef, forwardRef } from 'react';
 import { animated } from '@react-spring/web';

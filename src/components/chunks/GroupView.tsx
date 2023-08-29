@@ -1,6 +1,6 @@
+import { ChunkView } from '@components/chunks/ChunkView';
 import { Group } from '@rendering/parsed_types';
-import { ChunkView } from '@rendering/ChunkView';
-import { pathToString, KeyPath } from '@rendering/rendering_utils';
+import { KeyPath, pathToString } from '@rendering/rendering_utils';
 
 interface GroupProps extends KeyPath {
   group: Group;

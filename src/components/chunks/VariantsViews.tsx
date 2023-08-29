@@ -1,3 +1,5 @@
+import { BoundView } from '@components/chunks/BoundView';
+import { ChunkView } from '@components/chunks/ChunkView';
 import { Close } from '@mui/icons-material';
 import {
   Checkbox,
@@ -6,15 +8,13 @@ import {
   MenuItem,
   Slide,
 } from '@mui/material';
-import { animated, easings, useTransition } from '@react-spring/web';
-import { xor } from 'lodash';
-import { ChangeEvent, MouseEvent, useMemo, useRef, useState } from 'react';
 import { fixBound } from '@pc-random/randomize';
-import { BoundView } from '@components/chunks/BoundView';
-import { ChunkView } from '@rendering/ChunkView';
+import { animated, easings, useTransition } from '@react-spring/web';
 import { PromptView } from '@rendering/PromptView';
 import { Variants } from '@rendering/parsed_types';
 import { KeyPath, pathToString } from '@rendering/rendering_utils';
+import { xor } from 'lodash';
+import { ChangeEvent, MouseEvent, useMemo, useRef, useState } from 'react';
 
 interface VariantProps extends KeyPath {
   variants: Variants;
