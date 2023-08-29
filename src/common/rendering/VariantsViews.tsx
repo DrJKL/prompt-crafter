@@ -1,19 +1,20 @@
-import { ChangeEvent, Fragment, MouseEvent, useRef, useState } from 'react';
-import { Variants } from './parsed_types';
+import { Close } from '@mui/icons-material';
 import {
-  MenuItem,
-  Menu,
-  Slide,
   Checkbox,
   FormControlLabel,
+  Menu,
+  MenuItem,
+  Slide,
 } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { animated, easings, useTransition } from '@react-spring/web';
 import { xor } from 'lodash';
-import { ChunkView } from './ChunkView';
-import { pathToString, KeyPath } from './rendering_utils';
-import { BoundView } from './BoundView';
-import { PromptView } from './PromptView';
+import { ChangeEvent, MouseEvent, useMemo, useRef, useState } from 'react';
 import { fixBound } from '../random/randomize';
+import { BoundView } from './BoundView';
+import { ChunkView } from './ChunkView';
+import { PromptView } from './PromptView';
+import { Variants } from './parsed_types';
+import { KeyPath, pathToString } from './rendering_utils';
 
 interface VariantProps extends KeyPath {
   variants: Variants;
@@ -86,6 +87,23 @@ export function FancyVariantView({
     variants.selections.includes(i),
   );
 
+  const variantRef = useMemo(() => new WeakMap(), []);
+
+  const transitions = useTransition(variant, {
+    from: { width: 0, opacity: 0 },
+    enter: (item) => (next) => {
+      next({ width: variantRef.get(item).offsetWidth, opacity: 1 });
+    },
+    leave: { width: 0, opacity: 0 },
+    config: {
+      duration: 100,
+      tension: 180,
+      friction: 12,
+      easing: easings.easeInOutElastic,
+    },
+    exitBeforeEnter: true,
+  });
+
   function handleClick(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     event.stopPropagation();
@@ -131,20 +149,24 @@ export function FancyVariantView({
           pathToString('fancy-variant', path) + ` : ${variants.selections}`
         }
         onClickCapture={handleClick}>
-        {variant.map((v, idx) => (
-          <Fragment key={idx}>
-            {idx > 0 && separator && (
-              <span className="flex-auto">{separator}</span>
-            )}
-            <PromptView
-              prompt={v}
-              path={path}
-              fancy={fancy}
-              dense={dense}
-              updateSelection={updateSelection}
-            />
-          </Fragment>
-        ))}
+        {transitions((styles, v, _state, idx) => {
+          return (
+            <animated.span style={styles} key={idx}>
+              <span
+                className="inline-block whitespace-nowrap"
+                ref={(el) => variantRef.set(v, el)}>
+                {idx > 0 && separator && <span>{separator}</span>}
+                <PromptView
+                  prompt={v}
+                  path={path}
+                  fancy={fancy}
+                  dense={dense}
+                  updateSelection={updateSelection}
+                />
+              </span>
+            </animated.span>
+          );
+        })}
         {!variant.length && '...'}
       </span>
       <Menu
