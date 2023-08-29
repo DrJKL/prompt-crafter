@@ -21,7 +21,7 @@ import {
 import { HistoryEdu, Close } from '@mui/icons-material';
 import { PromptCrafterAppBar } from './components/PromptCrafterAppBar';
 import { nextType } from './common/rendering/RenderType';
-import { RenderedPrompt } from './common/rendering/PromptRender';
+import { RenderedPrompt } from './common/rendering/RenderedPrompt';
 import { useImmer, useImmerReducer } from 'use-immer';
 import {
   activePrompt$,

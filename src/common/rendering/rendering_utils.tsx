@@ -1,4 +1,4 @@
-import { SelectionUpdateFn } from './PromptRender';
+import { SelectionUpdateFn } from './RenderedPrompt';
 
 export interface KeyPath {
   path: number[];
