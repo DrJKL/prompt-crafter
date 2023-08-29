@@ -35,8 +35,8 @@
       "@rendering/*": [
         "./common/rendering/*"
       ],
-      "@wildcard-browser/": [
-        "../external/wildcard-browser/src",
+      "@wildcard-browser/*": [
+        "../external/wildcard-browser/*",
       ]
     }
   },

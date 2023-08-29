@@ -12,7 +12,7 @@ export default defineConfig({
       '@rendering': path.resolve(__dirname, './src/common/rendering'),
       '@wildcard-browser': path.resolve(
         __dirname,
-        './external/wildcard-browser/src',
+        './external/wildcard-browser',
       ),
     },
   },
