@@ -91,8 +91,8 @@ export function FancyVariantView({
 
   const transitions = useTransition(variant, {
     from: { width: 0, opacity: 0 },
-    enter: (item) => (next) => {
-      next({ width: variantRef.get(item).offsetWidth, opacity: 1 });
+    enter: (item) => async (next) => {
+      await next({ width: variantRef.get(item).offsetWidth, opacity: 1 });
     },
     leave: { width: 0, opacity: 0 },
     config: {
