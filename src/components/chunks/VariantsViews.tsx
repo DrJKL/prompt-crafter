@@ -96,7 +96,7 @@ export function FancyVariantView({
     },
     leave: { width: 0, opacity: 0 },
     config: {
-      duration: 100,
+      duration: 250,
       tension: 180,
       friction: 12,
       easing: easings.easeInOutElastic,
