@@ -21,7 +21,7 @@ export function GroupView({
     <span
       className={`${
         fancy
-          ? 'border-red-500 border-opacity-50 border-2 rounded-md flex-[0_1_fit-content]'
+          ? 'border-red-500 border-opacity-50 border-2 rounded-md flex-[0_1_fit-content] inline-flex'
           : ''
       } text-purple-200 font-bold`}>
       (

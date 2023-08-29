@@ -118,7 +118,7 @@ export function FancyVariantView({
     <>
       <span
         ref={transitionContainer}
-        className={`align-baseline text-pink-500 font-bold cursor-pointer transition-all flex-[0_1_fit-content] ${
+        className={`align-baseline text-pink-500 font-bold cursor-pointer transition-all flex-[0_1_fit-content] inline-flex gap-1 ${
           fancy
             ? 'border-pink-500 border-2 rounded-md px-1 py-0 hover:border-pink-200'
             : ''
