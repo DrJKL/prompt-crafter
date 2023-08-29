@@ -21,18 +21,19 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./src",
     "paths": {
-      "@components": [
-        "./common/components"
+      "@components/*": [
+        "./common/components/*"
       ],
-      "@common": [
-        "./common"
+      "@common/*": [
+        "./common/*"
       ],
-      "@random": [
-        "./common/random"
+      "@pc-random/*": [
+        "./common/random/*"
       ],
-      "@rendering": [
-        "./common/rendering"
+      "@rendering/*": [
+        "./common/rendering/*"
       ]
     }
   },
