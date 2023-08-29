@@ -20,7 +20,21 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@components": [
+        "./common/components"
+      ],
+      "@common": [
+        "./common"
+      ],
+      "@random": [
+        "./common/random"
+      ],
+      "@rendering": [
+        "./common/rendering"
+      ]
+    }
   },
   "include": [
     "src"
