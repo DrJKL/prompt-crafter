@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { GroupView } from './GroupView';
 import { LiteralView } from './LiteralView';
 import { FancyVariantView, VariantView } from './VariantsViews';
+import { WildcardView } from './WildcardView';
 
 export interface ChunkProps extends KeyPath {
   chunk: Chunk;
@@ -49,7 +50,15 @@ export function ChunkView({
         />
       );
     case 'wildcard':
-      return <span className="text-amber-600">{chunk.path}</span>;
+      return (
+        <WildcardView
+          wildcard={chunk}
+          path={path}
+          fancy={fancy}
+          dense={dense}
+          updateSelection={updateSelection}
+        />
+      );
     case 'group':
       return (
         <GroupView

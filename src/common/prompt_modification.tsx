@@ -1,7 +1,10 @@
-import { Draft, current } from 'immer';
-import { ParseResult, Prompt } from './rendering/parsed_types';
+import { Draft, createDraft, current, finishDraft } from 'immer';
+import { ParseResult, Prompt, Wildcard } from './rendering/parsed_types';
 import { randomizeAllResults } from './random/randomize';
 import { PRNG } from 'seedrandom';
+import { wildcardFiles$ } from '@wildcard-browser/src/lib/wildcards';
+import { endWith, filter, first, firstValueFrom, map } from 'rxjs';
+import { constructLiteral } from './parsing/parse_utils';
 
 export type ModifyPromptAction =
   | { type: 'reset'; results: ParseResult }
@@ -23,6 +26,44 @@ export function variantSelectionReducer(
   }
   action satisfies never;
   return draft;
+}
+
+export async function fillOutWildcards(allResults: ParseResult) {
+  const draft = createDraft(allResults);
+  await Promise.all(
+    draft.flat().map(async (prompt) => await fillOutChunkInPlace(prompt)),
+  );
+  return finishDraft(draft);
+}
+
+async function fillOutChunkInPlace(prompt: Draft<Prompt>): Promise<void> {
+  for (const chunk of prompt) {
+    switch (chunk.type) {
+      case 'group':
+        await fillOutChunkInPlace(chunk.chunks);
+        break;
+      case 'variants':
+        await Promise.all(
+          chunk.variants.map(async (c) => await fillOutChunkInPlace(c)),
+        );
+        break;
+      case 'wildcard':
+        await fillOutWildcardInPlace(chunk);
+        break;
+    }
+  }
+}
+
+async function fillOutWildcardInPlace(wildcard: Draft<Wildcard>) {
+  const wildcardEntries = await firstValueFrom(
+    wildcardFiles$.pipe(
+      filter((w) => w.filepath.includes(wildcard.path)),
+      map((w) => w.wildcardEntries),
+      endWith(['NO_WILDCARDS_FOUND']),
+      first(),
+    ),
+  );
+  wildcard.variants = wildcardEntries.map((e) => [constructLiteral(e)]);
 }
 
 function modifySelection(
@@ -56,7 +97,10 @@ function modifySelection(
   try {
     const leafHopefully =
       chunkCursor[path[path.length - 2]][path[path.length - 1]];
-    if (leafHopefully?.type === 'variants') {
+    if (
+      leafHopefully?.type === 'variants' ||
+      leafHopefully?.type === 'wildcard'
+    ) {
       leafHopefully.selections = selection;
       return;
     }

@@ -92,6 +92,9 @@ export function constructWildcard([, wildcardPath]: any[]): Wildcard {
   return {
     type: 'wildcard',
     path: wildcardPath.value,
+    variants: [],
+    bound: DEFAULT_BOUND,
+    selections: [0],
   };
 }
 

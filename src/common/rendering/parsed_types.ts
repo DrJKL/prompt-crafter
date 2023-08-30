@@ -5,7 +5,7 @@ export type Prompt = readonly Chunk[]; // List of Chunks
 
 export type ParseResult = Prompt[][];
 
-export interface Wildcard {
+export interface Wildcard extends Omit<Variants, 'type'> {
   readonly type: 'wildcard';
   readonly path: string;
 }

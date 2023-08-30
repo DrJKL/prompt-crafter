@@ -93,6 +93,7 @@ export function FancyVariantView({
     from: { width: 0, opacity: 0 },
     enter: (item) => async (next) => {
       await next({ width: variantRef.get(item).offsetWidth, opacity: 1 });
+      await next({ width: 'unset', opacity: 1 });
     },
     leave: { width: 0, opacity: 0 },
     config: {
@@ -136,7 +137,7 @@ export function FancyVariantView({
     <>
       <span
         ref={transitionContainer}
-        className={`align-baseline text-pink-500 font-bold cursor-pointer transition-all flex-[0_1_fit-content] inline-flex gap-1 ${
+        className={`align-baseline text-pink-500 font-bold cursor-pointer transition-all flex-[0_1_fit-content] inline-flex flex-wrap gap-1 ${
           fancy
             ? 'border-pink-500 border-2 rounded-md px-1 py-0 hover:border-pink-200'
             : ''
@@ -153,7 +154,7 @@ export function FancyVariantView({
           return (
             <animated.span style={styles} key={idx}>
               <span
-                className="inline-block whitespace-nowrap"
+                className="inline-flex flex-wrap gap-1"
                 ref={(el) => variantRef.set(v, el)}>
                 {idx > 0 && separator && <span>{separator}</span>}
                 <PromptView

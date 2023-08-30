@@ -4,6 +4,7 @@ import {
   ParseResult,
   Prompt,
   Variants,
+  Wildcard,
 } from '../rendering/parsed_types';
 import { PRNG } from 'seedrandom';
 
@@ -38,13 +39,16 @@ function randomizePromptInPlace(prompt: Draft<Prompt>, prng: PRNG): void {
         randomizeVariantsInPlace(chunk, prng);
         break;
       case 'wildcard':
-        // TODO
+        randomizeVariantsInPlace(chunk, prng);
         break;
     }
   }
 }
 
-function randomizeVariantsInPlace(variants: Draft<Variants>, prng: PRNG) {
+function randomizeVariantsInPlace(
+  variants: Draft<Variants | Wildcard>,
+  prng: PRNG,
+) {
   const { bound, variants: options } = variants;
   const count = getRandomInBounds(bound, options.length, prng);
   const allSelections = allPossibleSelections(options.length);
