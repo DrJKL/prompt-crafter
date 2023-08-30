@@ -48,6 +48,7 @@ import { PromptCrafterAppBar } from './components/PromptCrafterAppBar';
 import { SavedPromptDisplay } from './components/SavedPrompt';
 import { FolderTreeDisplay } from '@wildcard-browser/src/components/FolderTree';
 import { WildcardFile } from '@wildcard-browser/src/lib/wildcards';
+import { debounce } from 'lodash';
 
 const minHeight =
   3 * parseInt(getComputedStyle(document.documentElement)?.fontSize);
@@ -82,18 +83,26 @@ function App() {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  useEffect(() => {
-    try {
-      const results = parsePrompt(promptText);
-      dispatch({ type: 'reset', results });
+  const debouncedParse = useMemo(
+    () =>
+      debounce((promptText, dispatch) => {
+        try {
+          const results = parsePrompt(promptText);
+          dispatch({ type: 'reset', results });
 
-      fillOutWildcards(results).then((filledOut) => {
-        dispatch({ type: 'reset', results: filledOut });
-      });
-    } catch (err: unknown) {
-      console.error(err);
-    }
-  }, [promptText, dispatch]);
+          fillOutWildcards(results).then((filledOut) => {
+            dispatch({ type: 'reset', results: filledOut });
+          });
+        } catch (err: unknown) {
+          console.error(err);
+        }
+      }, 1000),
+    [],
+  );
+
+  useEffect(() => {
+    debouncedParse(promptText, dispatch);
+  }, [promptText, dispatch, debouncedParse]);
 
   function updateSelection(path: number[], selection: number[]) {
     dispatch({ type: 'choose-variant', path, selection });
