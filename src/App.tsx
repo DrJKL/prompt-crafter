@@ -1,9 +1,12 @@
 import { useMonaco } from '@monaco-editor/react';
 import { Close, HistoryEdu } from '@mui/icons-material';
 import {
+  AppBar,
   CssBaseline,
+  Drawer,
   IconButton,
   Snackbar,
+  Toolbar,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -15,7 +18,6 @@ import {
   Fill,
   LeftResizable,
   Top,
-  ViewPort,
 } from 'react-spaces';
 import { SizeUnit } from 'react-spaces/dist/core-types';
 import seedrandom from 'seedrandom';
@@ -43,6 +45,8 @@ import { editAttentionMonaco } from './common/tweaks/edit_attention';
 import { Editor } from './components/Editor';
 import { PromptCrafterAppBar } from './components/PromptCrafterAppBar';
 import { SavedPromptDisplay } from './components/SavedPrompt';
+import { FolderTreeDisplay } from '@wildcard-browser/src/components/FolderTree';
+import { WildcardFile } from '@wildcard-browser/src/lib/wildcards';
 
 const minHeight =
   3 * parseInt(getComputedStyle(document.documentElement)?.fontSize);
@@ -74,6 +78,8 @@ function App() {
     ParseResult,
     ModifyPromptAction
   >(variantSelectionReducer, []);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -176,11 +182,24 @@ function App() {
     }
   }
 
+  async function copyToClipboard(text: string) {
+    if ('clipboard' in navigator) {
+      return await navigator.clipboard.writeText(text);
+    }
+  }
+
+  const drawerWidth = 400;
+  const toggleTree = () => {
+    setDrawerOpen(!drawerOpen);
+  };
+
   return (
     <>
       <CssBaseline />
-      <ViewPort>
-        <Top size={64}>
+      <AppBar
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        position="relative">
+        <Toolbar className="flex flex-auto justify-between">
           <PromptCrafterAppBar
             renderingOptions={renderingOptions}
             setRenderingOptions={setRenderingOptions}
@@ -189,7 +208,40 @@ function App() {
             randomizePrompt={randomizePrompt}
             seed={seed}
             setSeed={setSeed}
+            toggleWildcardTree={toggleTree}
           />
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        sx={{
+          width: drawerWidth,
+
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+          },
+        }}
+        anchor="left"
+        variant="temporary"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        ModalProps={{ keepMounted: true }}>
+        <Toolbar />
+        <FolderTreeDisplay
+          onLeafClick={(_entry: WildcardFile) => {
+            // setSearch(entry.filepath);
+            // Maybe a dialog with the entries?
+            // Or copy the wildcard?
+            // I think Copy the wildcard by default, maybe an icon for the dialog
+            copyToClipboard(_entry.toPlaceholder());
+            setDrawerOpen(false);
+          }}
+        />
+      </Drawer>
+      <Fill>
+        <Top size={64}>
+          <Toolbar />
         </Top>
         <Fill className="p-4 pb-10">
           <LeftResizable size="50%">
@@ -256,7 +308,7 @@ function App() {
           {/* Here to force-remount the editor. */}
           <HistoryEdu color="secondary" onClick={incrementEditorKey} />
         </Bottom>
-      </ViewPort>
+      </Fill>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={showCopySnackbar}
