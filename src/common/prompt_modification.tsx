@@ -3,7 +3,8 @@ import { ParseResult, Prompt, Wildcard } from './rendering/parsed_types';
 import { randomizeAllResults } from './random/randomize';
 import { PRNG } from 'seedrandom';
 import { wildcardFiles$ } from '@wildcard-browser/src/lib/wildcards';
-import { endWith, filter, first, firstValueFrom, map } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
+import { filter, endWith, first, map } from 'rxjs/operators';
 import { constructLiteral } from './parsing/parse_utils';
 
 export type ModifyPromptAction =
@@ -86,9 +87,11 @@ function modifySelection(
     const nextVariants = chunk[path[i + 1]];
     if (nextVariants?.type !== 'variants') {
       console.error(`Found non-variable sub-path when trying to update
-      ${chunk} in
-      ${draft} with path
-      ${path}`);
+      ${JSON.stringify(chunk, null, 2)} in
+      ${JSON.stringify(undraft, null, 2)} with path
+      ${path}
+      
+      Found ${nextVariants?.type} instead`);
 
       return draft;
     }
