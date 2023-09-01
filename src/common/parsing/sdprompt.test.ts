@@ -1,7 +1,13 @@
 import nearley from 'nearley';
 import { assertType, describe, expect, expectTypeOf, test } from 'vitest';
 import { LANDSCAPE_VERY_DYNAMIC } from '../../examples/prompts';
-import { Bound, Chunk, Variants } from '../rendering/parsed_types';
+import {
+  Bound,
+  Chunk,
+  ParseResult,
+  Variable,
+  Variants,
+} from '../rendering/parsed_types';
 import { countType } from './parse_utils';
 import grammar from './sdprompt';
 
@@ -186,5 +192,46 @@ describe('parser', () => {
         expect(bounds2.separator).toBe(' or ');
       },
     );
+
+    describe('variable', () => {
+      parserIt('variable assignment', ({ parser }) => {
+        const prompt = '${foo=bar}';
+        parser.feed(prompt);
+        const [[result]]: ParseResult = parser.results;
+        const [variable] = result;
+        expect(variable.type).toBe('variable');
+        if (variable.type !== 'variable') {
+          return;
+        }
+        assertType<Variable>(variable);
+        expect(variable.flavor).toBe('assignment');
+      });
+
+      parserIt('variable assignment (immediate)', ({ parser }) => {
+        const prompt = '${foo=!{alfa|bravo|charlie}}';
+        parser.feed(prompt);
+        const [[result]]: ParseResult = parser.results;
+        const [variable] = result;
+        expect(variable.type).toBe('variable');
+        if (variable.type !== 'variable') {
+          return;
+        }
+        assertType<Variable>(variable);
+        expect(variable.flavor).toBe('assignmentImmediate');
+      });
+
+      parserIt('variable access default', ({ parser }) => {
+        const prompt = '${foo:bar}';
+        parser.feed(prompt);
+        const [[result]]: ParseResult = parser.results;
+        const [variable] = result;
+        expect(variable.type).toBe('variable');
+        if (variable.type !== 'variable') {
+          return;
+        }
+        assertType<Variable>(variable);
+        expect(variable.flavor).toBe('accessWithDefault');
+      });
+    });
   });
 });

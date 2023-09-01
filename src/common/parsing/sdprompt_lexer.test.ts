@@ -111,4 +111,42 @@ describe('basicPromptLexer', () => {
       .join(' ');
     expect(result).toBeTruthy();
   });
+
+  describe('variables', () => {
+    it('should handle variable access', () => {
+      const prompt = '${foo}';
+
+      basicPromptLexer.reset(prompt);
+      const result = Array.from(basicPromptLexer);
+      expect(result).toBeTruthy();
+    });
+    it('should handle variable access with a default', () => {
+      const prompt = '${foo:bar}';
+
+      basicPromptLexer.reset(prompt);
+      const result = Array.from(basicPromptLexer);
+      expect(result).toBeTruthy();
+    });
+    it('should handle variable initialization', () => {
+      const prompt = '${foo=bar}';
+
+      basicPromptLexer.reset(prompt);
+      const result = Array.from(basicPromptLexer);
+      expect(result).toBeTruthy();
+    });
+    it('should handle variable initialization to variants', () => {
+      const prompt = '${foo={alfa|bravo|charlie}}';
+
+      basicPromptLexer.reset(prompt);
+      const result = Array.from(basicPromptLexer);
+      expect(result).toBeTruthy();
+    });
+    it('should handle variable initialization (immediate)', () => {
+      const prompt = '${foo=!{alfa|bravo|charlie}}';
+
+      basicPromptLexer.reset(prompt);
+      const result = Array.from(basicPromptLexer);
+      expect(result).toBeTruthy();
+    });
+  });
 });

@@ -6,6 +6,11 @@ function id(d: any[]): any { return d[0]; }
 declare var literal: any;
 declare var vstart: any;
 declare var vend: any;
+declare var varstart: any;
+declare var variableName: any;
+declare var assignment: any;
+declare var colon: any;
+declare var immediateAssign: any;
 declare var bar: any;
 declare var bound: any;
 declare var wildcardstart: any;
@@ -17,7 +22,15 @@ declare var gend: any;
     // eslint-disable
     // @ts-nocheck
     import {basicPromptLexer} from './sdprompt_lexer';
-    import {constructVariants, flattenVariantsList, constructBound, constructWildcard,  constructGroup, constructLiteral} from './parse_utils';
+    import {
+        constructBound,
+        constructGroup,
+        constructLiteral,
+        constructVariable,
+        constructVariants,
+        constructWildcard,
+        flattenVariantsList,
+    } from './parse_utils';
     
     /* Utility */
     // const tag = (key: string) => (data: any[]) => [key, ...data.flat()]; 
@@ -60,6 +73,7 @@ const grammar: Grammar = {
     {"name": "variant_prompt", "symbols": ["variant_prompt$ebnf$1"]},
     {"name": "variant_chunk$subexpression$1", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["group"]},
+    {"name": "variant_chunk$subexpression$1", "symbols": ["variable"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["variants"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["wildcard"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["unknown"]},
@@ -69,6 +83,13 @@ const grammar: Grammar = {
     {"name": "variants$ebnf$2", "symbols": ["variants_list"], "postprocess": id},
     {"name": "variants$ebnf$2", "symbols": [], "postprocess": () => null},
     {"name": "variants", "symbols": [(basicPromptLexer.has("vstart") ? {type: "vstart"} : vstart), "variants$ebnf$1", "variants$ebnf$2", (basicPromptLexer.has("vend") ? {type: "vend"} : vend)], "postprocess": constructVariants},
+    {"name": "variable$ebnf$1$subexpression$1$subexpression$1", "symbols": [(basicPromptLexer.has("assignment") ? {type: "assignment"} : assignment)], "postprocess": id},
+    {"name": "variable$ebnf$1$subexpression$1$subexpression$1", "symbols": [(basicPromptLexer.has("colon") ? {type: "colon"} : colon)], "postprocess": id},
+    {"name": "variable$ebnf$1$subexpression$1$subexpression$1", "symbols": [(basicPromptLexer.has("immediateAssign") ? {type: "immediateAssign"} : immediateAssign)], "postprocess": id},
+    {"name": "variable$ebnf$1$subexpression$1", "symbols": ["variable$ebnf$1$subexpression$1$subexpression$1", "variant_prompt"]},
+    {"name": "variable$ebnf$1", "symbols": ["variable$ebnf$1$subexpression$1"], "postprocess": id},
+    {"name": "variable$ebnf$1", "symbols": [], "postprocess": () => null},
+    {"name": "variable", "symbols": [(basicPromptLexer.has("varstart") ? {type: "varstart"} : varstart), (basicPromptLexer.has("variableName") ? {type: "variableName"} : variableName), "variable$ebnf$1", (basicPromptLexer.has("vend") ? {type: "vend"} : vend)], "postprocess": constructVariable},
     {"name": "variants_list$ebnf$1", "symbols": []},
     {"name": "variants_list$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("bar") ? {type: "bar"} : bar), "variant_prompt"], "postprocess": (data) => data[1][0]},
     {"name": "variants_list$ebnf$1$subexpression$1", "symbols": [(basicPromptLexer.has("bar") ? {type: "bar"} : bar)], "postprocess": _ => [constructLiteral('')]},

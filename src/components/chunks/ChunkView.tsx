@@ -5,6 +5,7 @@ import { GroupView } from './GroupView';
 import { LiteralView } from './LiteralView';
 import { FancyVariantView, VariantView } from './VariantsViews';
 import { WildcardView } from './WildcardView';
+import { VariableView } from './VariableView';
 
 export interface ChunkProps extends KeyPath {
   chunk: Chunk;
@@ -67,6 +68,16 @@ export function ChunkView({
           fancy={fancy}
           dense={dense}
           group={chunk}
+        />
+      );
+    case 'variable':
+      return (
+        <VariableView
+          updateSelection={updateSelection}
+          path={path}
+          fancy={fancy}
+          dense={dense}
+          variable={chunk}
         />
       );
   }

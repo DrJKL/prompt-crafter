@@ -6,6 +6,8 @@ import {
   Group,
   Literal,
   Prompt,
+  Variable,
+  VariableFlavor,
   Variants,
   Wildcard,
 } from '../rendering/parsed_types';
@@ -44,6 +46,27 @@ any[]): Variants {
     bound,
     variants,
     selections,
+  };
+}
+
+const OPERATOR_TO_FLAVOR: Record<string, VariableFlavor> = {
+  '': 'access',
+  ':': 'accessWithDefault',
+  '=': 'assignment',
+  '=!': 'assignmentImmediate',
+};
+
+// eslint-disable-next-line
+export function constructVariable(data: any[]): Variable {
+  const [_vstart, name, operatorBlock, _vend] = data;
+  const [operator, value] = operatorBlock ?? [undefined, undefined];
+  const flavor: VariableFlavor =
+    OPERATOR_TO_FLAVOR[operator?.text ?? ''] ?? 'unknown';
+  return {
+    type: 'variable',
+    name: name.value,
+    flavor,
+    value,
   };
 }
 

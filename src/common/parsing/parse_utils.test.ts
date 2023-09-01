@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   constructBound,
   constructLiteral,
+  constructVariable,
+  constructVariants,
   generateDefaultSelection,
 } from './parse_utils';
 
@@ -63,8 +65,56 @@ describe('parse_utils', () => {
         constructLiteral('Foxtrot'),
       ];
       const selections = generateDefaultSelection(bound, chunks);
-      console.log({ bound, selections });
       expect(selections.length).toBe(3);
+    });
+  });
+
+  describe('variables', () => {
+    it('construction (access)', () => {
+      const data = ['${', 'foo', undefined, '}'];
+      const actual = constructVariable(data);
+      expect(actual.flavor).toBe('access');
+    });
+    it('construction (access with default)', () => {
+      const data = ['${', 'foo', [{ text: ':' }, 'bar'], '}'];
+      const actual = constructVariable(data);
+      expect(actual.flavor).toBe('accessWithDefault');
+    });
+    it('construction (assignment)', () => {
+      const data = ['${', 'foo', [{ text: '=' }, 'bar'], '}'];
+      const actual = constructVariable(data);
+      expect(actual.flavor).toBe('assignment');
+    });
+    it('construction (assignment immediate)', () => {
+      const data = ['${', 'foo', [{ text: '=!' }, 'bar'], '}'];
+      const actual = constructVariable(data);
+      expect(actual.flavor).toBe('assignmentImmediate');
+    });
+    it('construction (assignment immediate variants)', () => {
+      const data = [
+        '${',
+        'foo',
+        [
+          { text: '=!' },
+          [
+            [
+              constructVariants([
+                undefined,
+                undefined,
+                [
+                  constructLiteral('alfa'),
+                  constructLiteral('bravo'),
+                  constructLiteral('charlie'),
+                ],
+              ]),
+            ],
+          ],
+        ],
+        '}',
+      ];
+      const actual = constructVariable(data);
+      expect(actual.flavor).toBe('assignmentImmediate');
+      expect(actual.value?.[0]?.[0]?.type).toBe('variants');
     });
   });
 });

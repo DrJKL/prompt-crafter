@@ -1,9 +1,9 @@
-export type ChunkType = 'literal' | 'variants' | 'wildcard' | 'group';
-export type Chunk = Wildcard | Literal | Variants | Group;
+export type Chunk = Wildcard | Literal | Variants | Group | Variable;
+export type ChunkType = Chunk['type'];
 
 export type Prompt = readonly Chunk[]; // List of Chunks
 
-export type ParseResult = Prompt[][];
+export type ParseResult = readonly Prompt[][];
 
 export interface Wildcard extends Omit<Variants, 'type'> {
   readonly type: 'wildcard';
@@ -34,6 +34,20 @@ export interface Variants {
    *
    */
   readonly selections: readonly number[];
+}
+
+export type VariableFlavor =
+  | 'assignment'
+  | 'assignmentImmediate'
+  | 'access'
+  | 'accessWithDefault'
+  | 'unknown';
+
+export interface Variable {
+  readonly type: 'variable';
+  readonly name: string;
+  readonly value: Prompt[] | undefined;
+  readonly flavor: VariableFlavor;
 }
 
 export interface Bound {

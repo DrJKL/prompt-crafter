@@ -17,6 +17,7 @@ const boundMatchers = [
 ];
 
 const mainRule: Rules = {
+  varstart: { match: /\$\{\s*?/, push: 'variable' },
   vstart: { match: /\{\s*?/, push: 'variant' },
   gstart: { match: '(', push: 'group' },
   wildcardstart: {
@@ -35,6 +36,15 @@ const variantRule: Rules = {
   ...mainRule,
   vend: { match: /\s*?\}/, pop: 1 },
   bar: /\s*\|\s*/,
+};
+
+const variableRule: Rules = {
+  variableName: { match: /(?<=\{)\s*?\w+(?=[=:]!?|\})/ },
+  immediateAssign: '=!',
+  assignment: { match: /=(?!!)/ },
+  colon: ':',
+  ...variantRule,
+  ...mainRule,
 };
 
 const groupRule: Rules = {
@@ -61,5 +71,6 @@ export const basicPromptLexer = moo.states({
   main: mainRule,
   group: groupRule,
   variant: variantRule,
+  variable: variableRule,
   wildcard: wildcardRule,
 });

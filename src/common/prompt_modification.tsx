@@ -85,17 +85,24 @@ function modifySelection(
     }
     const chunk = chunkCursor[path[i]];
     const nextVariants = chunk[path[i + 1]];
-    if (nextVariants?.type !== 'variants') {
-      console.error(`Found non-variable sub-path when trying to update
+    if (nextVariants?.type === 'variants') {
+      chunkCursor = [...nextVariants.variants];
+      continue;
+    }
+    if (nextVariants?.type === 'variable') {
+      // TODO
+      chunkCursor = nextVariants.value ?? [];
+      continue;
+    }
+    console.error(`
+    Found non-variable sub-path when trying to update
       ${JSON.stringify(chunk, null, 2)} in
       ${JSON.stringify(undraft, null, 2)} with path
       ${path}
       
       Found ${nextVariants?.type} instead`);
 
-      return draft;
-    }
-    chunkCursor = [...nextVariants.variants];
+    return draft;
   }
   try {
     const leafHopefully =
