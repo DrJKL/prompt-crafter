@@ -195,6 +195,11 @@ export function FancyVariantView({
                   borderBottom: '2px inset #FFF6',
                   padding: '0',
                 },
+                {
+                  '& .MuiTypography-root': {
+                    whiteSpace: 'normal',
+                  },
+                },
                 isSelected && {
                   boxShadow: 'inset 0 0 2px 0 white',
                 },

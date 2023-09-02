@@ -93,7 +93,10 @@ function modifySelection(
     }
     const chunk = chunkCursor[path[i]];
     const nextVariants = chunk[path[i + 1]];
-    if (nextVariants?.type === 'variants') {
+    if (
+      nextVariants?.type === 'variants' ||
+      nextVariants?.type === 'wildcard'
+    ) {
       chunkCursor = [...nextVariants.variants];
       continue;
     }
