@@ -5,7 +5,7 @@ import { PRNG } from 'seedrandom';
 import { wildcardFiles$ } from '@wildcard-browser/src/lib/wildcards';
 import { firstValueFrom } from 'rxjs';
 import { filter, endWith, first, map } from 'rxjs/operators';
-import { constructLiteral } from './parsing/parse_utils';
+import { parsePrompt } from './parsing/app_parsing';
 
 export type ModifyPromptAction =
   | { type: 'reset'; results: ParseResult }
@@ -29,7 +29,9 @@ export function variantSelectionReducer(
   return draft;
 }
 
-export async function fillOutWildcards(allResults: ParseResult) {
+export async function fillOutWildcards(
+  allResults: ParseResult,
+): Promise<ParseResult> {
   const draft = createDraft(allResults);
   await Promise.all(
     draft.flat().map(async (prompt) => await fillOutChunkInPlace(prompt)),
@@ -64,7 +66,13 @@ async function fillOutWildcardInPlace(wildcard: Draft<Wildcard>) {
       first(),
     ),
   );
-  wildcard.variants = wildcardEntries.map((e) => [constructLiteral(e)]);
+  const parsedEntries = await Promise.all(
+    wildcardEntries.map((e) => parsePrompt(e)).map(fillOutWildcards),
+  );
+
+  wildcard.variants = [
+    ...parsedEntries.map(([[parseResult]]) => createDraft(parseResult)),
+  ];
 }
 
 function modifySelection(
