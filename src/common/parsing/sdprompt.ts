@@ -73,7 +73,7 @@ const grammar: Grammar = {
     {"name": "variant_prompt$ebnf$2", "symbols": ["variant_prompt$ebnf$2$subexpression$1"]},
     {"name": "variant_prompt$ebnf$2$subexpression$2", "symbols": ["variant_chunk"], "postprocess": id},
     {"name": "variant_prompt$ebnf$2", "symbols": ["variant_prompt$ebnf$2", "variant_prompt$ebnf$2$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
-    {"name": "variant_prompt", "symbols": ["variant_prompt$ebnf$1", "variant_prompt$ebnf$2"], "postprocess": ([option, chunks]) => [chunks]},
+    {"name": "variant_prompt", "symbols": ["variant_prompt$ebnf$1", "variant_prompt$ebnf$2"], "postprocess": ([_option, chunks]) => [chunks]},
     {"name": "variant_chunk$subexpression$1", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["group"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["variable"]},
