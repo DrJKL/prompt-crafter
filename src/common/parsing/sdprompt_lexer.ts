@@ -32,6 +32,9 @@ const mainRule: Rules = {
     match: wildcard_enclosure,
     push: 'wildcard',
   },
+  comment: {
+    match: /^\s*#[^\n]*/,
+  },
 
   literal: {
     match: new RegExp(`(?:[^#|\${}()_]|${NON_WILDCARD_UNDERSCORE})+`),

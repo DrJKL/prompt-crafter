@@ -4,6 +4,7 @@
 // @ts-ignore
 function id(d: any[]): any { return d[0]; }
 declare var optionweight: any;
+declare var comment: any;
 declare var literal: any;
 declare var vstart: any;
 declare var vend: any;
@@ -74,6 +75,7 @@ const grammar: Grammar = {
     {"name": "variant_prompt$ebnf$2$subexpression$2", "symbols": ["variant_chunk"], "postprocess": id},
     {"name": "variant_prompt$ebnf$2", "symbols": ["variant_prompt$ebnf$2", "variant_prompt$ebnf$2$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "variant_prompt", "symbols": ["variant_prompt$ebnf$1", "variant_prompt$ebnf$2"], "postprocess": ([_option, chunks]) => [chunks]},
+    {"name": "variant_prompt", "symbols": [(basicPromptLexer.has("comment") ? {type: "comment"} : comment)], "postprocess": data => [data]},
     {"name": "variant_chunk$subexpression$1", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["group"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["variable"]},

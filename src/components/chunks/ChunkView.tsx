@@ -80,6 +80,8 @@ export function ChunkView({
           variable={chunk}
         />
       );
+    case 'comment':
+      return <pre>{chunk.value}</pre>;
   }
   chunk satisfies never;
   return (

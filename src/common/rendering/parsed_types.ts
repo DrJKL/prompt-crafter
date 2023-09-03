@@ -1,4 +1,10 @@
-export type Chunk = Wildcard | Literal | Variants | Group | Variable;
+export type Chunk =
+  | Wildcard
+  | Literal
+  | Variants
+  | Group
+  | Variable
+  | CommentLine;
 export type ChunkType = Chunk['type'];
 
 export type Prompt = readonly Chunk[]; // List of Chunks
@@ -63,3 +69,8 @@ export const DEFAULT_BOUND: Bound = {
   max: 1,
   separator: ',',
 };
+
+export interface CommentLine {
+  readonly type: 'comment';
+  readonly value: string;
+}
