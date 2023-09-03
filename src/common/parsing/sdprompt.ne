@@ -20,7 +20,7 @@
 
 @lexer basicPromptLexer
 
-variant_prompt   -> %optionweight:? (variant_chunk {% id %}):+                                                                              {% ([option, chunks]) => [chunks] %}
+variant_prompt   -> %optionweight:? (variant_chunk {% id %}):+                                                                              {% ([_option, chunks]) => [chunks] %}
 
 variant_chunk    -> (%literal | group | variable | variants | wildcard |  unknown)                                                          {% unwrap %}
 variants         -> %vstart bound:? variants_list:?  %vend                                                                                  {% constructVariants %}
