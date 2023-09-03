@@ -187,7 +187,7 @@ export function FancyVariantView({
           const isSelected = variants.selections.includes(idx);
           return (
             <MenuItem
-              // disableRipple
+              disableRipple
               disabled={fullSelection && !isSelected}
               value={idx}
               sx={[
