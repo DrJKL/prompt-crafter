@@ -5,6 +5,14 @@ const WEIGHT_PARTIAL = '\\s*\\d+(?:\\.\\d*)?\\s*(?=\\))';
 const WEIGHT_PATTERN = `:${WEIGHT_PARTIAL}`;
 const ANTIWEIGHT_PATTERN = `:(?!${WEIGHT_PARTIAL})`;
 const NON_WILDCARD_UNDERSCORE = `_(?!_)`;
+const NUMBER = [
+  `(?:\\d+)`,
+  `(?:\\.\\d+)`,
+  `(?:\\d+\\.)`,
+  `(?:\\d+\\.\\d+)`,
+].join('|');
+const OPTION_WEIGHT_PATTERN = `(?:${NUMBER})::`;
+const optionWeightMatcher = new RegExp(OPTION_WEIGHT_PATTERN);
 
 const SEPARATOR_PATTERN = `\\$\\$(?:(?:[^$|}]|\\$(?!\\$))*?\\$\\$)?`;
 
@@ -33,6 +41,7 @@ const mainRule: Rules = {
 
 const variantRule: Rules = {
   bound: boundMatchers,
+  optionweight: { match: optionWeightMatcher },
   ...mainRule,
   vend: { match: /\s*?\}/, pop: 1 },
   bar: /\s*\|\s*/,

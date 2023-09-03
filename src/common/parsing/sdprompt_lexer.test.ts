@@ -149,4 +149,17 @@ describe('basicPromptLexer', () => {
       expect(result).toBeTruthy();
     });
   });
+
+  describe('weighting', () => {
+    it('should lex with weights', () => {
+      const prompt = `{0.5::summer|0.1::autumn|0.3::winter|0.1::spring}`;
+      basicPromptLexer.reset(prompt);
+
+      const result = Array.from(basicPromptLexer)
+        .map((t) => t.type)
+        .join(' ');
+      console.log(result);
+      expect(result).toBeTruthy();
+    });
+  });
 });

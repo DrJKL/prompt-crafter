@@ -3,6 +3,7 @@
 // Bypasses TS6133. Allow declared but unused functions.
 // @ts-ignore
 function id(d: any[]): any { return d[0]; }
+declare var optionweight: any;
 declare var literal: any;
 declare var vstart: any;
 declare var vend: any;
@@ -66,11 +67,13 @@ interface Grammar {
 const grammar: Grammar = {
   Lexer: basicPromptLexer,
   ParserRules: [
-    {"name": "variant_prompt$ebnf$1$subexpression$1", "symbols": ["variant_chunk"], "postprocess": id},
-    {"name": "variant_prompt$ebnf$1", "symbols": ["variant_prompt$ebnf$1$subexpression$1"]},
-    {"name": "variant_prompt$ebnf$1$subexpression$2", "symbols": ["variant_chunk"], "postprocess": id},
-    {"name": "variant_prompt$ebnf$1", "symbols": ["variant_prompt$ebnf$1", "variant_prompt$ebnf$1$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
-    {"name": "variant_prompt", "symbols": ["variant_prompt$ebnf$1"]},
+    {"name": "variant_prompt$ebnf$1", "symbols": [(basicPromptLexer.has("optionweight") ? {type: "optionweight"} : optionweight)], "postprocess": id},
+    {"name": "variant_prompt$ebnf$1", "symbols": [], "postprocess": () => null},
+    {"name": "variant_prompt$ebnf$2$subexpression$1", "symbols": ["variant_chunk"], "postprocess": id},
+    {"name": "variant_prompt$ebnf$2", "symbols": ["variant_prompt$ebnf$2$subexpression$1"]},
+    {"name": "variant_prompt$ebnf$2$subexpression$2", "symbols": ["variant_chunk"], "postprocess": id},
+    {"name": "variant_prompt$ebnf$2", "symbols": ["variant_prompt$ebnf$2", "variant_prompt$ebnf$2$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
+    {"name": "variant_prompt", "symbols": ["variant_prompt$ebnf$1", "variant_prompt$ebnf$2"], "postprocess": ([option, chunks]) => [chunks]},
     {"name": "variant_chunk$subexpression$1", "symbols": [(basicPromptLexer.has("literal") ? {type: "literal"} : literal)]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["group"]},
     {"name": "variant_chunk$subexpression$1", "symbols": ["variable"]},

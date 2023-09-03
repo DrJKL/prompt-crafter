@@ -193,6 +193,17 @@ describe('parser', () => {
       },
     );
 
+    describe('weighting', () => {
+      parserIt('should accept weighted options', ({ parser }) => {
+        const prompt = `{0.5::summer|0.1::autumn|0.3::winter|0.1::spring}`;
+        parser.feed(prompt);
+
+        const [[result]] = parser.results;
+        const [variants1] = result;
+        console.log(JSON.stringify(variants1, null, 2));
+      });
+    });
+
     describe('variable', () => {
       parserIt('variable assignment', ({ parser }) => {
         const prompt = '${foo=bar}';
