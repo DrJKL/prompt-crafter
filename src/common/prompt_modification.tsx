@@ -4,7 +4,7 @@ import { randomizeAllResults } from './random/randomize';
 import { PRNG } from 'seedrandom';
 import { wildcardFiles$ } from '@wildcard-browser/src/lib/wildcards';
 import { firstValueFrom } from 'rxjs';
-import { filter, endWith, first, map } from 'rxjs/operators';
+import { filter, map, reduce } from 'rxjs/operators';
 import { parsePrompt } from './parsing/app_parsing';
 
 export type ModifyPromptAction =
@@ -58,12 +58,15 @@ async function fillOutChunkInPlace(prompt: Draft<Prompt>): Promise<void> {
 }
 
 async function fillOutWildcardInPlace(wildcard: Draft<Wildcard>) {
+  const searchRegex = new RegExp(wildcard.path.replace('*', '.+'));
   const wildcardEntries = await firstValueFrom(
     wildcardFiles$.pipe(
-      filter((w) => w.filepath.includes(wildcard.path)),
+      filter((w) => searchRegex.test(w.filepath)),
       map((w) => w.wildcardEntries),
-      endWith(['NO_WILDCARDS_FOUND']),
-      first(),
+      reduce<readonly string[], readonly string[]>(
+        (acc, cur) => [...acc, ...cur],
+        [],
+      ),
     ),
   );
   const parsedEntries = await Promise.all(
