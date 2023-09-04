@@ -1,7 +1,7 @@
 import { Variable, VariableFlavor } from '@rendering/parsed_types';
 import { KeyPath, pathToString } from '@rendering/rendering_utils';
 import { PromptView } from './PromptView';
-import { Badge, Tooltip } from '@mui/material';
+import { Tooltip } from '@mui/material';
 
 interface VariableProps extends KeyPath {
   variable: Variable;
@@ -9,8 +9,8 @@ interface VariableProps extends KeyPath {
 
 const FLAVOR_TO_SYMBOL: Record<VariableFlavor, string> = {
   access: '',
-  assignment: '= ',
-  assignmentImmediate: '=!',
+  assignment: ' = ',
+  assignmentImmediate: ' =! ',
   unknown: '¿¿',
 };
 
@@ -22,10 +22,18 @@ export function VariableView({
 }: VariableProps) {
   return (
     <Tooltip
-      title={`variable: ${variable.name}${FLAVOR_TO_SYMBOL[variable.flavor]}`}
+      title={
+        <div>
+          ${'{'}
+          {variable.name}
+          {FLAVOR_TO_SYMBOL[variable.flavor]}
+          {'}'}
+          <br />
+          {pathToString('variable', path)}
+        </div>
+      }
       color="primary">
       <span
-        title={pathToString('variable', path)}
         className={`${
           fancy
             ? '' //'border-rose-600 border-opacity-50 border-2 rounded-md flex-[0_1_fit-content] inline-flex'
