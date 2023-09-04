@@ -74,16 +74,19 @@ describe('parse_utils', () => {
       const data = ['${', 'foo', undefined, '}'];
       const actual = constructVariable(data);
       expect(actual.flavor).toBe('access');
+      expect(actual.value).toBe(undefined);
     });
     it('construction (access with default)', () => {
       const data = ['${', 'foo', [{ text: ':' }, 'bar'], '}'];
       const actual = constructVariable(data);
-      expect(actual.flavor).toBe('accessWithDefault');
+      expect(actual.flavor).toBe('access');
+      expect(actual.value).toContain('bar');
     });
     it('construction (assignment)', () => {
       const data = ['${', 'foo', [{ text: '=' }, 'bar'], '}'];
       const actual = constructVariable(data);
       expect(actual.flavor).toBe('assignment');
+      expect(actual.value).toBe('bar');
     });
     it('construction (assignment immediate)', () => {
       const data = ['${', 'foo', [{ text: '=!' }, 'bar'], '}'];

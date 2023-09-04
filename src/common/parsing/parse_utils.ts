@@ -51,7 +51,7 @@ any[]): Variants {
 
 const OPERATOR_TO_FLAVOR: Record<string, VariableFlavor> = {
   '': 'access',
-  ':': 'accessWithDefault',
+  ':': 'access',
   '=': 'assignment',
   '=!': 'assignmentImmediate',
 };

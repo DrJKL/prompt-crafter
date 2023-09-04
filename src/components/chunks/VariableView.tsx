@@ -9,7 +9,6 @@ interface VariableProps extends KeyPath {
 const FLAVOR_TO_SYMBOL: Record<VariableFlavor, string> = {
   access: '~ ',
   assignment: '= ',
-  accessWithDefault: ': ',
   assignmentImmediate: '=!',
   unknown: '¿¿',
 };

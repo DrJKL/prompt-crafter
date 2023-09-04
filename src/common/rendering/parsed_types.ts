@@ -46,7 +46,6 @@ export type VariableFlavor =
   | 'assignment'
   | 'assignmentImmediate'
   | 'access'
-  | 'accessWithDefault'
   | 'unknown';
 
 export interface Variable {

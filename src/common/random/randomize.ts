@@ -3,16 +3,26 @@ import {
   Bound,
   ParseResult,
   Prompt,
+  Variable,
   Variants,
   Wildcard,
 } from '../rendering/parsed_types';
 import { PRNG } from 'seedrandom';
+import { cloneDeep } from 'lodash';
+
+type VariableMap = Record<
+  string,
+  { immediate: boolean; value: Draft<Prompt[]> }
+>;
 
 export function randomizeAllResults(
   allResults: Draft<ParseResult>,
   prng: PRNG,
 ): ParseResult {
-  allResults.flat().forEach((prompt) => randomizePromptInPlace(prompt, prng));
+  const variableMap: VariableMap = {};
+  allResults
+    .flat()
+    .forEach((prompt) => randomizePromptInPlace(prompt, variableMap, prng));
   return allResults;
 }
 
@@ -29,17 +39,24 @@ export function fixBound(bound: Bound, optionsCount: number): Bound {
   return { ...bound, min, max };
 }
 
-function randomizePromptInPlace(prompt: Draft<Prompt>, prng: PRNG): void {
+function randomizePromptInPlace(
+  prompt: Draft<Prompt>,
+  variableMap: VariableMap,
+  prng: PRNG,
+): void {
   for (const chunk of prompt) {
     switch (chunk.type) {
       case 'group':
-        randomizePromptInPlace(chunk.chunks, prng);
+        randomizePromptInPlace(chunk.chunks, variableMap, prng);
         break;
       case 'variants':
-        randomizeVariantsInPlace(chunk, prng);
+        randomizeVariantsInPlace(chunk, variableMap, prng);
         break;
       case 'wildcard':
-        randomizeVariantsInPlace(chunk, prng);
+        randomizeVariantsInPlace(chunk, variableMap, prng);
+        break;
+      case 'variable':
+        randomizeOrPopulateVariable(chunk, variableMap, prng);
         break;
     }
   }
@@ -47,6 +64,7 @@ function randomizePromptInPlace(prompt: Draft<Prompt>, prng: PRNG): void {
 
 function randomizeVariantsInPlace(
   variants: Draft<Variants | Wildcard>,
+  variableMap: VariableMap,
   prng: PRNG,
 ) {
   const { bound, variants: options } = variants;
@@ -57,7 +75,43 @@ function randomizeVariantsInPlace(
   variants.selections = selections;
   selections
     .map((i) => options[i])
-    .forEach((o) => randomizePromptInPlace(o, prng));
+    .forEach((o) => randomizePromptInPlace(o, variableMap, prng));
+}
+
+function randomizeOrPopulateVariable(
+  variable: Draft<Variable>,
+  variableMap: VariableMap,
+  prng: PRNG,
+) {
+  console.log('v=', JSON.parse(JSON.stringify(variable)));
+  const { name, flavor, value } = variable;
+  const currentValue = variableMap[name];
+  switch (flavor) {
+    case 'assignment':
+    case 'assignmentImmediate':
+      if (currentValue !== undefined) {
+        console.warn(`Overriding variable ${name}, was ${currentValue}`);
+      }
+      if (value) {
+        variableMap[name] = {
+          immediate: flavor === 'assignmentImmediate',
+          value,
+        };
+      }
+      break;
+    case 'access':
+      if (currentValue) {
+        variable.value = currentValue.immediate
+          ? currentValue.value
+          : cloneDeep(currentValue.value);
+      }
+      break;
+    default:
+      flavor satisfies 'unknown';
+  }
+  if (variable.value) {
+    variable.value.forEach((v) => randomizePromptInPlace(v, variableMap, prng));
+  }
 }
 
 function getRandomInBounds(bound: Bound, optionsCount: number, prng: PRNG) {

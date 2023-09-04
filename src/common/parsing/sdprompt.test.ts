@@ -241,7 +241,7 @@ describe('parser', () => {
           return;
         }
         assertType<Variable>(variable);
-        expect(variable.flavor).toBe('accessWithDefault');
+        expect(variable.flavor).toBe('access');
       });
     });
   });
