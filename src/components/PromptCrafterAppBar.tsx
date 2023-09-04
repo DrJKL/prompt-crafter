@@ -51,9 +51,13 @@ export function PromptCrafterAppBar({
   }
   return (
     <>
-      <IconButton aria-label="" onClick={toggleWildcardTree}>
-        <Forest />
-      </IconButton>
+      <Tooltip title="Browse available wildcards">
+        <IconButton
+          aria-label="Wildcard Drawer Toggle"
+          onClick={toggleWildcardTree}>
+          <Forest />
+        </IconButton>
+      </Tooltip>
       <Typography className="flex-auto select-none" variant="h5" component="h1">
         Prompt Crafter
       </Typography>
