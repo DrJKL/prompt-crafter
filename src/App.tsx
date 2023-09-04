@@ -25,7 +25,7 @@ import { useImmer, useImmerReducer } from 'use-immer';
 import { getPromptTokens, parsePrompt } from './common/parsing/app_parsing';
 import {
   ModifyPromptAction,
-  fillOutWildcards,
+  fillOutWildcardsAndVariables,
   variantSelectionReducer,
 } from './common/prompt_modification';
 import { nextType } from './common/rendering/RenderType';
@@ -90,7 +90,7 @@ function App() {
           const results = parsePrompt(promptText);
           dispatch({ type: 'reset', results });
 
-          fillOutWildcards(results).then((filledOut) => {
+          fillOutWildcardsAndVariables(results).then((filledOut) => {
             dispatch({ type: 'reset', results: filledOut });
           });
         } catch (err: unknown) {

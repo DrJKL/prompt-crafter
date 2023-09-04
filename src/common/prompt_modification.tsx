@@ -1,11 +1,17 @@
 import { Draft, createDraft, current, finishDraft } from 'immer';
-import { ParseResult, Prompt, Wildcard } from './rendering/parsed_types';
-import { randomizeAllResults } from './random/randomize';
+import {
+  ParseResult,
+  Prompt,
+  Variable,
+  Wildcard,
+} from './rendering/parsed_types';
+import { VariableMap, randomizeAllResults } from './random/randomize';
 import { PRNG } from 'seedrandom';
 import { wildcardFiles$ } from '@wildcard-browser/src/lib/wildcards';
 import { firstValueFrom } from 'rxjs';
 import { filter, map, reduce } from 'rxjs/operators';
 import { parsePrompt } from './parsing/app_parsing';
+import { cloneDeep } from 'lodash';
 
 export type ModifyPromptAction =
   | { type: 'reset'; results: ParseResult }
@@ -29,30 +35,40 @@ export function variantSelectionReducer(
   return draft;
 }
 
-export async function fillOutWildcards(
+export async function fillOutWildcardsAndVariables(
   allResults: ParseResult,
 ): Promise<ParseResult> {
   const draft = createDraft(allResults);
+  const variableMap: VariableMap = {};
   await Promise.all(
-    draft.flat().map(async (prompt) => await fillOutChunkInPlace(prompt)),
+    draft
+      .flat()
+      .map(async (prompt) => await fillOutChunkInPlace(prompt, variableMap)),
   );
   return finishDraft(draft);
 }
 
-async function fillOutChunkInPlace(prompt: Draft<Prompt>): Promise<void> {
+async function fillOutChunkInPlace(
+  prompt: Draft<Prompt>,
+  variableMap: VariableMap,
+): Promise<void> {
   for (const chunk of prompt) {
     switch (chunk.type) {
       case 'group':
-        await fillOutChunkInPlace(chunk.chunks);
+        await fillOutChunkInPlace(chunk.chunks, variableMap);
         break;
       case 'variants':
         await Promise.all(
-          chunk.variants.map(async (c) => await fillOutChunkInPlace(c)),
+          chunk.variants.map(
+            async (c) => await fillOutChunkInPlace(c, variableMap),
+          ),
         );
         break;
       case 'wildcard':
         await fillOutWildcardInPlace(chunk);
         break;
+      case 'variable':
+        await populateVariable(chunk, variableMap);
     }
   }
 }
@@ -70,12 +86,45 @@ async function fillOutWildcardInPlace(wildcard: Draft<Wildcard>) {
     ),
   );
   const parsedEntries = await Promise.all(
-    wildcardEntries.map((e) => parsePrompt(e)).map(fillOutWildcards),
+    wildcardEntries
+      .map((e) => parsePrompt(e))
+      .map(fillOutWildcardsAndVariables),
   );
 
   wildcard.variants = [
     ...parsedEntries.map(([[parseResult]]) => createDraft(parseResult)),
   ];
+}
+
+export function populateVariable(
+  variable: Draft<Variable>,
+  variableMap: VariableMap,
+) {
+  const { name, flavor, value } = variable;
+  const currentValue = variableMap[name];
+  switch (flavor) {
+    case 'assignment':
+    case 'assignmentImmediate':
+      if (currentValue !== undefined) {
+        console.warn(`Overriding variable ${name}, was ${currentValue}`);
+      }
+      if (value) {
+        variableMap[name] = {
+          immediate: flavor === 'assignmentImmediate',
+          value,
+        };
+      }
+      break;
+    case 'access':
+      if (currentValue) {
+        variable.value = currentValue.immediate
+          ? currentValue.value
+          : cloneDeep(currentValue.value);
+      }
+      break;
+    default:
+      flavor satisfies 'unknown';
+  }
 }
 
 function modifySelection(

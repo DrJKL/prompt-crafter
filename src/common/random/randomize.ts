@@ -8,9 +8,9 @@ import {
   Wildcard,
 } from '../rendering/parsed_types';
 import { PRNG } from 'seedrandom';
-import { cloneDeep } from 'lodash';
+import { populateVariable } from '@common/prompt_modification';
 
-type VariableMap = Record<
+export type VariableMap = Record<
   string,
   { immediate: boolean; value: Draft<Prompt[]> }
 >;
@@ -83,32 +83,7 @@ function randomizeOrPopulateVariable(
   variableMap: VariableMap,
   prng: PRNG,
 ) {
-  console.log('v=', JSON.parse(JSON.stringify(variable)));
-  const { name, flavor, value } = variable;
-  const currentValue = variableMap[name];
-  switch (flavor) {
-    case 'assignment':
-    case 'assignmentImmediate':
-      if (currentValue !== undefined) {
-        console.warn(`Overriding variable ${name}, was ${currentValue}`);
-      }
-      if (value) {
-        variableMap[name] = {
-          immediate: flavor === 'assignmentImmediate',
-          value,
-        };
-      }
-      break;
-    case 'access':
-      if (currentValue) {
-        variable.value = currentValue.immediate
-          ? currentValue.value
-          : cloneDeep(currentValue.value);
-      }
-      break;
-    default:
-      flavor satisfies 'unknown';
-  }
+  populateVariable(variable, variableMap);
   if (variable.value) {
     variable.value.forEach((v) => randomizePromptInPlace(v, variableMap, prng));
   }
