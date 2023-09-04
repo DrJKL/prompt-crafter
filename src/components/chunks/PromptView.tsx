@@ -15,19 +15,21 @@ export function PromptView({
 }: PromptProps) {
   return (
     <>
-      {prompt?.map((c, idx) => {
-        const newPath = [...path, idx];
-        return (
-          <ChunkView
-            key={idx}
-            chunk={c}
-            path={newPath}
-            updateSelection={updateSelection}
-            fancy={fancy}
-            dense={dense}
-          />
-        );
-      })}{' '}
+      {prompt
+        ?.filter((c) => c.type !== 'comment')
+        .map((c, idx) => {
+          const newPath = [...path, idx];
+          return (
+            <ChunkView
+              key={idx}
+              chunk={c}
+              path={newPath}
+              updateSelection={updateSelection}
+              fancy={fancy}
+              dense={dense}
+            />
+          );
+        })}{' '}
     </>
   );
 }

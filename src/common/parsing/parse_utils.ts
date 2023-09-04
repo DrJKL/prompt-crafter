@@ -39,7 +39,9 @@ export function constructVariants([
 ]: // eslint-disable-next-line
 any[]): Variants {
   const bound = boundMaybe ?? DEFAULT_BOUND;
-  const variants = variantsMaybe ?? [];
+  const variants = (variantsMaybe ?? []).filter(
+    (c: Chunk) => c.type !== 'comment',
+  );
   const selections = generateDefaultSelection(bound, variants);
   return {
     type: 'variants',
